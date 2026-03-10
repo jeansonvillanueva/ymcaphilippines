@@ -1,4 +1,5 @@
 import React from 'react';
+import LatestNews from './Card-Media/Latest_News';
 
 function Media() {
     return (
@@ -9,6 +10,8 @@ function Media() {
                     <p>This is the media page of the website</p>
                 </div>
             </div>
+
+            <LatestNews />
         </div>
     );
 }
