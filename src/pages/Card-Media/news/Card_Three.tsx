@@ -1,19 +1,24 @@
-import React from "react";
+import NewsArticle from "../../../components/NewsArticle";
+import { getNewsArticleMeta } from "../../../data/news";
 
-function Card_Three() {
+export default function Card_Three() {
+  const meta = getNewsArticleMeta('/news/Card_Three');
   return (
-    <>
-      <h1>45th Rizal Youth Leadership Training Institute (RYLTI)</h1>
-      <h2>
-      Leadership beyond Limits: Powering Vision 2030 through Youth Actions
-      </h2>
-      <p>November 6-7, 2026</p>
-
+    <NewsArticle
+      title={meta?.title ?? 'YMCA of the Philippines Federation Office Staff Planning & Team Building'}
+      date={meta?.date ?? 'February 14-17, 2026'}
+      subtitle={meta?.subtitle}
+      imageUrl={meta?.imageUrl}
+      articlePath="/news/Card_Three"
+      layoutVariant="news"
+    >
       <p>
-      A significant milestone in YMCA history was reached with the successful execution of the 2025 Rizal Youth Leadership Training Institute (RYLTI), which took place from June 30 to July 14, 2025, and was organized by the YMCA of Manila. In its 45th year now, RYLTI has consistently developed young leaders who are making significant contributions in diverse areas.
-      </p>
-    </>
+      From February 14–17, the YMCA Philippines Staff gathered as one in Puerto Galera, Oriental Mindoro for a purposeful series of sessions centered on growth, collaboration, and strategic planning for the year ahead.
+      ✅ Staff addressed key issues and mapped out programs to strengthen the YMCA movement nationwide.
+      ✅ An evaluation was conducted to assess the needs and capabilities of the staff, ensuring alignment with organizational goals.
+      ✅ Sessions highlighted personal and professional development, equipping staff to serve with excellence.
+      ✅ Sharing circles and team-building activities fostered deeper relationships, unity, and teamwork among colleagues.
+      Through planning, evaluation, and team building, we reaffirm our mission to inspire growth and uphold the values of spirit, mind, and body.      </p>
+    </NewsArticle>
   );
 }
-
-export default Card_Three

@@ -1,70 +1,67 @@
-import './Footer.css'
-import { FaFacebookF, FaInstagram, FaTwitter, FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
-import logo from '../assets/images/logo.webp'; // Replace with your YMCA logo
+import './Footer.css';
+import { FaFacebookF, FaInstagram, FaTwitter, FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
+import logo from '../assets/images/logo.webp';
+import { Link } from 'react-router-dom';
+
+const MAP_URL =
+  'https://www.google.com/maps/search/?api=1&query=YMCA+of+the+Philippines+Federation+Office+Manila';
 
 export default function Footer() {
   return (
     <footer className="footer">
-
       <div className="footer-container">
-
-        {/* LEFT SIDE */}
         <div className="footer-left">
-            <img src={logo} alt="YMCA Logo" className="footer-logo" />
-            <div>
-                <h3>Find us</h3>
+          <Link to="/">
+            <img src={logo} alt="YMCA Logo" className="navbar-logo" />
+          </Link>
 
-                <div className="footer-item">
-                <FaMapMarkerAlt className="footer-icon" />
-                <p>
-                    350 Antonio Villegas St,<br/>
-                    Ermita, Manila, 1000<br/>
-                    Metro Manila.
-                </p>
-                </div>
+          <div>
+            <h3>Find us</h3>
 
-            </div>
+            <a className="footer-item footer-item--link" href={MAP_URL} target="_blank" rel="noopener noreferrer">
+              <FaMapMarkerAlt className="footer-icon" aria-hidden />
+              <span>
+                350 Antonio Villegas St,
+                <br />
+                Ermita, Manila, 1000
+                <br />
+                Metro Manila.
+              </span>
+            </a>
+          </div>
         </div>
 
-
-        {/* CENTER */}
         <div className="footer-center">
-
           <h3>Get in touch</h3>
 
-          <div className="footer-item">
-            <FaPhoneAlt className="footer-icon" />
-            <p>02)8528-0557 / (02)8711-9012</p>
-          </div>
+          <a className="footer-item footer-item--link" href="tel:+63285280557">
+            <FaPhoneAlt className="footer-icon" aria-hidden />
+            <span>02)8528-0557 / (02)8711-9012</span>
+          </a>
 
-          <div className="footer-item">
-            <FaEnvelope className="footer-icon" />
-            <p>
-              ymcaphilippines@yahoo.com<br/>
-              admin@ymca.ph
-            </p>
+          <div className="footer-item footer-item--stack">
+            <FaEnvelope className="footer-icon" aria-hidden />
+            <div className="footer-email-stack">
+              <a href="mailto:ymcaphilippines@yahoo.com">ymcaphilippines@yahoo.com</a>
+              <a href="mailto:admin@ymca.ph">admin@ymca.ph</a>
+            </div>
           </div>
-
         </div>
 
-
-        {/* RIGHT */}
-        <div className="footer-right">
-
-          <a href="https://www.facebook.com/ymcaphilippines1911" target="_blank"><FaFacebookF /></a>
-          <a href="https://www.instagram.com/ymcaphilippines/" target="_blank"><FaInstagram /></a>
-          <a href="https://x.com/YMCAPhilippines" target="_blank"><FaTwitter /></a>
-
+        <div className="footer-right" aria-label="Social media">
+          <a href="https://www.facebook.com/ymcaphilippines1911" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+            <FaFacebookF />
+          </a>
+          <a href="https://www.instagram.com/ymcaphilippines/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <FaInstagram />
+          </a>
+          <a href="https://x.com/YMCAPhilippines" target="_blank" rel="noopener noreferrer" aria-label="X">
+            <FaTwitter />
+          </a>
         </div>
-
       </div>
 
-
-      {/* COPYRIGHT */}
-      <div className="footer-bottom">
-        Copyright © 2026 YMCA of the Philippines | Powered by YMCA of the Philippines
-      </div>
-
+      <div className="footer-bottom">Copyright © 2026 YMCA of the Philippines | Powered by YMCA of the Philippines</div>
     </footer>
-  )
+  );
 }
