@@ -1,35 +1,114 @@
 /* Card.css */
 .card-container {
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 16px;
-    margin: 16px;
-    max-width: 300px;
-    overflow: hidden;
-  }
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  margin: 16px;
+  max-width: 340px;
+  overflow: hidden;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-container--article {
+  border: 2px solid rgba(30, 42, 122, 0.22);
+  box-shadow: 0 14px 36px rgba(30, 42, 122, 0.12);
+  background: linear-gradient(180deg, #fff 0%, #f8f9fd 100%);
+}
+
+.card-container--article .card-title {
+  font-size: 1.35rem;
+  letter-spacing: 0.01em;
+}
+
+.card-container--article .card-image {
+  height: 200px;
+}
+
+.card-media {
+  position: relative;
+}
+
+.card-tag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: var(--ymca-navy, #1e2a7a);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.78rem;
+}
   
-  .card-image {
-    width: 100%;
-    height: auto;
-    border-radius: 8px 8px 0 0;
-  }
-  
-  .card-content {
-    padding: 16px 0;
-  }
-  
-  .card-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-  }
-  
-  .card-subtitle {
+.card-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+  .card-image--placeholder {
+    aspect-ratio: 16 / 9;
+    min-height: 150px;
+    background: var(--ymca-gray-bg, #f0f0f0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ymca-text-muted, #666);
     font-size: 1rem;
-    color: #666;
-    margin-bottom: 8px;
+    text-align: center;
+    padding: 1rem;
   }
   
-  .card-body {
-    font-size: 0.9rem;
-  }
+.card-content {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  text-align: justify;
+}
+  
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--ymca-navy, #1e2a7a);
+  line-height: 1.2;
+  text-align: left;
+}
+  
+.card-subtitle {
+  font-size: 1rem;
+  color: var(--ymca-text-muted, #666);
+  font-weight: 600;
+  text-align: left;
+}
+
+.card-description {
+  font-size: 0.98rem;
+  color: var(--ymca-text, #333);
+  line-height: 1.55;
+  text-align: left;
+}
+  
+.card-body {
+  font-size: 0.95rem;
+}
+
+.card-content a {
+  margin-top: auto;
+  align-self: flex-start;
+  text-decoration: none;
+  font-weight: 800;
+  color: var(--ymca-red, #c41e3a);
+}
+
+.card-content a:hover {
+  text-decoration: underline;
+}

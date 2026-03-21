@@ -1,15 +1,14 @@
 import Navbar from './components/Navbar';
 import './App.css';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 
-import Home from './pages/Home';
-import About_Y from './pages/Who_is_Y';
-import Calendar from './pages/Calendar';
-import Media from './pages/Media';
-import Find_Your_YMCA from './pages/Find_Your_YMCA';
-import Contact_Us from './pages/Contact_Us';
+import About_Y from './pages/Home';
+import Calendar from './pages/What_We_Do';
+import Find_Your_YMCA from './pages/Where_We_Are';
 import Donate from './pages/Donate';
 import Get_Involved from './pages/Get_Involved';
+import LocalDetails from './pages/LocalDetails';
 
 import Card_One from './pages/Card-Media/news/Card_One';
 import Card_Two from './pages/Card-Media/news/Card_Two';
@@ -21,24 +20,49 @@ import Card_Seven from './pages/Card-Media/news/Card_Seven';
 import Card_Eight from './pages/Card-Media/news/Card_Eight';
 
 import Footer from './components/Footer';
-import Partner from './components/Partners';
+import Article from './pages/Article_Form';
 
+function ScrollToHash() {
+  const { hash, pathname } = useLocation();
+
+  useEffect(() => {
+    // Always start at top when navigating to a new page without a hash.
+    if (!hash) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+      return;
+    }
+
+    const id = hash.replace('#', '');
+    // Defer until after paint so the section exists.
+    window.requestAnimationFrame(() => {
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      // Offset for fixed navbar.
+      const y = el.getBoundingClientRect().top + window.scrollY - 120;
+      window.scrollTo({ top: Math.max(0, y), left: 0, behavior: 'smooth' });
+    });
+  }, [hash, pathname]);
+
+  return null;
+}
 
 function App() {
   return (
     <Router>
       <Navbar />
+      <ScrollToHash />
 
       <main>
       <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About_Y />} />
+          <Route path="/" element={<About_Y />} />
           <Route path="/calendar" element={<Calendar />} />
-          <Route path="/media" element={<Media />} />
           <Route path="/find-ymca" element={<Find_Your_YMCA />} />
-          <Route path="/contact" element={<Contact_Us />} />
+          <Route path="/find-ymca/:localId" element={<LocalDetails />} />
           <Route path="/donate" element={<Donate />} />
           <Route path="/get-involved" element={<Get_Involved />} />
+
+          <Route path="Article" element={<Article />} />
 
           <Route path="/news/Card_One" element={<Card_One />} />
           <Route path="/news/Card_Two" element={<Card_Two />} />

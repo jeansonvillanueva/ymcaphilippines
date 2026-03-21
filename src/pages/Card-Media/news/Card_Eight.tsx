@@ -1,15 +1,30 @@
-import React from "react";
+import NewsArticle from '../../../components/NewsArticle';
+import { getNewsArticleMeta } from '../../../data/news';
+import { MANILA_YMCA } from '../articles/Manila_YMCA/local';
 
-function Card_Eight() {
+export default function Card_Eight() {
+  const meta = getNewsArticleMeta('/news/Card_Eight');
   return (
-    <>
-       <h1>YMCA CAREER DEVELOPMENT PROGRAM</h1>
-       <h2>Preparing Young Professionals through the YMCA Career Development Program 2024</h2>
-       <p>By: Michelle R. Maala, YMCA of Leyte, Inc.</p>
-       <p>
-       Over the last 19 days, the YMCA of the Philippines has played a key role in embarking on a transformative journey to empower the YMCA staff through a comprehensive Career Development Program. The program was designed to enhance skills and foster professional growth and personal development among participants. It is a training curriculum designed to equip young professionals who want to pursue a career in the YMCA.</p>
-    </>
+    <NewsArticle
+      title={meta?.title ?? 'YMCA Career Development Program'}
+      subtitle={meta?.subtitle}
+      imageUrl={meta?.imageUrl}
+      date={meta?.date}
+      articlePath="/news/Card_Eight"
+      layoutVariant="article"
+      localYMCA={MANILA_YMCA}
+      websiteUrl="https://www.facebook.com/YmcaOfManilaOfficial"
+    >
+      <p>By: Michelle R. Maala, YMCA of Leyte, Inc.</p>
+      <p>
+        <b>MANILA</b> - The YMCA of Manila, headed by President Antonio C. Keh, paid a courtesy visit to Dr. Nerissa
+        Roxas-Lomeda, OIC Schools Division Superintendent of the Division Office of Manila, to discuss collaborative
+        programs that will help empower and support students in Manila schools. This collaboration aims to develop and
+        support meaningful programs that will benefit the youth of Manila, particularly in promoting holistic
+        development, leadership, and well-being in schools. Together, we look forward to creating opportunities that
+        nurture character and growth among our young learners. #YMCAofManila #servingtheyouth #StrongerTogether
+        #EducationForAll #ManilaYouth
+      </p>
+    </NewsArticle>
   );
 }
-
-export default Card_Eight;

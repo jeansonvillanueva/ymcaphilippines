@@ -1,15 +1,21 @@
-import React from "react";
+import NewsArticle from "../../../components/NewsArticle";
+import { getNewsArticleMeta } from "../../../data/news";
 
-function Card_Four() {
+export default function Card_Four() {
+  const meta = getNewsArticleMeta('/news/Card_Four');
   return (
-    <>
-      <h1>YMCA National Eco-Heroes Training</h1>
-
+    <NewsArticle
+      title={meta?.title ?? 'The Installation and Induction Ceremonies of the YMCA of Baguio for the term 2026–2027.'}
+      date={meta?.date ?? 'February 4, 2026'}
+      subtitle={meta?.subtitle}
+      imageUrl={meta?.imageUrl}
+      articlePath="/news/Card_Four"
+      layoutVariant="news"
+    >
       <p>
-      After three enriching days of learning, collaboration, and action, the National Eco-Heroes Training has successfully concluded at the YMCA of Albay, a gathering that ignited passion and purpose in the hearts of young environmental advocates.
-      </p>
-    </>
+      National President, Engr. Antonio C. Keh, is serving as the Chief Induction Officer. In his speech, he highlighted the achievements of Baguio through the years, remaining true to the mission of serving the YMCA community.  
+      OIC-NGS Mr. Orlando F. Carreon also delivered his message and greetings, emphasizing the strength of the YMCA movement and its mission of faith, integrity, and sustained dedication.  
+      Congratulations to YMCA Baguio on this meaningful occasion, as it continues to uphold its legacy of service, leadership, and community impact.      </p>
+    </NewsArticle>
   );
 }
-
-export default Card_Four

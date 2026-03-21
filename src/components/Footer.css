@@ -49,6 +49,43 @@ body {
     gap:15px;
     margin-top:15px;
   }
+
+  .footer-item--link {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .footer-item--link:hover,
+  .footer-item--link:focus-visible {
+    opacity: 0.88;
+    outline: none;
+  }
+
+  .footer-item--stack {
+    align-items: flex-start;
+  }
+
+  .footer-email-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .footer-email-stack a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255,255,255,0.35);
+    width: fit-content;
+    transition: border-color 0.2s ease, opacity 0.2s ease;
+  }
+
+  .footer-email-stack a:hover,
+  .footer-email-stack a:focus-visible {
+    border-bottom-color: rgba(255,255,255,0.85);
+    outline: none;
+  }
   
   .footer-icon{
     font-size:26px;
@@ -58,17 +95,25 @@ body {
   /* RIGHT SOCIALS */
   .footer-right{
     display:flex;
+    align-items: center;
+    justify-content: flex-end;
     gap:25px;
     font-size:40px;
   }
   
   .footer-right a{
     color:white;
-    transition:0.3s;
+    transition: opacity 0.3s, transform 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
   
-  .footer-right a:hover{
-    opacity:0.7;
+  .footer-right a:hover,
+  .footer-right a:focus-visible{
+    opacity:0.85;
+    transform: translateY(-2px);
+    outline: none;
   }
   
   /* COPYRIGHT */
@@ -77,4 +122,31 @@ body {
     text-align:center;
     font-size:18px;
     opacity:0.9;
+  }
+
+  @media (max-width: 900px) {
+    .footer{
+      padding:28px 20px;
+    }
+
+    .footer-container{
+      flex-direction:column;
+      align-items:flex-start;
+      gap:24px;
+    }
+
+    .footer-left{
+      flex-direction:column;
+      align-items:flex-start;
+      gap:16px;
+    }
+
+    .footer-right{
+      font-size:34px;
+    }
+
+    .footer-bottom{
+      font-size:14px;
+      margin-top:28px;
+    }
   }
