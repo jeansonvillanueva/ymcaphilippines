@@ -24,12 +24,20 @@ import OrgChartCard from '../components/OrgChartCard';
 import Partners from '../components/Partners';
 import aboutLeadImage from '../assets/images/About_Us/YMCA-Fun-Run.webp';
 import ymcaLogo from '../assets/images/logo.webp';
+import OrgDepartment from '../components/OrgDepartment';
 
 type OrgProfile = {
   name: string;
   position: string;
   imageUrl?: string | null;
 };
+
+type OrgDepartment = {
+  key: string;
+  label: string;
+  members: OrgProfile[];
+};
+
 
 const ORG_STRUCTURE = {
   head: {
