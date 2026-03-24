@@ -5,7 +5,6 @@ import '../styles/design-system.css';
 import './Home.css';
 import Partners from '../components/Partners';
 import vision from '../assets/images/partners/vision_2030.png';
-import Card from './Card-Media/Card';
 import VideoShowcase, { type VideoItem } from '../components/VideoShowcase';
 import ImpactStats from '../components/ImpactStats';
 import { LATEST_NEWS } from '../data/news';
