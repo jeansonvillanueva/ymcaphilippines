@@ -14,12 +14,11 @@ import marlonImage from '../assets/images/staff/marlon_mendoza.png';
 import christopherImage from '../assets/images/staff/christopher_annang.png';
 import armandoImage from '../assets/images/staff/armando_tan.png';
 
-import presidentKeh from '../assets/images/president/Keh.png';
-import presidentYang from '../assets/images/president/Yang.png';
 import pillarCommunityWellbeing from '../assets/images/pillars/community_wellbeing.png';
 import pillarMeaningWork from '../assets/images/pillars/meaning_work.png';
 import pillarSustainablePlanet from '../assets/images/pillars/sustainable_planet.png';
 import pillarJustWorld from '../assets/images/pillars/just_world.png';
+
 import SubjectHeader from '../components/SubjectHeader';
 import OrgChartCard from '../components/OrgChartCard';
 import Partners from '../components/Partners';
@@ -31,8 +30,6 @@ type OrgProfile = {
   position: string;
   imageUrl?: string | null;
 };
-
-type OrgDepartment = { key: string; label: string; members: OrgProfile[] };
 
 const ORG_STRUCTURE = {
   head: {
@@ -61,7 +58,7 @@ const ORG_STRUCTURE = {
       title: 'Secretary for Member Association',
       imageUrl: null,
       children: [
-        { name: '', position: 'Member Association Assistant', imageUrl: null },
+        { name: 'Vacant', position: 'Member Association Assistant', imageUrl: null },
       ],
     },
     {
@@ -80,9 +77,9 @@ const ORG_STRUCTURE = {
           group: 'Line 2',
           members: [
             { name: 'Armando G. Tan', position: 'Janitor / Utility', imageUrl: armandoImage },
-            { name: '', position: 'Administrative Assistant', imageUrl: null },
-            { name: '', position: 'IT Support Staff', imageUrl: null },
-            { name: '', position: 'Watchman', imageUrl: null },
+            { name: 'Vacant', position: 'Administrative Assistant', imageUrl: null },
+            { name: 'Vacant', position: 'IT Support Staff', imageUrl: null },
+            { name: 'Vacant', position: 'Watchman', imageUrl: null },
           ],
         },
       ],
@@ -90,18 +87,13 @@ const ORG_STRUCTURE = {
   ],
 };
 
-function About_Us() {
+function AboutUs() {
   const sectionRef = useScrollReveal<HTMLDivElement>();
   const [pillarsHover, setPillarsHover] = useState(false);
   const [activePillarIndex, setActivePillarIndex] = useState(0);
-  const [pillarsActiveSlide, setPillarsActiveSlide] = useState(0);
+  const [activeSlide, setPillarsActiveSlide] = useState(0);
 
-  const PILLARS: {
-    key: string;
-    label: string;
-    icon: string;
-    detailSlides: { title: string; body: React.ReactNode }[];
-  }[] = [
+  const PILLARS = [
     {
       key: 'community-wellbeing',
       label: 'Community Wellbeing',
@@ -216,7 +208,6 @@ function About_Us() {
 
   return (
     <div ref={sectionRef} className="who-is-y-page">
-
       {/* ABOUT US */}
       <section id="about-us" className="page-section page-section--white">
         <div className="page-section__inner">
@@ -256,7 +247,7 @@ function About_Us() {
                 <div key={i} className="org-tree__branch">
                   <OrgChartCard
                     name={branch.name || branch.title || 'Vacant'}
-                    position={branch.position || ''}
+                    position={branch.position || 'Vacant'}
                     imageUrl={branch.imageUrl || ymcaLogo}
                   />
 
@@ -269,7 +260,7 @@ function About_Us() {
                               <OrgChartCard
                                 key={j}
                                 name={m.name || 'Vacant'}
-                                position={m.position}
+                                position={m.position || 'Vacant'}
                                 imageUrl={m.imageUrl || ymcaLogo}
                               />
                             ))}
@@ -281,7 +272,7 @@ function About_Us() {
                         <OrgChartCard
                           key={idx}
                           name={child.name || 'Vacant'}
-                          position={child.position}
+                          position={child.position || 'Vacant'}
                           imageUrl={child.imageUrl || ymcaLogo}
                         />
                       );
@@ -304,4 +295,4 @@ function About_Us() {
   );
 }
 
-export default About_Us;
+export default AboutUs;
