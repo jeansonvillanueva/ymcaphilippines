@@ -1,29 +1,30 @@
 import NewsArticle from '../../../../components/NewsArticle';
+import { getNewsArticleMeta } from '../../../../data/news';
 import { MANILA_YMCA } from './local';
 
-export default function Manila_Article_One() {
+export default function Article_One() {
+  const meta = getNewsArticleMeta('/news/Article_One');
   return (
     <NewsArticle
-      title="College Y Club General Assembly & Induction of Officers"
-      date="March 12, 2026 at 10:59 AM"
-      subtitle="Manila – Unity in action, service in spirit."
+      title={meta?.title ?? 'YMCA Career Development Program'}
+      subtitle={meta?.subtitle}
+      imageUrl={meta?.imageUrl}
+      date={meta?.date}
+      articlePath="/Manila_YMCA/Article_One"
+      layoutVariant="article"
       localYMCA={MANILA_YMCA}
+      websiteUrl="https://www.facebook.com/YmcaOfManilaOfficial"
     >
+      <p>By: Michelle R. Maala, YMCA of Leyte, Inc.</p>
       <p>
-        The College Y Club General Assembly &amp; Induction of Officers was successfully held on February 21,
-        2026 at the YMCA of Manila and Rizal Park, gathering College Y’ers from different universities for a
-        meaningful day of leadership, fellowship, and shared purpose.
-      </p>
-      <p>
-        With the theme “BALA/Y/ANIHAN: Tahanan ng mga Layunin, Nagkakaisang Tutuparin,” the event highlighted
-        the spirit of unity and collaboration among youth leaders.
-      </p>
-      <p>
-        The induction ceremony marked a new chapter for the officers who have committed themselves to lead with
-        integrity and passion in advancing the mission of the YMCA. Congratulations to all newly inducted
-        officers and participating College Y’ers.
+        <b>MANILA</b> - The YMCA of Manila, headed by President Antonio C. Keh, paid a courtesy visit to Dr. Nerissa
+        Roxas-Lomeda, OIC Schools Division Superintendent of the Division Office of Manila, to discuss collaborative
+        programs that will help empower and support students in Manila schools. This collaboration aims to develop and
+        support meaningful programs that will benefit the youth of Manila, particularly in promoting holistic
+        development, leadership, and well-being in schools. Together, we look forward to creating opportunities that
+        nurture character and growth among our young learners. #YMCAofManila #servingtheyouth #StrongerTogether
+        #EducationForAll #ManilaYouth
       </p>
     </NewsArticle>
   );
 }
-

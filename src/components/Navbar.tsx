@@ -95,19 +95,10 @@ function Navbar() {
               </NavLink>
               <ul className="nav-dropdown-menu" aria-label="Home submenu">
                 <li>
-                  <Link to="/#about" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>About Us</Link>
+                  <Link to="/#vision_2030" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>Vision 2030</Link>
                 </li>
                 <li>
-                  <Link to="/#mission" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>Mission</Link>
-                </li>
-                <li>
-                  <Link to="/#vision" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>Vision</Link>
-                </li>
-                <li>
-                  <Link to="/#history" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>History</Link>
-                </li>
-                <li>
-                  <Link to="/#meet-family" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>Meet Our Family</Link>
+                  <Link to="/#made-our-impact" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>Made Our Impact</Link>
                 </li>
               </ul>
             </li>
@@ -161,6 +152,48 @@ function Navbar() {
                 <li>
                   <Link to="/find-ymca#contact-us" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
                     Contact Us
+                  </Link>
+                </li>
+              </ul>
+            </li>
+
+            <li className="nav-dropdown">
+              <NavLink
+                to="/about-us"
+                onClick={() => {
+                  setIsSearchOpen(false);
+                  setIsMenuOpen(false);
+                }}
+                className={({ isActive }) => (isActive ? 'nav-link nav-link--active' : 'nav-link')}
+              >
+               About Us
+              </NavLink>
+
+              <ul className="nav-dropdown-menu" aria-label="About Us submenu">
+                <li>
+                  <Link to="/about-us#vmv-section" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
+                    Vision, Mission and Pillars of Impact
+                  </Link>
+                </li>
+
+                <li>
+                  <Link to="/about-us#history-section" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
+                   History
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/about-us#meet-family" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
+                    Meet Our Family
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/about-us/highlights" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
+                    About Us Highlights
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/about-us#partners-section" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
+                    Partners
                   </Link>
                 </li>
               </ul>

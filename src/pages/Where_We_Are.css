@@ -17,6 +17,11 @@
   align-items: start;
 }
 
+.where-banner {
+  min-height: clamp(320px, 46vh, 460px);
+  border-radius: 12px;
+}
+
 .find-ymca__map-wrap {
   background: var(--ymca-gray-bg);
   border-radius: 8px;
@@ -329,9 +334,9 @@
   width: 100%;
   padding: 0.7rem 1rem;
   margin-bottom: 0.85rem;
-  border: none;
-  border-radius: 999px;
-  background: #d6d6d6;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  background: var(--ymca-white);
   font-size: var(--text-base);
   color: var(--ymca-navy);
   outline: none;
@@ -339,7 +344,7 @@
 }
 
 .contact-textarea {
-  border-radius: 18px;
+  border-radius: 12px;
   height: 150px;
   resize: none;
   padding-top: 0.9rem;
@@ -367,7 +372,7 @@
 }
 
 .contact-submit {
-  background: var(--ymca-red);
+  background: var(--ymca-navy);
   color: white;
   border: none;
   padding: 0.55rem 2rem;
@@ -378,7 +383,7 @@
 }
 
 .contact-submit:hover {
-  background: var(--ymca-red-hover);
+  background: var(--ymca-navy-dark);
   transform: translateY(-1px);
 }
 

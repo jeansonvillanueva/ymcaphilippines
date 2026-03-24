@@ -8,6 +8,8 @@ import '../styles/design-system.css';
 import './Where_We_Are.css';
 import map from '../assets/images/Philippine-Map.png';
 import defaultBranchLogo from '../assets/images/logo.webp';
+import ecoHeroesTrainingImage from '../assets/images/About_Us/eco-heroes_training.jpg';
+
 type Branch = {
   id: string;
   name: string;
@@ -64,40 +66,40 @@ const REGIONS: Region[] = [
     id: 'manila-bay',
     name: 'Manila Bay Region',
     branches: [
-      { id: 'b6', name: 'YMCA of Makati', markerId: 'makati', link: 'https://www.facebook.com/ymcamakati' },
-      { id: 'b7', name: 'Manila Downtown YMCA', markerId: 'manila_downtown', link: 'https://www.facebook.com/mdymca' },
-      { id: 'b8', name: 'YMCA of Manila', markerId: 'manila', link: 'https://www.facebook.com/YmcaOfManilaOfficial'  },
-      { id: 'b9', name: 'YMCA of Quezon City', markerId: 'quezon_city', link: 'https://www.facebook.com/p/YMCA-of-Quezon-City-Inc-100064587435993/' },
+      { id: 'b5', name: 'YMCA of Makati', markerId: 'makati', link: 'https://www.facebook.com/ymcamakati' },
+      { id: 'b6', name: 'Manila Downtown YMCA', markerId: 'manila_downtown', link: 'https://www.facebook.com/mdymca' },
+      { id: 'b7', name: 'YMCA of Manila', markerId: 'manila', link: 'https://www.facebook.com/YmcaOfManilaOfficial'  },
+      { id: 'b8', name: 'YMCA of Quezon City', markerId: 'quezon_city', link: 'https://www.facebook.com/p/YMCA-of-Quezon-City-Inc-100064587435993/' },
     ],
   },
   {
     id: 'south-luzon',
     name: 'South Luzon Region',
     branches: [
-      { id: 'b10', name: 'YMCA of Albay', markerId: 'albay', link: 'https://www.facebook.com/albay.ymca' },
-      { id: 'b11', name: 'YMCA of Los Baños', markerId: 'los_banos', link: 'https://www.facebook.com/ymcalb' },
-      { id: 'b12', name: 'YMCA of Nueva Caceres', markerId: 'nueva_caceres', link: 'https://www.facebook.com/YMCACamarinesSur' },
-      { id: 'b13', name: 'YMCA of San Pablo', markerId: 'san_pablo', link: 'https://www.facebook.com/YMCASanPablo' },
+      { id: 'b9', name: 'YMCA of Albay', markerId: 'albay', link: 'https://www.facebook.com/albay.ymca' },
+      { id: 'b10', name: 'YMCA of Los Baños', markerId: 'los_banos', link: 'https://www.facebook.com/ymcalb' },
+      { id: 'b11', name: 'YMCA of Nueva Caceres', markerId: 'nueva_caceres', link: 'https://www.facebook.com/YMCACamarinesSur' },
+      { id: 'b12', name: 'YMCA of San Pablo', markerId: 'san_pablo', link: 'https://www.facebook.com/YMCASanPablo' },
     ],
   },
   {
     id: 'visayas',
     name: 'Visayas Region',
     branches: [
-      { id: 'b14', name: 'YMCA of Cebu', markerId: 'cebu' },
-      { id: 'b15', name: 'YMCA of Leyte', markerId: 'leyte', link: 'https://www.facebook.com/ymcaofleyte' },
-      { id: 'b16', name: 'YMCA of Negros Occidental', markerId: 'negros_occidental', link: 'https://www.facebook.com/ymcanegrosoccidental/' },
-      { id: 'b17', name: 'YMCA of Negros Oriental', markerId: 'negros_oriental', link: 'https://www.facebook.com/ymcadumaguete.negrosor' },
-      { id: 'b18', name: 'City of Ormoc YMCA', markerId: 'ormoc' },
-      { id: 'b19', name: 'YMCA of San Carlos City', markerId: 'san_carlos_city' },
+      { id: 'b13', name: 'YMCA of Cebu', markerId: 'cebu' },
+      { id: 'b14', name: 'YMCA of Leyte', markerId: 'leyte', link: 'https://www.facebook.com/ymcaofleyte' },
+      { id: 'b15', name: 'YMCA of Negros Occidental', markerId: 'negros_occidental', link: 'https://www.facebook.com/ymcanegrosoccidental/' },
+      { id: 'b16', name: 'YMCA of Negros Oriental', markerId: 'negros_oriental', link: 'https://www.facebook.com/ymcadumaguete.negrosor' },
+      { id: 'b17', name: 'City of Ormoc YMCA', markerId: 'ormoc' },
+      { id: 'b18', name: 'YMCA of San Carlos City', markerId: 'san_carlos_city' },
     ],
   },
   {
     id: 'mindanao',
     name: 'Mindanao Region',
     branches: [
-      { id: 'b20', name: 'YMCA of Davao', markerId: 'davao', link: 'https://www.facebook.com/YMCAofDavao' },
-      { id: 'b21', name: 'YMCA Cagayan de Oro', markerId: 'cagayan_de_oro', link: 'https://www.facebook.com/cagayandeoroymca' },
+      { id: 'b19', name: 'YMCA of Davao', markerId: 'davao', link: 'https://www.facebook.com/YMCAofDavao' },
+      { id: 'b20', name: 'YMCA Cagayan de Oro', markerId: 'cagayan_de_oro', link: 'https://www.facebook.com/cagayandeoroymca' },
     ],
   },
 ];
@@ -144,23 +146,39 @@ function Find_Your_YMCA() {
           {/* ABOUT */}
     <section id="about" className="page-section page-section--white">
         <div
-          className="about-banner reveal"
+          className="about-banner where-banner reveal"
           style={{ backgroundImage: `url(${ABOUT_IMAGE})` }}
         >
           <div className="about-banner__overlay" />
           <div className="about-banner__inner">
             <h1 className="about-banner__title">
-              About <span className="y-accent">Y</span> Philippines
+              Where are <span className="y-accent">Y</span>
             </h1>
             <p className="about-banner__body">
-              We, the Young Men's Christian Association in the Philippines, are committed to
-              advocating and working for the viability of the movement and empowerment of people
-              through coordinated programs that will promote peace, sustainability of life with
-              justice, and the holistic development of community.
+            The YMCA of the Philippines is established in multiple locations nationwide, with local associations actively serving their respective communities. Below are the different YMCA locals and their areas of operation.
             </p>
           </div>
         </div>
       </section>
+
+      <div className="about-us-top reveal reveal-delay-1">
+        <img src={ecoHeroesTrainingImage} alt="YMCA eco heroes training" className="about-us-top__image" />
+        <div className="about-us-top__content">
+          <h3>YMCA National Eco-Heroes Training</h3>
+          <p>
+          After three enriching days of learning, collaboration, and action, the National Eco-Heroes Training has successfully concluded at the YMCA of Albay, a gathering that ignited passion and purpose in the hearts of young environmental advocates.
+          </p>
+          <a 
+            href="https://ymca.ph/climateaction/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="about-us-top__cta"
+          >
+            Be Involved
+          </a>
+        </div>
+      </div>
+
 
           <SubjectHeader text="Find Your YMCA" className="reveal" />
 
