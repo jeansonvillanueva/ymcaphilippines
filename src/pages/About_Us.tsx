@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import '../styles/design-system.css';
@@ -25,11 +25,11 @@ import Partners from '../components/Partners';
 import aboutLeadImage from '../assets/images/About_Us/YMCA-Fun-Run.webp';
 import ymcaLogo from '../assets/images/logo.webp';
 
-type OrgProfile = {
-  name: string;
-  position: string;
-  imageUrl?: string | null;
-};
+// type OrgProfile = {
+//   name: string;
+//   position: string;
+//   imageUrl?: string | null;
+// };
 
 const ORG_STRUCTURE = {
   head: {
@@ -89,9 +89,9 @@ const ORG_STRUCTURE = {
 
 function AboutUs() {
   const sectionRef = useScrollReveal<HTMLDivElement>();
-  const [pillarsHover, setPillarsHover] = useState(false);
-  const [activePillarIndex, setActivePillarIndex] = useState(0);
-  const [activeSlide, setPillarsActiveSlide] = useState(0);
+  const [pillarsHover] = useState(false);
+  const [activePillarIndex] = useState(0);
+  const [, setPillarsActiveSlide] = useState(0);
 
   const PILLARS = [
     {
