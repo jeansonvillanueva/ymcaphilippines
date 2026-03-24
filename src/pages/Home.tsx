@@ -9,6 +9,7 @@ import Card from './Card-Media/Card';
 import VideoShowcase, { type VideoItem } from '../components/VideoShowcase';
 import ImpactStats from '../components/ImpactStats';
 import { LATEST_NEWS } from '../data/news';
+import Card from '../components/Card';
 
 type HeroSlide = {
   image: string;
