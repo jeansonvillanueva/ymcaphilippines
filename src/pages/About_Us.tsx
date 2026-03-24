@@ -31,12 +31,6 @@ type OrgProfile = {
   imageUrl?: string | null;
 };
 
-type OrgDepartment = {
-  key: string;
-  label: string;
-  members: OrgProfile[];
-};
-
 const ORG_STRUCTURE = {
   head: {
     name: 'Orlando F. Carreon',
