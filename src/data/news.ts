@@ -84,6 +84,24 @@ export const LATEST_NEWS: NewsArticleMeta[] = [
     category: 'Articles',
     topic: 'Careers',
   },
+  {
+    path: '/news/Article_One',
+    title: 'College Y Club General Assembly & Induction of Officers',
+    date: 'March 12, 2026 at 10:59 AM',
+    subtitle: 'Leyte – Unity in action, service in spirit.',
+    imageUrl: card8,
+    category: 'Articles',
+    topic: 'Youth Leadership',
+  },
+  {
+    path: '/news/Article_Two',
+    title: 'College Y Club General Assembly & Induction of Officers',
+    date: 'March 12, 2026 at 10:59 AM',
+    subtitle: 'Leyte – Unity in action, service in spirit.',
+    imageUrl: card8,
+    category: 'Articles',
+    topic: 'Youth Leadership',
+  },
 ];
 
 export function getNewsArticleMeta(path: NewsArticleMeta['path']) {

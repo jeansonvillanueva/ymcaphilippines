@@ -4,6 +4,7 @@ import vision from '../assets/images/partners/vision_2030.png';
 import Yusa from '../assets/images/partners/YMCA_USA_Logo.png';
 import Yworld from '../assets/images/partners/World-YMCA_Logo.png';
 import SubjectHeader from './SubjectHeader';
+import asiaPacificRegion from '../assets/images/partners/Asia_Pacific_Logo.jpg';
 
 export default function Partners() {
   return (
@@ -20,6 +21,10 @@ export default function Partners() {
 
         <a href="https://www.ymca.int" target="_blank" rel="noopener noreferrer">
           <img src={Yworld} alt="World YMCA" />
+        </a>
+
+        <a href="https://www.asiapacificymca.org/joomla/" target="_blank" rel="noopener noreferrer">
+          <img src={asiaPacificRegion} alt="Asia Pacific Region" />
         </a>
 
         <a href="https://www.ymca.int/what-we-do/vision-2030/" target="_blank" rel="noopener noreferrer">

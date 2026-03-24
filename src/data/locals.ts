@@ -125,7 +125,7 @@ const quezonCityHero = new URL(
 const quezonCityLogo = new URL('../assets/images/local_Y/Quezon_City/Quezon_Logo.jpg', import.meta.url).href;
 
 const albayHero = placeholderHero;
-const albayLogo = placeholderLogo;
+const albayLogo = new URL('../assets/images/local_Y/Albay/Albay_Logo.jpg', import.meta.url).href;
 
 const losbanosHero = new URL(
   '../assets/images/local_Y/Los_Banos/639207121_1379325430901221_1827035227254402564_n.jpg',
