@@ -3,6 +3,8 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 import logo from '../assets/images/logo.webp';
 import { searchSite, type SearchResult } from '../data/searchIndex';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'
 
 function groupLabel(t: SearchResult['type']) {
   if (t === 'news') return 'News';
@@ -212,7 +214,7 @@ function Navbar() {
             aria-expanded={isSearchOpen}
             onClick={() => setIsSearchOpen((v) => !v)}
           >
-            🔍
+            <FontAwesomeIcon icon={faMagnifyingGlass} />
           </button>
         </div>
       </div>

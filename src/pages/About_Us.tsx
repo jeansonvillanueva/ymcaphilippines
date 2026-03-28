@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import '../styles/design-system.css';
@@ -24,6 +24,9 @@ import OrgChartCard from '../components/OrgChartCard';
 import Partners from '../components/Partners';
 import aboutLeadImage from '../assets/images/About_Us/YMCA-Fun-Run.webp';
 import ymcaLogo from '../assets/images/logo.webp';
+import kehPresident from '../assets/images/president/Keh.png';
+import yangPresident from '../assets/images/president/Yang.png';
+import histoyVideo from '../assets/videos/videoplayback.mp4';
 
 // type OrgProfile = {
 //   name: string;
@@ -89,9 +92,15 @@ const ORG_STRUCTURE = {
 
 function AboutUs() {
   const sectionRef = useScrollReveal<HTMLDivElement>();
-  const [pillarsHover] = useState(false);
-  const [activePillarIndex] = useState(0);
-  const [, setPillarsActiveSlide] = useState(0);
+  const [selectedPillarKey, setSelectedPillarKey] = useState('');
+  const [detailSlideIndex, setDetailSlideIndex] = useState(0);
+  const [isPillarFlipped, setIsPillarFlipped] = useState(false);
+
+  const handlePillarSelect = (pillarKey: string) => {
+    setSelectedPillarKey(pillarKey);
+    setDetailSlideIndex(0);
+    setIsPillarFlipped(true);
+  };
 
   const PILLARS = [
     {
@@ -112,9 +121,19 @@ function AboutUs() {
           title: 'Our Pledge',
           body: (
             <p>
-              By 2030 the YMCA will co-create, provide and advocate for high-quality, relevant and sustainable
+              The YMCA will co-create, provide and advocate for high-quality, relevant and sustainable
               health and wellbeing solutions to young people and communities worldwide.
             </p>
+          ),
+        },
+        {
+          title: 'Strategic Goals',
+          body: (
+            <div>
+              <p><strong>(1) Our YMCAs:</strong> The YMCA Movement will review and develop relevant policies and practices so that its staff and volunteers at all levels work in a culture where individual, organisational and community wellbeing is a fundamental priority.</p>
+              <p><strong>(2) Our Communities:</strong> By 2030 the YMCA strengthens and expands safe, inclusive spaces at all levels, empowering every person we serve to care for their physical, spiritual and mental health, and the broader wellbeing and resilience of their families and communities.</p>
+              <p><strong>(3) Our World:</strong> The YMCA effectively champions improved policies and practices for keeping children and young people safe from harm, abuse and neglect at local, national and global levels.</p>
+            </div>
           ),
         },
       ],
@@ -128,8 +147,14 @@ function AboutUs() {
           title: 'Core Belief',
           body: (
             <p>
-              The YMCA Movement believes that all young people deserve the right to learn, engage in flexible,
-              dignified and meaningful work, and build sustainable livelihoods.
+              The YMCA Movement
+              believes that all young
+              people deserve the
+              right to learn, engage in
+              flexible, dignified and
+              meaningful work, and
+              build sustainable
+              livelihoods
             </p>
           ),
         },
@@ -138,8 +163,18 @@ function AboutUs() {
           body: (
             <p>
               The YMCA commits to creating, expanding and advocating meaningful, just and equitable education,
-              training, employment and entrepreneurship opportunities.
+              training, employment and entrepreneurship opportunities in the transition to the new economies.
             </p>
+          ),
+        },
+        {
+          title: 'Strategic Goals',
+          body: (
+            <div>
+              <p><strong>(1) Our YMCAs:</strong> The YMCA will review and develop its policies and practices to become a Movement where all its employees benefit from decent, meaningful, dignified and equitable work, as well as lifelong learning opportunities.</p>
+              <p><strong>(2) Our Communities:</strong> By 2030, the YMCA Movement creates, strengthens and scales sustainable education, upskilling, employment and entrepreneurship opportunities for young people and communities worldwide, with a focus on increasing their readiness for the Future of Work.</p>
+              <p><strong>(3) Our World:</strong> The YMCA amplifies the voices of young people and communities and advocates policies to ensure decent, flexible, meaningful and equitable access to employment, entrepreneurship and training opportunities.</p>
+            </div>
           ),
         },
       ],
@@ -153,8 +188,13 @@ function AboutUs() {
           title: 'Core Belief',
           body: (
             <p>
-              The YMCA believes that we should all commit and take action for the protection and regeneration
-              of our Planet.
+              The YMCA believes that we
+              should all commit and take
+              action for the protection and
+              regeneration of our Planet,
+              preparing for a Just Transition
+              to a world where humans live
+              in full harmony with Nature.
             </p>
           ),
         },
@@ -162,8 +202,19 @@ function AboutUs() {
           title: 'Our Pledge',
           body: (
             <p>
-              The YMCA commits to become a Greener Movement, an active youth voice on climate justice.
+              The YMCA commits to become a Greener Movement, an active youth voice on climate justice and
+              champion of youth-led sustainability solutions.
             </p>
+          ),
+        },
+        {
+          title: 'Strategic Goals',
+          body: (
+            <div>
+              <p><strong>(1) Our YMCAs:</strong> The YMCA will take steps towards becoming a climate-neutral* Movement, building a roadmap that will allow all YMCAs to make measurable and meaningful progress in their policies and practices based on local realities</p>
+              <p><strong>(2) Our Communities:</strong> The YMCA Movement inspires its members, staff, volunteers and community stakeholders to practice and champion environmental responsibility while also integrating climate education components for young people and communities in its programmes worldwide.</p>
+              <p><strong>(3) Our World:</strong>  The YMCA will champion global solutions and policies to support a Just Transition to Green Economy, making sure that no one is left behind as we work together towards the regeneration and protection of our Plane</p>
+            </div>
           ),
         },
       ],
@@ -177,8 +228,7 @@ function AboutUs() {
           title: 'Core Belief',
           body: (
             <p>
-              The YMCA believes in the power of young people and communities to promote and advance justice,
-              peace, equity and human rights for all.
+              The YMCA believes in the power of young people and communities to promote and advance justice, peace, equity and human rights for all.
             </p>
           ),
         },
@@ -186,25 +236,25 @@ function AboutUs() {
           title: 'Our Pledge',
           body: (
             <p>
-              The YMCA will become a global voice in the fight against systemic discrimination, inequity,
-              injustice and racism in all its forms.
+              The YMCA will become a global voice in the fight against systemic discrimination, inequity, injustice and racism in all its forms, amplifying the voices of young people and communities where it is active to ensure that everyone’s voice is heard.
             </p>
+          ),
+        },
+        {
+          title: 'Strategic Goals',
+          body: (
+            <div>
+              <p><strong>(1) Our YMCAs:</strong>By 2030, the YMCA commits to adapt its policies, practices and programmes to become a truly equitable, diverse and inclusive Movement in the fight against all types of discrimination.</p>
+              <p><strong>(2) Our Communities:</strong> The YMCA will empower young people to become peace builders and transformative activists, leaders and advocates for diversity, equity, inclusion and social change</p>
+              <p><strong>(3) Our World:</strong>  The YMCA will amplify the voices of young people and communities worldwide to ensure that all people, including vulnerable and marginalised communities, are treated with dignity and their voice is heard and acted upon</p>
+            </div>
           ),
         },
       ],
     },
   ];
 
-  const activePillar = PILLARS[activePillarIndex];
-  const activeSlides = activePillar.detailSlides;
-
-  useEffect(() => {
-    if (!pillarsHover) return;
-    const id = window.setInterval(() => {
-      setPillarsActiveSlide((prev) => (prev + 1) % activeSlides.length);
-    }, 3500);
-    return () => window.clearInterval(id);
-  }, [pillarsHover, activeSlides.length]);
+  const selectedPillar = PILLARS.find((pillar) => pillar.key === selectedPillarKey) || null;
 
   return (
     <div ref={sectionRef} className="who-is-y-page">
@@ -227,6 +277,149 @@ function AboutUs() {
                 Explore About Us Highlights
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Vision / Mission / Pillars of Impact */}
+      <section id="vision-mission-pillars" className="page-section page-section--white">
+        <div className="page-section__inner">
+          <div className="ymca-vmv">
+            <div className="ymca-vmv__block">
+              <h2 className="ymca-vmv__title">VISION</h2>
+              <div className="ymca-vmv__bar">
+                <p className="ymca-vmv__kicker">What is our Vision for the world?</p>
+                <p className="ymca-vmv__text">
+                  Our vision is a world where every person lives in harmony with self, with society and with creation.
+                </p>
+              </div>
+            </div>
+
+            <div className="ymca-vmv__block">
+              <h2 className="ymca-vmv__title">MISSION</h2>
+              <div className="ymca-vmv__bar">
+                <p className="ymca-vmv__kicker">How will we get to our destination?</p>
+                <p className="ymca-vmv__text">
+                  The YMCA’s mission is to empower young people and communities worldwide to build a just,
+                  sustainable, equitable and inclusive world, where every person can thrive in body, mind and spirit.
+                </p>
+              </div>
+            </div>
+
+            <div className="ymca-vmv__block">
+              <h2 className="ymca-vmv__title">PILLARS OF IMPACT</h2>
+              <div className="pillars-grid">
+                {PILLARS.map((pillar) => {
+                  const isActive = pillar.key === selectedPillarKey;
+                  return (
+                    <button
+                      key={pillar.key}
+                      type="button"
+                      className={`pillar-card ${isActive ? 'pillar-card--active' : ''}`}
+                      onClick={() => handlePillarSelect(pillar.key)}
+                      aria-label={`Show ${pillar.label} details`}
+                    >
+                      <span className="pillar-card__icon">
+                        <img src={pillar.icon} alt="" className="pillar-card__iconImage" />
+                      </span>
+                      <span className="pillar-card__label">{pillar.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className={`pillars-detail ${isPillarFlipped ? 'pillars-detail--active' : ''}`}>
+                <div className="pillars-detail__front">
+                  <span className="pillars-detail__pillartag">Pillars of Impact</span>
+                  <h3 className="pillars-detail__title">Click a pillar card to flip</h3>
+                  <p className="pillars-detail__body">
+                    Explore Core Belief, Our Pledge and Strategic Goals for each pillar using the slider navigation.
+                  </p>
+                </div>
+                <div className="pillars-detail__back">
+                  {selectedPillar ? (
+                    <>
+                      <div className="pillars-detail__slides">
+                        {selectedPillar.detailSlides.map((slide, idx) => (
+                          <article
+                            key={`${selectedPillar.key}-${slide.title}`}
+                            className={`pillars-detail__slide ${idx === detailSlideIndex ? 'pillars-detail__slide--active' : ''}`}
+                          >
+                            <span className="pillars-detail__pillartag">{selectedPillar.label}</span>
+                            <h3 className="pillars-detail__title">{slide.title}</h3>
+                            <div className="pillars-detail__body">{slide.body}</div>
+                          </article>
+                        ))}
+                      </div>
+                      <div className="pillars-detail__nav">
+                        <button
+                          type="button"
+                          className="pillars-detail__navButton"
+                          onClick={() => setDetailSlideIndex((prev) => Math.max(0, prev - 1))}
+                          disabled={detailSlideIndex === 0}
+                        >
+                          Previous
+                        </button>
+                        <span className="pillars-detail__navStatus">
+                          {detailSlideIndex + 1} / {selectedPillar.detailSlides.length}
+                        </span>
+                        <button
+                          type="button"
+                          className="pillars-detail__navButton"
+                          onClick={() => setDetailSlideIndex((prev) => Math.min(selectedPillar.detailSlides.length - 1, prev + 1))}
+                          disabled={detailSlideIndex === selectedPillar.detailSlides.length - 1}
+                        >
+                          Next
+                        </button>
+                      </div>
+                      <div className="pillars-detail__dots">
+                        {selectedPillar.detailSlides.map((_, idx) => (
+                          <button
+                            key={`${selectedPillar.key}-dot-${idx}`}
+                            type="button"
+                            className={`pillars-detail__dot ${idx === detailSlideIndex ? 'pillars-detail__dot--active' : ''}`}
+                            onClick={() => setDetailSlideIndex(idx)}
+                            aria-label={`Show ${selectedPillar.detailSlides[idx]?.title} content`}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <p>
+                      Select a pillar to see Core Belief, Our Pledge, and Strategic Goals.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* HistoY */}
+      <section id="histoy" className="page-section histoy-section">
+        <div className="page-section__inner">
+          <SubjectHeader text="HistorY" className="reveal" />
+          <p className="histoy__subtitle reveal">Since arriving in the Philippines in 1899 and formally incorporating in 1911, we have spent over a century at the forefront of community development. From pioneering the country's first Physical Education classes and the first Filipino Boy Scouts troop, we have grown into a nationwide network of local branches. Today, our enduring legacy of nation-building and holistic youth empowerment continues to thrive across the country. </p>
+
+          <div className="histoy-grid reveal reveal-delay-1">
+            <figure className="histoy-card histoy-card--right">
+              <img src={yangPresident} alt="YMCA President Yang" />
+              <figcaption>Teodoro R.Yang</figcaption>
+            </figure>
+
+            <div className="histoy-video-wrap">
+              <video className="histoy-video" controls preload="metadata">
+                <source src={histoyVideo} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+
+            <figure className="histoy-card histoy-card--left">
+              <img src={kehPresident} alt="YMCA President Keh" />
+              <figcaption>Engr. Antonio C. Keh</figcaption>
+            </figure>
+
           </div>
         </div>
       </section>

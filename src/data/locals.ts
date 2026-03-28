@@ -1,3 +1,6 @@
+import Zoom from "@mui/material/Zoom";
+import { Activity } from "react";
+
 export type LocalPillarKey = 'community' | 'work' | 'planet' | 'world';
 
 export type LocalProgram = {
@@ -337,7 +340,12 @@ tuguegarao: {
       label: 'Community Wellbeing',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Relief Operation for Typhoon Kristine, Arce and Pepito',
+          'City Development Council Meeting',
+          'Civil Society Organization Forum',
+          'Provincial Development Council Meeting'
+        ] },
       ],
     },
     {
@@ -345,7 +353,13 @@ tuguegarao: {
       label: 'Meaningful Work',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Re-organization of the Hi-Y Clubs in the different schools',
+          'Hi-Y Club Orientation at Cagayan National High School (Jr & Sr)',
+          'North Luzon Regional Meeting',
+          'Monthly Board Meeting',
+          'CSO Night'
+        ] },
       ],
     },
     {
@@ -353,7 +367,9 @@ tuguegarao: {
       label: 'Sustainable Planet',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'National Eco-Heroes Training'
+        ] },
       ],
     },
     {
@@ -361,7 +377,9 @@ tuguegarao: {
       label: 'Just World',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Unity Walk (Tuguegarao Town Fiesta'
+        ] },
       ],
     },
   ],
@@ -385,7 +403,14 @@ nueva_ecija: {
       label: 'Community Wellbeing',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Kanlungan sa Y',
+          'Zumba Fitness Program',
+          'Chess Clinic',
+          'Local Academic Olympics',
+          'Chess Summer Program Tournament',
+          'Induction Ceremony'
+        ] },
       ],
     },
     {
@@ -393,7 +418,11 @@ nueva_ecija: {
       label: 'Meaningful Work',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Partnership with DepEd Alternative Learning System',
+          'Project Tinola',
+          'Referral Pathway'
+        ] },
       ],
     },
     {
@@ -401,7 +430,11 @@ nueva_ecija: {
       label: 'Sustainable Planet',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Eco Hero Training',
+          'Vertical Gardening',
+          'Environment Forum (Koalisyong nga Maka-Kalikasang Novo Ecijanos - KOMANE)'
+        ] },
       ],
     },
     {
@@ -409,7 +442,10 @@ nueva_ecija: {
       label: 'Just World',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Scholarship Program',
+          'Kilos Kabataan Program'
+        ] },
       ],
     },
   ],
@@ -434,7 +470,12 @@ pangasinan: {
       label: 'Community Wellbeing',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Attendance on 3rd Quarter meeting ABSNET Pangasinan',
+          'Flood Disaster Relief Operation',
+          'Provision for Social Concern',
+          'GS JCB Sponsorship Program'
+        ] },
       ],
     },
     {
@@ -442,7 +483,17 @@ pangasinan: {
       label: 'Meaningful Work',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'YMCA Staff Monthly Regular Meeting',
+          'YMCA Preschool Teachers Association Officers',
+          'YMCA Head Meetings',
+          'YMCA Local Regular Board Meeting',
+          'YMCA Standing Committee Meetings',
+          'Attendance to NCM 2024',
+          'Annual Corporate Meeting',
+          'Kamustaha',
+          'Attendance to National Collaboration Meeting'
+        ] },
       ],
     },
     {
@@ -450,7 +501,10 @@ pangasinan: {
       label: 'Sustainable Planet',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'YMCA Waste Management',
+          'YMCA Joins Brigada Eskwela 2025'
+        ] },
       ],
     },
     {
@@ -458,7 +512,12 @@ pangasinan: {
       label: 'Just World',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'In-Service and Team Planning',
+          'REECE Trip',
+          'Online Engagement with NTUMSPERBAYUOE 2025',
+          'YMCA & YWCA National Youth Summit'
+        ] },
       ],
     },
   ],
@@ -484,7 +543,11 @@ makati : {
       label: 'Community Wellbeing',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Uni Y Club of University of Makati',
+          'Liturgical Bible Study (LBS)',
+          'Angklung Ensemble'
+        ] },
       ],
     },
     {
@@ -492,7 +555,10 @@ makati : {
       label: 'Meaningful Work',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Makati YMCA Scholarship',
+          'Y Speak',
+        ] },
       ],
     },
     {
@@ -500,7 +566,13 @@ makati : {
       label: 'Sustainable Planet',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Tree Musketeers: Soldiers of the Trees',
+          'Kalakalikasan 2.0 (ArtVocacy)',
+          'YMCA OF MAKA',
+          'Green YMCA, Green Community x Ecology Ministry',
+          'Bokashi Composting'
+        ] },
       ],
     },
     {
@@ -508,7 +580,10 @@ makati : {
       label: 'Just World',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Gabay Aral',
+          'Love Meals Program'
+        ] },
       ],
     },
   ],
@@ -534,7 +609,18 @@ manila: {
         label: 'Community Wellbeing',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'YMCA Academic Meet',
+            'Youth Values Formation',
+            '10th YMCA Fitness Camp of the Red Triangle Club',
+            'Y-Kids Coloring, Spelling, Solo and Group Story Telling Contest',
+            'HI-Y Sportsfest & College Y Sportsfest',
+            '2025 Recollection and Thanksgiving Mass',
+            'Summer Rural Workcamp',
+            'Brigada Eskwela',
+            'YMCA Friendly Swimming Competition',
+            'Leptospirosis Health Campaign'
+          ] },
         ],
       },
       {
@@ -542,7 +628,14 @@ manila: {
         label: 'Meaningful Work',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'Blood Donation Drive',
+            'Basketball Y Camp',
+            '1st Women\'s Basketball Tournament',
+            'Livelihood Program "Dishwashing and Perfume Making"',
+            'Reproductive Health Seminar',
+            'Seminar on SOGIESC'
+          ] },
         ],
       },
       {
@@ -550,7 +643,11 @@ manila: {
         label: 'Sustainable Planet',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'Tree Growing Activity (Earth Day)',
+            'A Seminar and Workshop on Carbon Footprint Auditing',
+            'Exposure at Don Bosco School of Theology Environmental Programs'
+          ] },
         ],
       },
       {
@@ -558,7 +655,20 @@ manila: {
         label: 'Just World',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'College Y Club Management Training',
+            'Red Triangle Club (RTC) Joint Leadership Day Camp',
+            'Hi-Y Club Management Training',
+            'Club Advisers Training',
+            '46th National Congress of College Students and the 26th YMCA Club Advisers',
+            'Seminar Workshop',
+            'Hi-Y Joint Leadership Camp for District',
+            '32nd YMCA National Assembly of the High School students and 25th YMCA',
+            'Y-Kids Club Cultural Talent Presentation "Philippine Festival"',
+            'High School Club Adviser Seminar.',
+            'College - Y Assembly and Induction of CSCY officers',
+            '"Kabataang Pinuno Para sa Bayan, Para sa Pilipino Series 1,2,3 & 4'
+          ] },
         ],
       },
     ],
@@ -583,7 +693,12 @@ manila_downtown : {
         label: 'Community Wellbeing',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'Humans Of YC', 
+            'Emotion Drive: Aligning the Heart and Mind', 
+            'I Got You',
+            'Joker\'s House'
+          ] },
         ],
       },
       {
@@ -591,7 +706,11 @@ manila_downtown : {
         label: 'Meaningful Work',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'Hosting & Photography: Snap 7 Snack',
+            'Youth Club Protege Program',
+            'Create-101'
+          ] },
         ],
       },
       {
@@ -599,7 +718,13 @@ manila_downtown : {
         label: 'Sustainable Planet',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'Tree Growing Activity (Earth Day)',
+            'A Seminar and Workshop on Carbon Footprint Auditing',
+            'Exposure at Don Bosco School of Theology Environmental Programs',
+            'Youth Cares'
+
+          ] },
         ],
       },
       {
@@ -607,9 +732,19 @@ manila_downtown : {
         label: 'Just World',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'Strand-Up for Cancers',
+            'Know It All Challenge',
+            'Youth Club Summer Camp',
+            'General Assembly',
+            'Youth Clubsports Fest',
+            'Lai Kong Hokkien',
+            'Bee A Spelling Champion',
+            'Artbokasiya'
+          ] },
         ],
       },
+
     ],
   },
   
@@ -628,35 +763,19 @@ manila_downtown : {
     },
     pillars: [
       {
-        key: 'community',
-        label: 'Community Wellbeing',
-        color: '#C41E3A',
-        programs: [
-          { bullets: ['Dishwashing and perfume making'] },
-        ],
-      },
-      {
         key: 'work',
         label: 'Meaningful Work',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
-        ],
-      },
-      {
-        key: 'planet',
-        label: 'Sustainable Planet',
-        color: '#C41E3A',
-        programs: [
-          { bullets: ['Dishwashing and perfume making'] },
-        ],
-      },
-      {
-        key: 'world',
-        label: 'Just World',
-        color: '#C41E3A',
-        programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            '51st Annual Corporate Meeting & Election Of 15 Board of A Directors',
+            'Annual Christmas Fellowship Program',
+            '2025 Induction and Installation of The Officers and Members of the Board',
+            '66th Anniversary Celebration Featuring: Teenage Singing Contests',
+            'Organization Of the College-Y Club of Technological Institute of the Philippines (TIP), Quezon City Campus Induction Of Officer and Members of The Board of YMCA Women\'s Club Of QC',
+            'Participation To the National Youth Assembly & 53rd National Council Meeting And 113rd YMCA Of the Philippines Anniversary Celebration',
+            'Induction Of Officers & Members of The YMCA Women\'s Club of Quezon City.'
+          ] },
         ],
       },
     ],
@@ -682,7 +801,15 @@ manila_downtown : {
         label: 'Community Wellbeing',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'Albay YMCA Board & Volunteers Christmas Fellowship',
+            'Bukluran sa Kabuhayan Christmas Fellowship Program',
+            '1st YMCA Overnight Summer Camp',
+            '1st Albay YMCA Novice Swim Cup',
+            'YMCA Leam to Swim',
+            'YMCA Shotokan Karate',
+            'YMCA Basketball Clinic'
+          ] },
         ],
       },
       {
@@ -690,7 +817,17 @@ manila_downtown : {
         label: 'Meaningful Work',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'Training On Business Appreciation and Financial Literacy',
+            'Leadership And Project Design Training',
+            'National Youth Assembly',
+            'Resource Mobilization Workshop of YMCA Clubs',
+            'International Youth Day Membership Information Caravan of United',
+            'Nations Association of The Philippines',
+            'YMCA-YWCA Youth Summit',
+            'Albay YMCA Labor Day Job Fair Services 2025',
+            'Camp Counselor Training'
+          ] },
         ],
       },
       {
@@ -698,7 +835,13 @@ manila_downtown : {
         label: 'Sustainable Planet',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'Youth-Led Solutions Climate Action Global Summit',
+            'National Green Team Meeting',
+            'Relief Operation to Typhoon Affected Communities in Tiwi, Albay & Catanduanes',
+            'Climate Auditors Workshop',
+            'National Eco-Heroes Training'
+          ] },
         ],
       },
       {
@@ -706,7 +849,12 @@ manila_downtown : {
         label: 'Just World',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'Youth Empowerment Seminar (YES)',
+            'Christmas Party of BRHMC Pediatric Carnicer Patients',
+            'Youth Empowerment Seminar (YES)',
+            '1st YMCA Women\'s Basketball League'
+          ] },
         ],
       },
     ],
@@ -731,7 +879,11 @@ manila_downtown : {
         label: 'Community Wellbeing',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            '1st YMCA Los Baños Open Chess Tournament',
+            'Michael "Jako" Concio" Chess Clinic',
+            'YMCA-LB\'s 2025 Academic Olympics with the theme "YMCA Inspiring Resilience with Hope in Today\'s World"'
+          ] },
         ],
       },
       {
@@ -739,7 +891,12 @@ manila_downtown : {
         label: 'Meaningful Work',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'The YMCA-LB operates a dormitory which sustains its operation and current personnel',
+            'The Scholar\'s Dormitory built at Lot 1 owned by YMCA-LB opens employment opportunities',
+            'The YMCA-LB maintains commercial spaces for canteen operations w/c employs people',
+            'YMCA-LB CSO Representation in the Municipal School Board Participation in the APD Mid-Year Conference'
+          ] },
         ],
       },
       {
@@ -747,7 +904,10 @@ manila_downtown : {
         label: 'Sustainable Planet',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'Waste Segregation Program',
+            'Participation of YMCA-LB delegates in the 53rd National Council Mtg. and 113th Anniv.'
+          ] },
         ],
       },
       {
@@ -755,7 +915,10 @@ manila_downtown : {
         label: 'Just World',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'Participation in the 409th Founding Anniv. And 23rd Bañamos Civic Parade',
+            'Participation of YMCA-LB delegates in the 53rd National Council Mtg. and 113th Anniv. Celebration of YMCA Phils'
+          ] },
         ],
       },
     ],
@@ -780,7 +943,14 @@ manila_downtown : {
         label: 'Community Wellbeing',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'Albay YMCA 4 Day In-House Summer Camp - Camp Counselor',
+            'KAAGAPAY: Arts and Poetry Workshop for Mental Wellness',
+            'Typhoon Kristine Relief Operation',
+            'YMCA Call for Donations',
+            '44th Rizal Youth Leadership Training Institute (RYLTI)',
+            'Y CARES: Balik Eskwela Donation Drive'
+          ] },
         ],
       },
       {
@@ -788,7 +958,16 @@ manila_downtown : {
         label: 'Meaningful Work',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'HP Access-Project- Equipment Grantee',
+            'Advancing Meaningful Work with WORLD YMCA - Attendance and Participation',
+            'Regional Committee Meeting (Zoom)',
+            'College Y Club Membership Drive',
+            'YMCA CamSur Membership Drive',
+            '53rd National Council Meeting Annual Corporate Meeting',
+            '7th National Youth Assembly',
+            'College Y Club Membership Drive'
+          ] },
         ],
       },
       {
@@ -796,7 +975,10 @@ manila_downtown : {
         label: 'Sustainable Planet',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'National Eco-Heroes Training',
+            'YMCA Youth Led Solutions Global Summit with YMCA of USA'
+          ] },
         ],
       },
       {
@@ -804,7 +986,9 @@ manila_downtown : {
         label: 'Just World',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'Youth Dialogue on the Christian identity of the 21st Century'
+          ] },
         ],
       },
     ],
@@ -829,7 +1013,14 @@ manila_downtown : {
         label: 'Community Wellbeing',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'YMCA Basketball Training Camp and League',
+            'YMCA Special One on One/After School Basketball Training',
+            'YMCA Basketball Club',
+            'YMCA Basketball League',
+            'YMCA Samurai Karatedo Club',
+            'Taekwondo Chargers YMCA'
+          ] },
         ],
       },
       {
@@ -837,7 +1028,11 @@ manila_downtown : {
         label: 'Meaningful Work',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'Batang Y Volunteer Internship and Scholarship Program',
+            'Adopt a Community Program',
+            'Adopt a School Program'
+          ] },
         ],
       },
       {
@@ -845,7 +1040,19 @@ manila_downtown : {
         label: 'Sustainable Planet',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: [
+            'PIL sa Y Planting is Life in The Y',
+            '10K Narra Tree Planting Challenge',
+            'TREEP with a Green Talk',
+            'Organization of YMCA-SCFA Young Green Minds "Future Great Eco Heroes"',
+            'CARE for Climate Change Training',
+            'National Eco Heroes Training',
+            'YMCA Multi-Sports Green Court',
+            'Happy Birthday Tree Planting',
+            'Bayanihan Sagip Lawa',
+            'Project HUGS (Hydroponics Urban Gardening in School)',
+
+          ] },
         ],
       },
       {
@@ -853,7 +1060,7 @@ manila_downtown : {
         label: 'Just World',
         color: '#C41E3A',
         programs: [
-          { bullets: ['Dishwashing and perfume making'] },
+          { bullets: ['Alternative Learning System (ALS)'] },
         ],
       },
     ],
@@ -879,7 +1086,11 @@ cebu : {
       label: 'Community Wellbeing',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'LILY Feeding Program',
+          'INTERNATIONAL PARTNERSHIP / PROGRAM & OTHER ACTIVITIES',
+          'Workcamp (Rotary Club & YMCA of Honolulu, YMCA of Hiroshima & YMCA of Cebu)'
+        ] },
       ],
     },
     {
@@ -887,7 +1098,11 @@ cebu : {
       label: 'Meaningful Work',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Christmas Camping in the City',
+          'Summer Learn to Swim',
+          'Karate Lesson'
+        ] },
       ],
     },
     {
@@ -895,7 +1110,7 @@ cebu : {
       label: 'Sustainable Planet',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: ['Tree Planting'] },
       ],
     },
     {
@@ -903,7 +1118,7 @@ cebu : {
       label: 'Just World',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: ['PWD (Person with Disabilities) Swimming Lessons'] },
       ],
     },
   ],
@@ -928,7 +1143,10 @@ leyte : {
       label: 'Community Wellbeing',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Rising Faster than Sea Levels: Focused Group Discussion',
+          'Vibe and Thrive: Breaking the Ice and Building the Trust Activity'
+        ] },
       ],
     },
     {
@@ -936,7 +1154,7 @@ leyte : {
       label: 'Meaningful Work',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: ['YMCA 21st Century Christian Identity Conversation'] },
       ],
     },
     {
@@ -944,7 +1162,10 @@ leyte : {
       label: 'Sustainable Planet',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'APAY Climate Auditors\' Workshop',
+          'Property Clean Up Drive'
+        ] },
       ],
     },
     {
@@ -952,7 +1173,12 @@ leyte : {
       label: 'Just World',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'YMCA Outstanding Student Award 2025',
+          'Brigada Eskwela/Pagbasa 2025',
+          'YLeyte Membership Campaign',
+          'YMCA Leyte Youth Council General Assembly'
+        ] },
       ],
     },
   ],
@@ -977,7 +1203,10 @@ negros_occidental : {
       label: 'Community Wellbeing',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'YMCA Feeding Program',
+          'YMCA Medical Mission'
+        ] },
       ],
     },
     {
@@ -985,7 +1214,10 @@ negros_occidental : {
       label: 'Meaningful Work',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'YMCA Raffle for a Cause',
+          'YMCA Gift Giving'
+        ] },
       ],
     },
     {
@@ -993,7 +1225,10 @@ negros_occidental : {
       label: 'Sustainable Planet',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'YMCA Clean-up Drive',
+          'YMCA Trees for Life Project'
+        ] },
       ],
     },
     {
@@ -1001,7 +1236,10 @@ negros_occidental : {
       label: 'Just World',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'YMCA Leadership Training',
+          'First Aid: Safety Seminar'
+        ] },
       ],
     },
   ],
@@ -1025,7 +1263,13 @@ negros_oriental : {
       label: 'Community Wellbeing',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          '19th Provincial Children\'s Art Drawing Contest',
+          '33rd Community Student Awards Program',
+          '53rd Annual Corporate Members Assembly',
+          'YMCA Membership Enrollment Campaign',
+          'YMCA Day of Prayer for Peace & Family Fun Day'
+        ] },
       ],
     },
     {
@@ -1033,7 +1277,9 @@ negros_oriental : {
       label: 'Meaningful Work',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: ['Christmas Camp for Under-privileged Children',
+          '1st HS Student Council Leaders Conference'
+        ] },
       ],
     },
     {
@@ -1041,7 +1287,7 @@ negros_oriental : {
       label: 'Sustainable Planet',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: ['18th Provincial Children\'s Art Drawing Contest International Coastal Clean-Up'] },
       ],
     },
     {
@@ -1049,59 +1295,16 @@ negros_oriental : {
       label: 'Just World',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Monthly Ecumenical Bible Study Sharing & Reflection',
+          'Monthly Meeting of Youth Volunteer Leaders Corp',
+          'Organization of the YMCA Leaders Corp'
+        ] },
       ],
     },
   ],
 },
 
-ormoc : {
-  id: 'ormoc',
-  name: 'City of Ormoc YMCA',
-  established: '####',
-  facebookUrl: 'https://www.facebook.com/ymca.ormocchapter/',
-  heroImageUrl: ormocHero,
-  logoImageUrl: ormocLogo,
-  stats: {
-    corporate: 0,
-    youth: 0,
-    totalMembersAsOf: '2025',
-  },
-  pillars: [
-    {
-      key: 'community',
-      label: 'Community Wellbeing',
-      color: '#C41E3A',
-      programs: [
-        { bullets: ['Dishwashing and perfume making'] },
-      ],
-    },
-    {
-      key: 'work',
-      label: 'Meaningful Work',
-      color: '#C41E3A',
-      programs: [
-        { bullets: ['Dishwashing and perfume making'] },
-      ],
-    },
-    {
-      key: 'planet',
-      label: 'Sustainable Planet',
-      color: '#C41E3A',
-      programs: [
-        { bullets: ['Dishwashing and perfume making'] },
-      ],
-    },
-    {
-      key: 'world',
-      label: 'Just World',
-      color: '#C41E3A',
-      programs: [
-        { bullets: ['Dishwashing and perfume making'] },
-      ],
-    },
-  ],
-},
 
 // MINDANAO REGION YMCAs
 'cagayan_de_oro': {
@@ -1123,7 +1326,21 @@ ormoc : {
       label: 'Community Wellbeing',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'International Youth Celebration',
+          'Leadership Training and Workshop for Tagpangi National High School Leaders',
+          'Kagay-An Civic Higalaay Parade',
+          'Y\'ers Online Chickahan: Youth Program',
+          'School Upplier Support to Indigenous Students at DIS',
+          'Poster Making Contest (Youth)',
+          'YMCA Basketball League',
+          'YMCA Community Zumbathon',
+          'National Academic Olympics',
+          'Mural Art Contest',
+          'YMCA Table Tennis Opening and Blessing',
+          'YMCA/YWCA National Youth Summit',
+          'PANAGTAGBO 2025'
+        ] },
       ],
     },
     {
@@ -1139,7 +1356,16 @@ ormoc : {
       label: 'Sustainable Planet',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Tree Growing at the YMCA Campsite with YMCA of Manila',
+          'Waste Segregation Orientation and the Importance of Waste Management Seminar and Workshop at CDO NHS with YES-O',
+          'Re-organization of Green Team Philippines',
+          'Tree Growing Activity with the Metro Rotary Club of Cagayan de Oro',
+          'City Attendance at the National Eco-Heroes Training',
+          'YMCA Cagayan de Oro\'s Community Clean-Up Drive',
+          'YMCA Tree Growing and Seminar on Environmental Action for a Sustainable Planet with CDO NHS Student Leaders on Arbor Day',
+          'YMCA CDO and YMCA Davao Fruit-Bearing Tree Growing'
+        ] },
       ],
     },
     {
@@ -1147,7 +1373,10 @@ ormoc : {
       label: 'Just World',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Indigenous Schools Brigada Eskwela Attendance and Support',
+          'Volunteer Expo 2024'
+        ] },
       ],
     },
   ],
@@ -1172,7 +1401,10 @@ davao : {
       label: 'Community Wellbeing',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Karate Program',
+          'Members Fellowship 2025'
+        ] },
       ],
     },
     {
@@ -1180,7 +1412,19 @@ davao : {
       label: 'Meaningful Work',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Operation TULI',
+          'DCAOSYD Collaboration and Partnership Uprise',
+          'School Supplies Distribution for the 546 Pupils from Grade 1 To Grade 12 Of Carmen Integrated School: (SKWELAKALSADA)',
+          'Medical And Dental Mission 2025 Induction of Officers',
+          'Local Academic Olympic',
+          'National Academic Olympics',
+          '2nd National Collaboration Meeting for Local Presidents and General Secretaries',
+          'Mid-Year Conference: Association of Professional Directors (APD)',
+          'First Inter-School Christian Band Competition',
+          'Building Development',
+          'Regular Board Meeting'
+        ] },
       ],
     },
     {
@@ -1188,7 +1432,11 @@ davao : {
       label: 'Sustainable Planet',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Tree Planting',
+          '1st YMCAS Mindanao Regional Committee Meeting 2025 - Tree Planting Activity',
+          'Proper Waste Recycling'
+        ] },
       ],
     },
     {
@@ -1196,7 +1444,10 @@ davao : {
       label: 'Just World',
       color: '#C41E3A',
       programs: [
-        { bullets: ['Dishwashing and perfume making'] },
+        { bullets: [
+          'Training Of Trainers: Integrating Mental Health and Psychosocial Support into Peacebuilding', 
+          'SKWELAKALSADA Caravan'
+        ] },
       ],
     },
   ],

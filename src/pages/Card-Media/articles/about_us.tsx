@@ -19,42 +19,42 @@ const ABOUT_CARDS: AboutCard[] = [
     id: 'health',
     title: 'Health',
     imageUrl: health,
-    details: 'We build healthy habits through sports, recreation, and safe wellness spaces for all ages.',
+    details: 'Every young person has the ability to contribute to improving their own health and the health of the communities in which they live. Through YMCA programmes, young people care for their physical, spiritual and mental health.',
   },
   {
     id: 'employment',
     title: 'Employment',
     imageUrl: employment,
-    details: 'We support career readiness through training, mentoring, and opportunities for meaningful work.',
+    details: 'Young people are valuable economic participants and have a right to contribute to the world’s development and wellbeing. Through YMCA programmes, young people address issues relating to youth employment and economic empowerment.',
   },
   {
     id: 'environment',
     title: 'Environment',
     imageUrl: environment,
-    details: 'We empower communities to care for nature through local sustainability and climate initiatives.',
+    details: 'Every young person has the ability to contribute to reducing environmental degradation and its consequences. Through YMCA programmes, young people coordinate sustainable practices and advocating on issues relating to the environment and climate change.',
   },
   {
     id: 'youth',
     title: 'Youth Engagement',
     imageUrl: youth,
-    details: 'We equip young people with leadership skills, service opportunities, and spaces to belong.',
+    details: 'By providing empowering programs and services, safe places to be with their peers and the chance to express themselves, we are working together with youth to move the obstacles in their way to greater things. With mentorship, encouragement and mutual problem solving, we can support youth as they develop into the role models and leaders our communities need.',
   },
   {
     id: 'community',
     title: 'Community Initiatives',
     imageUrl: community,
-    details: 'We partner with families and local groups to deliver practical support where it matters most.',
+    details: 'A vibrant, healthy community offers opportunities for everyone. At the YMCA, that often means stepping forward with a new program or service to address specific and unique needs in the communities we serve. It may also mean reaching out, beyond our walls, to deliver programs where they are needed most.',
   },
   {
     id: 'global',
     title: 'Global Initiatives',
     imageUrl: global,
-    details: 'We connect with the worldwide YMCA movement to scale impact and exchange best practices.',
+    details: 'The YMCA of the Philippines is only part of the YMCA story. In fact, the YMCA is a global network with YMCAs in 119 countries all over the world! While the YMCA looks a bit different from country to country, we’re all united by our passion to improve the lives of the people, particularly young people, in our communities.',
   },
 ];
 
 export default function About_Us() {
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [flippedId, setFlippedId] = useState<string | null>(null);
 
   return (
     <div className="about-us-article page-section page-section--white">
@@ -73,19 +73,40 @@ export default function About_Us() {
 
         <div className="about-us-article__grid">
           {ABOUT_CARDS.map((card) => {
-            const expanded = expandedId === card.id;
+            const isFlipped = flippedId === card.id;
             return (
-              <article key={card.id} className="about-us-article__card">
-                <button
-                  type="button"
-                  className="about-us-article__cardBtn"
-                  onClick={() => setExpandedId(expanded ? null : card.id)}
-                  aria-expanded={expanded}
-                >
-                  <img src={card.imageUrl} alt={card.title} />
-                  <span>{card.title}</span>
-                </button>
-                {expanded ? <p className="about-us-article__details">{card.details}</p> : null}
+              <article
+                key={card.id}
+                className={`about-us-article__card ${isFlipped ? 'is-flipped' : ''}`}
+              >
+                <div className="about-us-article__cardInner">
+                  {/* Front of card */}
+                  <button
+                    type="button"
+                    className="about-us-article__cardFront"
+                    onClick={() => setFlippedId(card.id)}
+                    aria-label={`Click to view ${card.title} details`}
+                  >
+                    <img src={card.imageUrl} alt={card.title} />
+                    <span>{card.title}</span>
+                  </button>
+
+                  {/* Back of card */}
+                  <div className="about-us-article__cardBack">
+                    <button
+                      type="button"
+                      className="about-us-article__cardBackBtn"
+                      onClick={() => setFlippedId(null)}
+                      aria-label={`Click to close ${card.title} details`}
+                    >
+                      ✕
+                    </button>
+                    <div className="about-us-article__cardBackContent">
+                      <h3>{card.title}</h3>
+                      <p>{card.details}</p>
+                    </div>
+                  </div>
+                </div>
               </article>
             );
           })}

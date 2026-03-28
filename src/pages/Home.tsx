@@ -36,10 +36,10 @@ const YOUTUBE_VIDEOS: VideoItem[] = [
     embedUrl: 'https://youtu.be/CS9OO0S5w2k?si=B957j43VPPv2g4Gl',
   },
   {
-    id: 'YWCA_greetings',
-    title: 'YWCA Greeting',
+    id: 'YWCA_Motion',
+    title: 'YWCA Motion',
     description: 'YWCA Greeting from the President of YWCA of the Philippines.',
-    embedUrl: 'https://www.facebook.com/share/v/1D9bbK1wDN/',
+    embedUrl: 'https://youtu.be/-KO_7ahfJaY?si=xNDPKbKj9bApsc7p',
   }
 ];
 
