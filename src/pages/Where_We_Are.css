@@ -10,6 +10,13 @@
   align-items: center;
 }
 
+/* About section with header – positioned near navbar with spacing */
+.find-ymca-page #about {
+  min-height: auto;
+  padding-top: clamp(2rem, 5vw, 3.5rem);
+  align-items: flex-start;
+}
+
 .find-ymca__layout {
   display: grid;
   grid-template-columns: 360px 1fr;

@@ -4,7 +4,7 @@ import { LEYTE_YMCA } from '../Leyte_YMCA/local.ts';
 export default function Leyte_Article_Two() {
   return (
     <NewsArticle
-      title="College Y Club General Assembly & Induction of Officers"
+      title="YMCA Career Development Program"
       date="March 12, 2026 at 10:59 AM"
       subtitle="Manila – Unity in action, service in spirit."
       localYMCA={LEYTE_YMCA}

@@ -9,6 +9,7 @@ import './Where_We_Are.css';
 import map from '../assets/images/Philippine-Map.png';
 import defaultBranchLogo from '../assets/images/logo.webp';
 import ecoHeroesTrainingImage from '../assets/images/About_Us/eco-heroes_training.jpg';
+import axios from 'axios';
 
 type Branch = {
   id: string;
@@ -22,6 +23,28 @@ type Region = {
   name: string;
   branches: Branch[];
 };
+
+// const [input, setInputs] = useState({});
+
+// const handleChange = (event) => {
+//   const name = event.target.name;
+//   const value = event.target.value;
+//   setInputs(values => ({...values, [name]: value}))
+// };
+
+// const handleSubmit = (event) => {
+//   event.preventDefault();
+//   console.log(inputs);
+//   axios.post('http://localhost:8080/api/contact/save', inputs)
+//     .then(response => {
+//       console.log('Form submitted successfully:', response.data);
+//     })
+//     .catch(error => {
+//       console.error('Error submitting form:', error);
+//     });
+// };
+
+
 
 // Marker positions are approximate on the simplified map SVG.
 const MARKERS: BranchMarker[] = [
@@ -126,6 +149,9 @@ function Find_Your_YMCA() {
 
   const aggregate = useMemo(() => getLocalsAggregateStats(), []);
 
+  const [contactName, setContactName] = useState('');
+  const [contactSurname, setContactSurname] = useState('');
+  const [contactMessage, setContactMessage] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [contactPhone, setContactPhone] = useState('');
   const [contactTouched, setContactTouched] = useState(false);
@@ -304,8 +330,32 @@ function Find_Your_YMCA() {
               onSubmit={(e) => {
                 e.preventDefault();
                 setContactTouched(true);
+
                 if (!STRICT_EMAIL.test(contactEmail.trim())) return;
                 if (contactPhone.trim() && !isValidPhPhone(contactPhone.trim())) return;
+
+                axios.post('http://localhost:3000/api/feedback', {
+                  name: contactName,
+                  surname: contactSurname,
+                  email: contactEmail,
+                  phone_num: contactPhone,
+                  message: contactMessage,
+                })
+                .then(response => {
+                  console.log('Success:', response.data);
+                  alert('Feedback submitted successfully!');
+
+                  // reset form
+                  setContactName('');
+                  setContactSurname('');
+                  setContactEmail('');
+                  setContactPhone('');
+                  setContactMessage('');
+                })
+                .catch(error => {
+                  console.error('Error submitting feedback:', error);
+                  alert('Something went wrong. Please try again.');
+                });
               }}
               noValidate
             >
@@ -313,8 +363,22 @@ function Find_Your_YMCA() {
                 Leave your details and our team will reach out to you.
               </p>
 
-              <input className="contact-input" type="text" placeholder="Name" required />
-              <input className="contact-input" type="text" placeholder="Surname" required />
+              <input 
+                className="contact-input" 
+                type="text" 
+                placeholder="Name" 
+                value={contactName}
+                onChange={(e) => setContactName(e.target.value)}
+                required 
+              />
+              <input 
+                className="contact-input" 
+                type="text" 
+                placeholder="Surname" 
+                value={contactSurname}
+                onChange={(e) => setContactSurname(e.target.value)}
+                required 
+              />
               <input
                 className={`contact-input ${emailInvalid ? 'contact-input--invalid' : ''}`}
                 type="email"
@@ -341,7 +405,12 @@ function Find_Your_YMCA() {
                 <p className="contact-field-error">Use a valid PH-style number (at least 10 digits).</p>
               ) : null}
 
-              <textarea className="contact-textarea" placeholder="Your Message" />
+              <textarea 
+                className="contact-textarea" 
+                placeholder="Your Message" 
+                value={contactMessage}
+                onChange={(e) => setContactMessage(e.target.value)}
+              />
 
               <div className="contact-actions">
                 <button className="contact-submit" type="submit">

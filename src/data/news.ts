@@ -95,7 +95,7 @@ export const LATEST_NEWS: NewsArticleMeta[] = [
   },
   {
     path: '/news/Article_Two',
-    title: 'College Y Club General Assembly & Induction of Officers',
+    title: 'YMCA Career Development Program',
     date: 'March 12, 2026 at 10:59 AM',
     subtitle: 'Leyte – Unity in action, service in spirit.',
     imageUrl: card8,

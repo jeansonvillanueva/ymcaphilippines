@@ -43,17 +43,66 @@ function Article() {
   const [email, setEmail] = useState('');
   const [articleUrl, setArticleUrl] = useState('');
   const [touched, setTouched] = useState(false);
+  const [name, setName] = useState('');
+  const [title, setTitle] = useState('');
+  const [subtitle, setSubtitle] = useState('');
+  const [message, setMessage] = useState('');
 
   const emailInvalid = touched && email.length > 0 && !EMAIL_RE.test(email.trim());
   const urlInvalid = touched && articleUrl.length > 0 && !/^https?:\/\/.+\..+/.test(articleUrl.trim());
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setTouched(true);
-    if (!selectedYMCA || !EMAIL_RE.test(email.trim()) || !/^https?:\/\/.+\..+/.test(articleUrl.trim())) {
+
+    if (!selectedYMCA || 
+        !EMAIL_RE.test(email.trim()) ||
+        !/^https?:\/\/.+\..+/.test(articleUrl.trim())
+      ) {
       return;
     }
-    alert('Thank you — your update was recorded for review.');
+
+    try {
+      const response = await fetch('http://localhost:3000/api/submit-update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          local_ymca: selectedYMCA?.value,
+          title, 
+          subtitle,
+          articleUrl,
+          email,
+          message,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Server error:', response.status, errorText);
+        throw new Error(`Server responded with ${response.status}: ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log('Success:', data);
+
+      alert('Thank you — your update was recorded for review.');
+
+      //OPTIONAL: reset form
+      setName('');
+      setSelectedYMCA(null);
+      setTitle('');
+      setSubtitle('');
+      setArticleUrl('');
+      setEmail('');
+      setMessage('');
+
+    } catch (error) {
+      console.error('Error submitting update:', error);
+      alert('An error occurred while submitting your update. Please try again later.');
+    }
   };
 
   return (
@@ -72,7 +121,15 @@ function Article() {
               <label className="article-form__label" htmlFor="ymca-update-name">
                 Name
               </label>
-              <input id="ymca-update-name" className="article-form__field" type="text" placeholder="Your name" required />
+              <input 
+                id="ymca-update-name" 
+                className="article-form__field" 
+                type="text" 
+                placeholder="Your name" 
+                required 
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
             </div>
 
             <div>
@@ -98,14 +155,30 @@ function Article() {
               <label className="article-form__label" htmlFor="ymca-update-title">
                 Title
               </label>
-              <input id="ymca-update-title" className="article-form__field" type="text" placeholder="Headline" required />
+              <input 
+                id="ymca-update-title" 
+                className="article-form__field" 
+                type="text" 
+                placeholder="Headline" 
+                required 
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
             </div>
 
             <div>
               <label className="article-form__label" htmlFor="ymca-update-subtitle">
                 Subtitle
               </label>
-              <input id="ymca-update-subtitle" className="article-form__field" type="text" placeholder="Short summary" required />
+              <input 
+                id="ymca-update-subtitle" 
+                className="article-form__field" 
+                type="text" 
+                placeholder="Short summary" 
+                required 
+                value={subtitle}
+                onChange={(e) => setSubtitle(e.target.value)}
+              />
             </div>
 
             <div>
@@ -154,6 +227,8 @@ function Article() {
                 id="ymca-update-message"
                 className="article-form__field article-form__textarea"
                 placeholder="Additional context for the web team"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
               />
             </div>
           </div>
