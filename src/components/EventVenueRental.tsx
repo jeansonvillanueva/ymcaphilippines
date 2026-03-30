@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import './EventVenueRental.css';
 
 interface EventVenueRentalProps {
@@ -6,7 +7,33 @@ interface EventVenueRentalProps {
 }
 
 export default function EventVenueRental({ imageUrl, images }: EventVenueRentalProps) {
-  const displayImage = imageUrl || (images && images.length > 0 ? images[0] : '');
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const slideImages = images && images.length > 0 ? images : (imageUrl ? [imageUrl] : []);
+
+  useEffect(() => {
+    if (slideImages.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slideImages.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [slideImages.length]);
+
+  const handlePrevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + slideImages.length) % slideImages.length);
+  };
+
+  const handleNextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % slideImages.length);
+  };
+
+  const handleDotClick = (index: number) => {
+    setCurrentSlide(index);
+  };
+
+  if (slideImages.length === 0) return null;
+
   return (
     <section className="event-venue-rental">
       <div className="page-section__inner event-venue-rental__inner">
@@ -40,11 +67,42 @@ export default function EventVenueRental({ imageUrl, images }: EventVenueRentalP
           </div>
           
           <div className="event-venue-rental__image-wrap">
+            {slideImages.length > 1 && (
+              <button 
+                className="event-venue-rental__nav-button event-venue-rental__nav-button--prev"
+                onClick={handlePrevSlide}
+                aria-label="Previous slide"
+              >
+                ‹
+              </button>
+            )}
             <img 
-              src={displayImage} 
+              src={slideImages[currentSlide]} 
               alt="YMCA Event Venue - 7th Floor Convention Hall" 
               className="event-venue-rental__image"
             />
+            {slideImages.length > 1 && (
+              <button 
+                className="event-venue-rental__nav-button event-venue-rental__nav-button--next"
+                onClick={handleNextSlide}
+                aria-label="Next slide"
+              >
+                ›
+              </button>
+            )}
+            
+            {slideImages.length > 1 && (
+              <div className="event-venue-rental__dots">
+                {slideImages.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`event-venue-rental__dot ${index === currentSlide ? 'event-venue-rental__dot--active' : ''}`}
+                    onClick={() => handleDotClick(index)}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
