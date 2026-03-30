@@ -12,7 +12,7 @@ function Get_Involved() {
     <div className="get-involved-page" ref={ref}>
       <section className="page-section page-section--white">
         <div className="page-section__inner">
-          <h1 className="get-involved-title reveal">Get Involve</h1>
+          <h1 className="get-involved-title reveal">Get Involved</h1>
           <p className="get-involved-lead reveal reveal-delay-1">
             The YMCA of the Philippines are dedicated to the growth of all persons in{' '}
             <span className="get-involved-lead__accent">spirit</span>,{' '}
