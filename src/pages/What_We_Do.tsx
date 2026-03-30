@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import ActivityCalendar, { type CalendarEvent } from '../components/ActivityCalendar';
 import Card from './Card-Media/Card';
@@ -26,7 +26,10 @@ function ymdToday() {
 
 const WhatWeDo: React.FC = () => {
   const ref = useScrollReveal<HTMLDivElement>();
-  const [selected, setSelected] = useState<CalendarEvent | null>(null);
+
+  const today = ymdToday();
+  const initialEvent = CALENDAR_EVENT_RECORDS.find((e) => e.date === today) ?? null;
+  const [selected, setSelected] = useState<CalendarEvent | null>(initialEvent);
   const [currentPage, setCurrentPage] = useState(0);
 
   type CategoryFilter = 'All' | NewsCategory;
@@ -65,28 +68,12 @@ const WhatWeDo: React.FC = () => {
     });
   }, [archiveYear, category, topic]);
 
-  useEffect(() => {
-    // Keep pagination stable when filters change.
-    setCurrentPage(0);
-  }, [archiveYear, category, topic]);
-
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / CARDS_PER_PAGE));
-  const start = currentPage * CARDS_PER_PAGE;
+  const safeCurrentPage = Math.min(currentPage, totalPages - 1);
+  const start = safeCurrentPage * CARDS_PER_PAGE;
   const visibleItems = filteredItems.slice(start, start + CARDS_PER_PAGE);
 
   const featuredItem = LATEST_NEWS[0];
-
-  useEffect(() => {
-    const today = ymdToday();
-    const firstToday = CALENDAR_EVENT_RECORDS.find((e) => e.date === today);
-    if (!firstToday) return;
-    setSelected({
-      title: firstToday.title,
-      date: firstToday.date,
-      description: firstToday.description,
-      image: firstToday.image,
-    });
-  }, []);
 
   const selectedDate = selected?.date ?? null;
   const formattedDate = useMemo(() => {

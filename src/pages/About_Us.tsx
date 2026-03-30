@@ -28,13 +28,28 @@ import kehPresident from '../assets/images/president/Keh.png';
 import yangPresident from '../assets/images/president/Yang.png';
 import histoyVideo from '../assets/videos/videoplayback.mp4';
 
-// type OrgProfile = {
-//   name: string;
-//   position: string;
-//   imageUrl?: string | null;
-// };
+type OrgMember = {
+  name: string;
+  position: string;
+  imageUrl?: string | null;
+};
 
-const ORG_STRUCTURE = {
+type OrgBranchGroup = {
+  group: string;
+  members: OrgMember[];
+};
+
+type OrgBranchChild = OrgMember | OrgBranchGroup;
+
+type OrgBranch = {
+  title?: string;
+  name?: string;
+  position?: string;
+  imageUrl?: string | null;
+  children?: OrgBranchChild[];
+};
+
+const ORG_STRUCTURE: { head: OrgMember; branches: OrgBranch[] } = {
   head: {
     name: 'Orlando F. Carreon',
     position: 'OIC – National General Secretary',
@@ -445,11 +460,11 @@ function AboutUs() {
                   />
 
                   <div className="org-tree__children">
-                    {branch.children?.map((child: any, idx: number) => {
-                      if (child.members) {
+                    {branch.children?.map((child: OrgBranchChild, idx: number) => {
+                      if ('members' in child && Array.isArray(child.members)) {
                         return (
                           <div key={idx} className="org-tree__subgroup">
-                            {child.members.map((m: any, j: number) => (
+                            {child.members.map((m, j) => (
                               <OrgChartCard
                                 key={j}
                                 name={m.name || 'Vacant'}
@@ -464,9 +479,9 @@ function AboutUs() {
                       return (
                         <OrgChartCard
                           key={idx}
-                          name={child.name || 'Vacant'}
-                          position={child.position || 'Vacant'}
-                          imageUrl={child.imageUrl || ymcaLogo}
+                          name={(child as OrgMember).name || 'Vacant'}
+                          position={(child as OrgMember).position || 'Vacant'}
+                          imageUrl={(child as OrgMember).imageUrl || ymcaLogo}
                         />
                       );
                     })}
