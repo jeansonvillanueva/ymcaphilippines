@@ -1,6 +1,3 @@
-import Zoom from "@mui/material/Zoom";
-import { Activity } from "react";
-
 export type LocalPillarKey = 'community' | 'work' | 'planet' | 'world';
 
 export type LocalProgram = {
@@ -45,7 +42,6 @@ const manilaLogo = new URL(
 ).href;
 
 const placeholderHero = new URL('../assets/images/Philippine-Map.png', import.meta.url).href;
-const placeholderLogo = new URL('../assets/images/logo.webp', import.meta.url).href;
 
 export function resolveLocalHeroImage(local: LocalConfig): string {
   const hero = local.heroImageUrl;
@@ -159,7 +155,6 @@ const leyteLogo = new URL(
   import.meta.url,
 ).href;
 
-
 const negrosOccidentalHero = new URL(
   '../assets/images/local_Y/Negros_Occidental/Negros_Occidental_Logo.jpg',
   import.meta.url,
@@ -179,10 +174,6 @@ const negrosOrientalLogo = new URL(
   '../assets/images/local_Y/Negros_Oriental/Negros_Oriental_Logo.jpg',
   import.meta.url,
 ).href;
-
-const ormocHero = placeholderHero;
-const ormocLogo = placeholderLogo;
-
 
 const davaoHero = new URL(
   '../assets/images/local_Y/Davao/588009835_1264023549084569_2080991013782010839_n.jpg',

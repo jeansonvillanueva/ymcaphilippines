@@ -16,27 +16,40 @@ function ImpactStats() {
   const aggregate = useMemo(() => getLocalsAggregateStats(), []);
   const ymcaCount = useMemo(() => Object.keys(LOCALS_BY_ID).length, []);
 
-  const stats: ImpactStat[] = [
-    { key: 'ymcas', label: 'YMCAs Across the Philippines', value: ymcaCount },
-    { key: 'members', label: 'Total Members', value: aggregate.total },
-    { key: 'programs', label: 'Community Programs', value: 50 },
-    { key: 'partners', label: 'Partners & Donors', value: 250 },
-    { key: 'volunteers', label: 'Volunteers', value: 2000, suffix: '+' },
-    { key: 'employees', label: 'Employees', value: 150, suffix: '+' },
-  ];
+  const stats: ImpactStat[] = useMemo(
+    () => [
+      { key: 'ymcas', label: 'YMCAs Across the Philippines', value: ymcaCount },
+      { key: 'members', label: 'Total Members', value: aggregate.total },
+      { key: 'programs', label: 'Community Programs', value: 50 },
+      { key: 'partners', label: 'Partners & Donors', value: 250 },
+      { key: 'volunteers', label: 'Volunteers', value: 2000, suffix: '+' },
+      { key: 'employees', label: 'Employees', value: 150, suffix: '+' },
+    ],
+    [ymcaCount, aggregate.total],
+  );
 
-  const [animated, setAnimated] = useState(() => stats.map(() => 0));
+  const [animated, setAnimated] = useState<number[]>(() => stats.map(() => 0));
 
   useEffect(() => {
+    let rafId: number | null = null;
     const start = performance.now();
     const duration = 4000;
     const step = (now: number) => {
       const progress = Math.min(1, (now - start) / duration);
       setAnimated(stats.map((s) => Math.floor(s.value * progress)));
-      if (progress < 1) window.requestAnimationFrame(step);
+      if (progress < 1) {
+        rafId = window.requestAnimationFrame(step);
+      }
     };
-    window.requestAnimationFrame(step);
-  }, []);
+
+    rafId = window.requestAnimationFrame(step);
+
+    return () => {
+      if (rafId !== null) {
+        window.cancelAnimationFrame(rafId);
+      }
+    };
+  }, [stats]);
 
   return (
     <section id="made-our-impact" className="page-section page-section--gray">

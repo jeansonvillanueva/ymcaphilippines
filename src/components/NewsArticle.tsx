@@ -57,10 +57,7 @@ export default function NewsArticle({
   }, [heroImageUrls, imageUrl]);
 
   const [heroIndex, setHeroIndex] = useState(0);
-
-  useEffect(() => {
-    setHeroIndex(0);
-  }, [slides]);
+  const clampedHeroIndex = slides.length > 0 ? heroIndex % slides.length : 0;
 
   useEffect(() => {
     if (slides.length <= 1) return;
@@ -88,12 +85,12 @@ export default function NewsArticle({
             <div
               key={`${src}-${i}`}
               className={
-                i === heroIndex
+                i === clampedHeroIndex
                   ? 'news-article-hero__slide news-article-hero__slide--active'
                   : 'news-article-hero__slide'
               }
               style={{ backgroundImage: `url(${src})` }}
-              aria-hidden={i !== heroIndex}
+              aria-hidden={i !== clampedHeroIndex}
             />
           ))}
           {slides.length > 1 ? (
@@ -102,9 +99,9 @@ export default function NewsArticle({
                 <button
                   key={i}
                   type="button"
-                  className={i === heroIndex ? 'news-article-hero__dot news-article-hero__dot--active' : 'news-article-hero__dot'}
+                  className={i === clampedHeroIndex ? 'news-article-hero__dot news-article-hero__dot--active' : 'news-article-hero__dot'}
                   aria-label={`Show image ${i + 1}`}
-                  aria-selected={i === heroIndex}
+                  aria-selected={i === clampedHeroIndex}
                   onClick={() => setHeroIndex(i)}
                 />
               ))}
