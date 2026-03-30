@@ -173,13 +173,13 @@ function Navbar() {
 
               <ul className="nav-dropdown-menu" aria-label="About Us submenu">
                 <li>
-                  <Link to="/about-us#vmv-section" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
+                  <Link to="/about-us#vision-mission-pillars" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
                     Vision, Mission and Pillars of Impact
                   </Link>
                 </li>
 
                 <li>
-                  <Link to="/about-us#history-section" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
+                  <Link to="/about-us#history" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
                    History
                   </Link>
                 </li>
@@ -205,7 +205,7 @@ function Navbar() {
 
         <div className="right-section">
           <Link to="/get-involved" className="btn-get-involved" onClick={() => setIsSearchOpen(false)}>
-            Support
+            Get Involved
           </Link>
           <button
             type="button"

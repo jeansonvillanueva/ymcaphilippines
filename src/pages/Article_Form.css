@@ -90,3 +90,18 @@
 .article-form .react-select-container {
   font-size: var(--text-base);
 }
+
+@media (max-width: 768px) {
+  .article-form {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+
+  .article-form__lead {
+    font-size: var(--text-base);
+  }
+
+  .article-form__actions {
+    justify-content: center;
+  }
+}
