@@ -1,0 +1,77 @@
+/* Get Involved page – matches provided layout */
+
+.get-involved-page {
+  font-family: var(--font-sans);
+  color: var(--ymca-text);
+}
+
+.get-involved-title {
+  text-align: center;
+  color: var(--ymca-navy);
+  font-size: var(--text-hero);
+  font-weight: 900;
+  margin: 0 0 1rem;
+}
+
+.get-involved-lead {
+  text-align: center;
+  max-width: 820px;
+  margin: 0 auto 2rem;
+  color: var(--ymca-navy);
+  line-height: 1.6;
+}
+
+.get-involved-lead__accent {
+  color: var(--ymca-red);
+  font-weight: 800;
+}
+
+.get-involved-ctas {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+.get-involved-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 140px;
+  height: 44px;
+  padding: 0 1.25rem;
+  background: var(--ymca-red);
+  color: white;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: transform var(--duration-normal) var(--ease-out), background var(--duration-normal) var(--ease-out);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+
+.get-involved-cta:hover {
+  background: var(--ymca-red-hover);
+  transform: translateY(-1px);
+}
+
+/* Diagonal cuts similar to screenshot */
+.get-involved-cta--left {
+  clip-path: polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%, 10% 50%);
+}
+
+.get-involved-cta--right {
+  clip-path: polygon(12% 0, 100% 0, 90% 50%, 100% 100%, 12% 100%, 0 50%);
+}
+
+@media (max-width: 600px) {
+  .get-involved-ctas {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .get-involved-cta {
+    width: 220px;
+  }
+}
+

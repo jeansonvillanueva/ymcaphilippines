@@ -106,7 +106,8 @@ app.post('/api/feedback', (req, res) => {
     (err, result) => {
       if (err) {
         console.error('Database error:', err);
-        return res.status(500).json({ 
+        return res.s
+        tatus(500).json({ 
           error: 'Failed to submit feedback',
           details: err.message 
         });
