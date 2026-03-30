@@ -197,6 +197,24 @@
   transform: translateY(-1px);
 }
 
+.btn-donate {
+  background: #c41e3a;
+  color: white;
+  padding: 10px 18px;
+  border: 2px solid #c41e3a;
+  font-weight: 900;
+  text-decoration: none;
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.btn-donate:hover {
+  background: #a01830;
+  border-color: #a01830;
+  transform: translateY(-1px);
+}
+
 .btn-search {
   background: rgba(255, 255, 255, 0.12);
   border: 2px solid rgba(255, 255, 255, 0.75);
@@ -346,6 +364,69 @@
   }
   .navbar-title {
     font-size: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .blue-section {
+    width: 100%;
+    justify-content: space-between;
+    padding: 14px 18px;
+  }
+
+  .navbar-menu {
+    display: none;
+  }
+
+  .navbar-menu--open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 96px;
+    left: 0;
+    right: 0;
+    background: #2f2f9e;
+    padding: 1rem;
+    gap: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-menu {
+    display: flex;
+  }
+
+  .right-section {
+    width: auto;
+    padding: 14px 18px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .navbar-title {
+    font-size: 32px;
+  }
+
+  .navbar-logo {
+    height: 80px;
+    width: 80px;
+  }
+
+  .nav-link {
+    font-size: 20px;
+  }
+
+  .nav-dropdown-menu {
+    position: static;
+    display: block;
+    box-shadow: none;
+    background: transparent;
+    padding: 0;
+    margin-top: 0.5rem;
+  }
+
+  .nav-dropdown-menu li a {
+    font-size: 16px;
+    padding: 6px 12px;
   }
 }
 

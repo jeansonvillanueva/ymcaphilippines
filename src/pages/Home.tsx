@@ -7,6 +7,9 @@ import Partners from '../components/Partners';
 import vision from '../assets/images/partners/vision_2030.png';
 import VideoShowcase, { type VideoItem } from '../components/VideoShowcase';
 import ImpactStats from '../components/ImpactStats';
+import EventVenueRental from '../components/EventVenueRental';
+import eventVenueImage1 from '../assets/images/rent/event1.jpg';
+import eventVenueImage2 from '../assets/images/rent/event2.jpg';
 import { LATEST_NEWS } from '../data/news';
 
 type HeroSlide = {
@@ -122,6 +125,8 @@ function Home() {
       </section>
 
       <VideoShowcase heading="YMCA Videos" videos={YOUTUBE_VIDEOS} />
+
+      <EventVenueRental images={[eventVenueImage1, eventVenueImage2]} />
 
             {/* Vision 2030 */}
         <section id="vision_2030" className="page-section page-section--gold">
