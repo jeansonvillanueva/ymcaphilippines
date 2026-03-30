@@ -448,6 +448,33 @@
     margin: 0;
   }
 
+@media (max-width: 768px) {
+  .ymca-vmv__title {
+    font-size: var(--text-xl);
+  }
+
+  .vmv-wrap {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .vmv-block {
+    padding: 1.5rem;
+  }
+
+  .vmv-block__title {
+    font-size: var(--text-xl);
+  }
+
+  .about-banner__title {
+    font-size: var(--text-3xl);
+  }
+
+  .about-banner__body {
+    font-size: var(--text-base);
+  }
+}
+
   /* HistoY section */
   .histoy-section {
     padding: 4rem 0;
