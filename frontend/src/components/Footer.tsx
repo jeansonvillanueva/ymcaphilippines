@@ -1,5 +1,5 @@
 import './Footer.css';
-import { FaFacebookF, FaInstagram, FaTwitter, FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaFacebookF, FaInstagram, FaTwitter, FaPhoneAlt, FaEnvelope, FaMapMarkerAlt, FaTiktok, FaYoutube } from 'react-icons/fa';
 import logo from '../assets/images/logo.webp';
 import { Link } from 'react-router-dom';
 
@@ -57,6 +57,12 @@ export default function Footer() {
           </a>
           <a href="https://x.com/YMCAPhilippines" target="_blank" rel="noopener noreferrer" aria-label="X">
             <FaTwitter />
+          </a>
+          <a href="https://www.tiktok.com/@ymcaphilippines" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+            <FaTiktok />
+          </a>
+          <a href="https://www.youtube.com/@YMCAPHILIPPINES1911" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+            <FaYoutube />
           </a>
         </div>
       </div>

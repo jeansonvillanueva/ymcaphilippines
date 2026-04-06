@@ -177,7 +177,7 @@ export default function LocalDetails() {
             </div>
 
             {activePrograms ? (
-              <div className="local-details-programs reveal reveal-delay-1" role="region" aria-label="Programs implemented">
+              <div className="local-details-programs" role="region" aria-label="Programs implemented">
                 <div className="local-details-programs__header">
                   <div className="local-details-programs__title">
                     Programs implemented
