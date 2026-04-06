@@ -1949,3 +1949,8 @@
     flex-wrap: wrap;
     justify-content: center;
   }
+
+  .hidden-dev-link {
+    color: transparent;
+    text-decoration: none;
+  }

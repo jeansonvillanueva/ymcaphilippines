@@ -50,8 +50,8 @@ type Region = {
 const MARKERS: BranchMarker[] = [
   { id: 'baguio', label: 'YMCA of the City of Baguio', x: 150, y: 130 },
   { id: 'tuguegarao', label: 'City of Tuguegarao YMCA', x: 200, y: 50 },
-  { id: 'nueva_ecija', label: 'YMCA of Nueva Ecija', x: 175, y: 150  },
-  { id: 'pangasinan', label: 'YMCA of Pangasinan', x: 145, y: 140  },
+  { id: 'nueva_ecija', label: 'YMCA of Nueva Ecija', x: 175, y: 150 },
+  { id: 'pangasinan', label: 'YMCA of Pangasinan', x: 145, y: 140 },
 
   { id: 'makati', label: 'YMCA of Makati', x: 175, y: 195 },
   { id: 'manila', label: 'YMCA of Manila', x: 180, y: 190 },
@@ -67,8 +67,8 @@ const MARKERS: BranchMarker[] = [
   { id: 'leyte', label: 'YMCA of Leyte', x: 330, y: 360 },
   { id: 'negros_occidental', label: 'YMCA of Negros Occidental', x: 255, y: 380 },
   { id: 'negros_oriental', label: 'YMCA of Negros Oriental', x: 250, y: 420 },
-  { id: 'ormoc', label: 'City of Ormoc YMCA', x: 330, y: 350  },
-  { id: 'san_carlos_city', label: 'YMCA of San Carlos City', x: 270, y: 370},
+  { id: 'ormoc', label: 'City of Ormoc YMCA', x: 330, y: 350 },
+  { id: 'san_carlos_city', label: 'YMCA of San Carlos City', x: 270, y: 370 },
   
   { id: 'davao', label: 'YMCA of Davao', x: 370, y: 520 },
   { id: 'cagayan_de_oro', label: 'YMCA Cagayan de Oro', x: 330, y: 470 },
@@ -142,7 +142,7 @@ function isValidPhPhone(raw: string) {
   return digits.length >= 10 && digits.length <= 12;
 }
 
-function Find_Your_YMCA() {
+function Where_We_Are() {
   const ref = useScrollReveal<HTMLDivElement>();
   const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -167,7 +167,7 @@ function Find_Your_YMCA() {
 
   return (
     <div className="find-ymca-page" ref={ref}>
-      <section id="find-ymca" className="page-section page-section--white">
+      <section className="page-section page-section--white">
         <div className="page-section__inner">
           {/* ABOUT */}
     <section id="about" className="page-section page-section--white">
@@ -175,10 +175,10 @@ function Find_Your_YMCA() {
           className="about-banner where-banner reveal"
           style={{ backgroundImage: `url(${ABOUT_IMAGE})` }}
         >
-          <div className="about-banner__overlay" />
+          <div className="about-banner__overlay"></div>
           <div className="about-banner__inner">
             <h1 className="about-banner__title">
-              Where are <span className="y-accent">Y</span>
+              Where <span className="y-accent">We</span> Are
             </h1>
             <p className="about-banner__body">
             The YMCA of the Philippines is established in multiple locations nationwide, with local associations actively serving their respective communities. Below are the different YMCA locals and their areas of operation.
@@ -206,7 +206,9 @@ function Find_Your_YMCA() {
       </div>
 
 
-          <SubjectHeader text="Find Your YMCA" className="reveal" />
+      <section id="find-your-ymca" className="page-section page-section--white">
+        <div className="page-section__inner">
+        <SubjectHeader text="Find Your YMCA" className="reveal" />
 
           <div className="find-ymca__stats reveal reveal-delay-1" aria-label="Membership summary across configured locals">
             <div className="find-ymca__stat">
@@ -312,16 +314,17 @@ function Find_Your_YMCA() {
           <div className="contact-layout reveal reveal-delay-1">
             {/* Google Map */}
             <div className="contact-map">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3861.172665460871!2d120.97979170421569!3d14.589235070481982!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397cbdfa4e6de45%3A0xad9f5ff94d5f823!2sYMCA%20of%20the%20Philippines%20Federation%20Office!5e0!3m2!1sen!2sph!4v1773130234298!5m2!1sen!2sph"
-                width="100%"
-                height="350"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="YMCA Location"
-              />
+              <div>
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2086.7379176810077!2d120.98200672571619!3d14.589301210393252!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397cbdfa4e6de45%3A0xad9f5ff94d5f823!2sYMCA%20of%20the%20Philippines%20Federation%20Office!5e0!3m2!1sen!2sph!4v1775437418046!5m2!1sen!2sph"
+                  width="600"
+                  height="450"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
+              </div>
             </div>
 
             {/* Contact Form */}
@@ -423,7 +426,9 @@ function Find_Your_YMCA() {
       </section>
 
     </div>
+  </section>
+</div>
   );
 }
 
-export default Find_Your_YMCA;
+export default Where_We_Are;

@@ -124,7 +124,7 @@ function Home() {
         </div>
       </section>
 
-      <VideoShowcase heading="YMCA Videos" videos={YOUTUBE_VIDEOS} />
+      <VideoShowcase id="videosHome" heading="YMCA Videos" videos={YOUTUBE_VIDEOS} />
 
       <EventVenueRental images={[eventVenueImage1, eventVenueImage2]} />
 
@@ -163,7 +163,6 @@ function Home() {
           <Partners />
         </div>
       </section>
-
     </div>
   );
 }

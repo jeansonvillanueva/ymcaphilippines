@@ -21,7 +21,7 @@ const PAGE_ENTRIES: SearchResult[] = [
   { type: 'page', title: 'Latest News', path: '/calendar#latest-news' },
   { type: 'page', title: 'Calendar of Activities', path: '/calendar#calendar' },
   { type: 'page', title: 'Where We Are', subtitle: 'Find your YMCA', path: '/find-ymca' },
-  { type: 'page', title: 'Find Your YMCA', path: '/find-ymca#find-ymca' },
+  { type: 'page', title: 'Find Your YMCA', path: '/find-ymca#find-your-ymca' },
   { type: 'page', title: 'Contact Us', path: '/find-ymca#contact-us' },
   { type: 'page', title: 'Get Involved', path: '/get-involved' },
   { type: 'page', title: 'Support — Donate', path: '/donate' },

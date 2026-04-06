@@ -6,7 +6,9 @@ type VideoItem = {
   videoUrl?: string;
 };
 
+
 type VideoShowcaseProps = {
+  id: string;
   heading: string;
   videos: VideoItem[];
 };

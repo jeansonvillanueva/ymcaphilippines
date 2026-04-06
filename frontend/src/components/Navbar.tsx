@@ -97,6 +97,9 @@ function Navbar() {
               </NavLink>
               <ul className="nav-dropdown-menu" aria-label="Home submenu">
                 <li>
+                  <Link to="/#videosHome" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>YMCA Videos</Link>
+                </li>
+                <li>
                   <Link to="/#vision_2030" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>Vision 2030</Link>
                 </li>
                 <li>
@@ -146,7 +149,7 @@ function Navbar() {
 
               <ul className="nav-dropdown-menu" aria-label="Where We Are submenu">
                 <li>
-                  <Link to="/find-ymca#find-ymca" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
+                  <Link to="/find-ymca#find-your-ymca" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
                     Find Your YMCA
                   </Link>
                 </li>
