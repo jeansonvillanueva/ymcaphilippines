@@ -76,7 +76,6 @@ const ORG_STRUCTURE: { head: OrgMember; branches: OrgBranch[] } = {
       title: 'Secretary for Member Association',
       imageUrl: null,
       children: [
-        { name: 'Vacant', position: 'Member Association Assistant', imageUrl: null },
       ],
     },
     {
@@ -95,9 +94,6 @@ const ORG_STRUCTURE: { head: OrgMember; branches: OrgBranch[] } = {
           group: 'Line 2',
           members: [
             { name: 'Armando G. Tan', position: 'Janitor / Utility', imageUrl: armandoImage },
-            { name: 'Vacant', position: 'Administrative Assistant', imageUrl: null },
-            { name: 'Vacant', position: 'IT Support Staff', imageUrl: null },
-            { name: 'Vacant', position: 'Watchman', imageUrl: null },
           ],
         },
       ],

@@ -800,12 +800,13 @@
 
   .org-tree__branches {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 2rem;
     width: 100%;
     max-width: var(--content-max-width);
     margin: 0 auto;
     align-items: start;
+    justify-items: center;
   }
 
   .org-tree__branch {
@@ -814,21 +815,24 @@
     gap: 1rem;
     align-items: center;
     text-align: center;
+    width: 100%;
   }
 
   .org-tree__children {
     display: flex;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    width: 100%;
     margin-top: 0.35rem;
   }
 
   .org-tree__subgroup {
     display: flex;
-    gap: 1.2rem;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    width: 100%;
   }
 
   /* Org chart card (used by OrgChartCard.tsx) */
@@ -842,7 +846,8 @@
     border: 1px solid rgba(0,0,0,0.06);
     box-shadow: 0 8px 18px rgba(0,0,0,0.06);
     width: 100%;
-    max-width: 320px;
+    max-width: 260px;
+    min-height: 80px;
   }
 
   .org-chart-card__image-wrap {
@@ -897,31 +902,20 @@
     }
 
     .org-tree__branches {
-      display: flex;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      gap: 1rem;
-      padding-bottom: 0.75rem;
-      scroll-snap-type: x mandatory;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
       width: 100%;
-      margin: 0;
     }
 
     .org-tree__branch {
-      flex: 0 0 90%;
-      min-width: 280px;
-      max-width: 320px;
-      scroll-snap-align: start;
-      align-items: flex-start;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-      padding: 0.8rem;
-      margin-right: 0.1rem;
-    }
-
-    .org-tree__branch:last-child {
-      margin-right: 1rem;
+      flex: 0 0 auto;
+      align-items: center;
+      background: transparent;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 0;
+      margin: 0;
     }
 
     .org-tree__children {
@@ -929,27 +923,28 @@
       gap: 0.8rem;
       width: 100%;
       margin-top: 0.8rem;
+      align-items: center;
     }
 
     .org-chart-card {
       width: 100%;
-      max-width: none;
-      flex-direction: column;
+      max-width: 240px;
+      flex-direction: row;
       align-items: center;
-      text-align: center;
-      padding: 0.85rem;
+      text-align: left;
+      padding: 0.75rem;
     }
 
     .org-chart-card__image-wrap {
-      width: 92px;
-      height: 92px;
-      flex: 0 0 92px;
-      border-radius: 12px;
+      width: 64px;
+      height: 64px;
+      flex: 0 0 64px;
+      border-radius: 8px;
     }
 
     .org-chart-card__name {
       white-space: normal;
-      font-size: 1rem;
+      font-size: 0.95rem;
     }
 
     .org-tree__branches::-webkit-scrollbar {
