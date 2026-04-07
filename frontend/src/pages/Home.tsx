@@ -27,22 +27,22 @@ const YOUTUBE_VIDEOS: VideoItem[] = [
     embedUrl: 'https://www.youtube.com/embed/KfGMl7ov2x8?si=qNnH4FVdON86cXLa',
   },
   {
-    id: 'history',
-    title: 'YMCA History',
-    description: 'A quick look at YMCA milestones and legacy.',
-    embedUrl: 'https://www.youtube.com/embed/fSzM4_k4nIM',
+    id: 'promotion',
+    title: 'YMCA Promotion',
+    description: 'Discover the impact of YMCA programs worldwide.',
+    embedUrl: 'https://www.youtube-nocookie.com/embed/DtnLgLoiYjw?si=nXyG6ENcBuu_ZmG4',
   },
   {
-    id: 'song',
-    title: 'YMCA Song',
-    description: 'Official Music Video of YMCA Song.',
-    embedUrl: 'https://youtu.be/CS9OO0S5w2k?si=B957j43VPPv2g4Gl',
+    id: 'program',
+    title: 'YMCA 2025 Program',
+    description: 'Explore the future of YMCA initiatives.',
+    embedUrl: 'https://www.youtube-nocookie.com/embed/g7D2GX2XfGw?si=J84hvIk2igPOoWGA',
   },
   {
     id: 'YWCA_Motion',
     title: 'YWCA Motion',
     description: 'YWCA Greeting from the President of YWCA of the Philippines.',
-    embedUrl: 'https://youtu.be/-KO_7ahfJaY?si=xNDPKbKj9bApsc7p',
+    embedUrl: 'https://www.youtube-nocookie.com/embed/-KO_7ahfJaY?si=aLqpPop0kLQYZN8X',
   }
 ];
 
