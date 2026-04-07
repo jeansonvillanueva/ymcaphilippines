@@ -2,10 +2,11 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
+  base: '/testsite/',
   plugins: [react()],
   server: {
     host: true,
     port: 5173,
-    allowedHosts: true // ✅ correct for your Vite version
+    allowedHosts: true
   }
 })
