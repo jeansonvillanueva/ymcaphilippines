@@ -12,6 +12,7 @@ import LocalDetails from './pages/LocalDetails';
 import About_Us from './pages/About_Us';
 import AboutUsHighlights from './pages/Card-Media/articles/about_us';
 import Developer from './pages/developer';
+import AdminDashboard from './pages/admin/AdminDashboard';
 
 import Card_One from './pages/Card-Media/news/Card_One';
 import Card_Two from './pages/Card-Media/news/Card_Two';
@@ -53,7 +54,7 @@ function ScrollToHash() {
 
 function App() {
   return (
-    <Router>
+    <Router basename="/testsite">
       <Navbar />
       <ScrollToHash />
 
@@ -68,6 +69,7 @@ function App() {
           <Route path="/about-us" element={<About_Us />} />
           <Route path="/about-us/highlights" element={<AboutUsHighlights />} />
           <Route path="/developer" element={<Developer />} />
+          <Route path="/admin" element={<AdminDashboard />} />
 
           <Route path="/article" element={<Article />} />
 

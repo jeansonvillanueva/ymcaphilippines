@@ -5,6 +5,7 @@ import { useScrollReveal } from '../hooks/useScrollReveal';
 import SubjectHeader from '../components/SubjectHeader';
 import '../styles/design-system.css';
 import './Article_Form.css';
+import { PUBLIC_API_URL } from '../hooks/useApi';
 
 type YMCAOption = {
   value: string;
@@ -63,7 +64,7 @@ function Article() {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/api/submit-update', {
+      const response = await fetch(`${PUBLIC_API_URL}/submit-update`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

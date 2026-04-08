@@ -1,8 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import db from './db.js';
+import initializeTables from './database-init.js';
 
 const app = express();
+
+// Initialize all tables
+initializeTables();
 
 // Middleware
 app.use(cors());
@@ -199,8 +203,272 @@ app.post('/api/feedback', (req, res) => {
     res.json({ message: 'Feedback submitted successfully', id: result.insertId });
   });
 });
+// ============ ADMIN API ROUTES ============
 
+// VIDEOS - Admin Management
+app.get("/admin/videos", (req, res) => {
+  db.query("SELECT * FROM videos ORDER BY created_at DESC", (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(result);
+  });
+});
 
+app.post("/admin/videos", (req, res) => {
+  const { title, description, embedUrl, videoUrl } = req.body;
+  if (!title) return res.status(400).json({ error: "Title is required" });
+  
+  db.query(
+    "INSERT INTO videos (title, description, embedUrl, videoUrl) VALUES (?, ?, ?, ?)",
+    [title, description, embedUrl, videoUrl],
+    (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ id: result.insertId, message: "Video added successfully" });
+    }
+  );
+});
+
+app.put("/admin/videos/:id", (req, res) => {
+  const { title, description, embedUrl, videoUrl } = req.body;
+  db.query(
+    "UPDATE videos SET title=?, description=?, embedUrl=?, videoUrl=? WHERE id=?",
+    [title, description, embedUrl, videoUrl, req.params.id],
+    (err) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: "Video updated successfully" });
+    }
+  );
+});
+
+app.delete("/admin/videos/:id", (req, res) => {
+  db.query("DELETE FROM videos WHERE id=?", [req.params.id], (err) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ message: "Video deleted successfully" });
+  });
+});
+
+// NEWS - Admin Management
+app.get("/admin/news", (req, res) => {
+  db.query("SELECT * FROM news ORDER BY created_at DESC", (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(result);
+  });
+});
+
+app.post("/admin/news", (req, res) => {
+  const { path, title, date, subtitle, imageUrl, category, topic } = req.body;
+  if (!title || !path) return res.status(400).json({ error: "Title and path are required" });
+  
+  db.query(
+    "INSERT INTO news (path, title, date, subtitle, imageUrl, category, topic) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    [path, title, date, subtitle, imageUrl, category, topic],
+    (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ id: result.insertId, message: "News added successfully" });
+    }
+  );
+});
+
+app.put("/admin/news/:id", (req, res) => {
+  const { path, title, date, subtitle, imageUrl, category, topic } = req.body;
+  db.query(
+    "UPDATE news SET path=?, title=?, date=?, subtitle=?, imageUrl=?, category=?, topic=? WHERE id=?",
+    [path, title, date, subtitle, imageUrl, category, topic, req.params.id],
+    (err) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: "News updated successfully" });
+    }
+  );
+});
+
+app.delete("/admin/news/:id", (req, res) => {
+  db.query("DELETE FROM news WHERE id=?", [req.params.id], (err) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ message: "News deleted successfully" });
+  });
+});
+
+// CALENDAR EVENTS - Admin Management
+app.get("/admin/calendar", (req, res) => {
+  db.query("SELECT * FROM calendar_events ORDER BY date DESC", (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(result);
+  });
+});
+
+app.post("/admin/calendar", (req, res) => {
+  const { title, date, description, imageUrl } = req.body;
+  if (!title || !date) return res.status(400).json({ error: "Title and date are required" });
+  
+  db.query(
+    "INSERT INTO calendar_events (title, date, description, imageUrl) VALUES (?, ?, ?, ?)",
+    [title, date, description, imageUrl],
+    (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ id: result.insertId, message: "Event added successfully" });
+    }
+  );
+});
+
+app.put("/admin/calendar/:id", (req, res) => {
+  const { title, date, description, imageUrl } = req.body;
+  db.query(
+    "UPDATE calendar_events SET title=?, date=?, description=?, imageUrl=? WHERE id=?",
+    [title, date, description, imageUrl, req.params.id],
+    (err) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: "Event updated successfully" });
+    }
+  );
+});
+
+app.delete("/admin/calendar/:id", (req, res) => {
+  db.query("DELETE FROM calendar_events WHERE id=?", [req.params.id], (err) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ message: "Event deleted successfully" });
+  });
+});
+
+// LOCALS (Where We Are) - Admin Management
+app.get("/admin/locals", (req, res) => {
+  db.query("SELECT * FROM locals ORDER BY name", (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(result);
+  });
+});
+
+app.get("/admin/locals/:id", (req, res) => {
+  db.query("SELECT * FROM locals WHERE id=?", [req.params.id], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!result.length) return res.status(404).json({ error: "Local not found" });
+    res.json(result[0]);
+  });
+});
+
+app.post("/admin/locals", (req, res) => {
+  const { id, name, established, facebookUrl, heroImageUrl, logoImageUrl, corporate, nonCorporate, youth, others, totalMembersAsOf } = req.body;
+  if (!id || !name) return res.status(400).json({ error: "ID and name are required" });
+  
+  db.query(
+    "INSERT INTO locals (id, name, established, facebookUrl, heroImageUrl, logoImageUrl, corporate, nonCorporate, youth, others, totalMembersAsOf) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    [id, name, established, facebookUrl, heroImageUrl, logoImageUrl, corporate || 0, nonCorporate || 0, youth || 0, others || 0, totalMembersAsOf],
+    (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ id, message: "Local added successfully" });
+    }
+  );
+});
+
+app.put("/admin/locals/:id", (req, res) => {
+  const { name, established, facebookUrl, heroImageUrl, logoImageUrl, corporate, nonCorporate, youth, others, totalMembersAsOf } = req.body;
+  db.query(
+    "UPDATE locals SET name=?, established=?, facebookUrl=?, heroImageUrl=?, logoImageUrl=?, corporate=?, nonCorporate=?, youth=?, others=?, totalMembersAsOf=? WHERE id=?",
+    [name, established, facebookUrl, heroImageUrl, logoImageUrl, corporate || 0, nonCorporate || 0, youth || 0, others || 0, totalMembersAsOf, req.params.id],
+    (err) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: "Local updated successfully" });
+    }
+  );
+});
+
+// PILLARS - Admin Management
+app.get("/admin/pillars/:localId", (req, res) => {
+  db.query(
+    `SELECT p.*, GROUP_CONCAT(JSON_OBJECT('id', pp.id, 'title', pp.title, 'bullets', pp.bullets, 'sequenceOrder', pp.sequenceOrder) SEPARATOR ',') as programs
+     FROM pillars p
+     LEFT JOIN pillar_programs pp ON p.id = pp.pillarId
+     WHERE p.localId=?
+     GROUP BY p.id`,
+    [req.params.localId],
+    (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(result);
+    }
+  );
+});
+
+app.put("/admin/pillars/:id", (req, res) => {
+  const { key, label, color } = req.body;
+  db.query(
+    "UPDATE pillars SET key=?, label=?, color=? WHERE id=?",
+    [key, label, color, req.params.id],
+    (err) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: "Pillar updated successfully" });
+    }
+  );
+});
+
+app.post("/admin/pillar-programs", (req, res) => {
+  const { pillarId, title, bullets, sequenceOrder } = req.body;
+  db.query(
+    "INSERT INTO pillar_programs (pillarId, title, bullets, sequenceOrder) VALUES (?, ?, ?, ?)",
+    [pillarId, title, JSON.stringify(bullets), sequenceOrder || 0],
+    (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ id: result.insertId, message: "Program added successfully" });
+    }
+  );
+});
+
+app.put("/admin/pillar-programs/:id", (req, res) => {
+  const { title, bullets, sequenceOrder } = req.body;
+  db.query(
+    "UPDATE pillar_programs SET title=?, bullets=?, sequenceOrder=? WHERE id=?",
+    [title, JSON.stringify(bullets), sequenceOrder || 0, req.params.id],
+    (err) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: "Program updated successfully" });
+    }
+  );
+});
+
+app.delete("/admin/pillar-programs/:id", (req, res) => {
+  db.query("DELETE FROM pillar_programs WHERE id=?", [req.params.id], (err) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ message: "Program deleted successfully" });
+  });
+});
+
+// STAFF (Meet Our Family) - Admin Management
+app.get("/admin/staff", (req, res) => {
+  db.query("SELECT * FROM staff ORDER BY departmentGroup, sequenceOrder", (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(result);
+  });
+});
+
+app.post("/admin/staff", (req, res) => {
+  const { name, position, imageUrl, departmentGroup, sequenceOrder } = req.body;
+  if (!name || !position) return res.status(400).json({ error: "Name and position are required" });
+  
+  db.query(
+    "INSERT INTO staff (name, position, imageUrl, departmentGroup, sequenceOrder) VALUES (?, ?, ?, ?, ?)",
+    [name, position, imageUrl, departmentGroup, sequenceOrder || 0],
+    (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ id: result.insertId, message: "Staff added successfully" });
+    }
+  );
+});
+
+app.put("/admin/staff/:id", (req, res) => {
+  const { name, position, imageUrl, departmentGroup, sequenceOrder } = req.body;
+  db.query(
+    "UPDATE staff SET name=?, position=?, imageUrl=?, departmentGroup=?, sequenceOrder=? WHERE id=?",
+    [name, position, imageUrl, departmentGroup, sequenceOrder || 0, req.params.id],
+    (err) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: "Staff updated successfully" });
+    }
+  );
+});
+
+app.delete("/admin/staff/:id", (req, res) => {
+  db.query("DELETE FROM staff WHERE id=?", [req.params.id], (err) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ message: "Staff deleted successfully" });
+  });
+});
 
 const port = process.env.PORT || 3000;
 

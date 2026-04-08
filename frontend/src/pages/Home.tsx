@@ -11,6 +11,7 @@ import EventVenueRental from '../components/EventVenueRental';
 import eventVenueImage1 from '../assets/images/rent/event1.jpg';
 import eventVenueImage2 from '../assets/images/rent/event2.jpg';
 import { LATEST_NEWS } from '../data/news';
+import { useVideos } from '../hooks/useApi';
 
 type HeroSlide = {
   image: string;
@@ -19,7 +20,7 @@ type HeroSlide = {
   path: string;
 };
 
-const YOUTUBE_VIDEOS: VideoItem[] = [
+const FALLBACK_VIDEOS: VideoItem[] = [
   {
     id: 'vision2030',
     title: 'YMCA Vision 2030',
@@ -58,6 +59,7 @@ function parseNewsDate(date?: string) {
 function Home() {
   const sectionRef = useScrollReveal<HTMLDivElement>();
   const [activeSlide, setActiveSlide] = useState(0);
+  const { videos } = useVideos();
 
   const heroSlides = useMemo<HeroSlide[]>(() => {
     const latest = [...LATEST_NEWS]
@@ -71,6 +73,21 @@ function Home() {
       path: item.path,
     }));
   }, []);
+
+  const videoItems = useMemo<VideoItem[]>(() => {
+    if (videos.length > 0) {
+      return videos.map((video) => ({
+        id: video.id?.toString() ?? `${video.title}-${Math.random()}`,
+        title: video.title,
+        description: video.description,
+        embedUrl: video.embedUrl,
+        videoUrl: video.videoUrl,
+      }));
+    }
+
+    return FALLBACK_VIDEOS;
+  }, [videos]);
+
 
   useEffect(() => {
     if (heroSlides.length < 2) return;
@@ -124,7 +141,7 @@ function Home() {
         </div>
       </section>
 
-      <VideoShowcase id="videosHome" heading="YMCA Videos" videos={YOUTUBE_VIDEOS} />
+      <VideoShowcase id="videosHome" heading="YMCA Videos" videos={videoItems} />
 
       <EventVenueRental images={[eventVenueImage1, eventVenueImage2]} />
 

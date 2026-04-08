@@ -10,6 +10,7 @@ import map from '../assets/images/Philippine-Map.png';
 import defaultBranchLogo from '../assets/images/logo.webp';
 import ecoHeroesTrainingImage from '../assets/images/About_Us/eco-heroes_training.jpg';
 import axios from 'axios';
+import { PUBLIC_API_URL } from '../hooks/useApi';
 
 type Branch = {
   id: string;
@@ -335,7 +336,7 @@ function Where_We_Are() {
                 if (!STRICT_EMAIL.test(contactEmail.trim())) return;
                 if (contactPhone.trim() && !isValidPhPhone(contactPhone.trim())) return;
 
-                axios.post('http://localhost:3000/api/feedback', {
+                axios.post(`${PUBLIC_API_URL}/feedback`, {
                   name: contactName,
                   surname: contactSurname,
                   email: contactEmail,
