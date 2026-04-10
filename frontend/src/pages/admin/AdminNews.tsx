@@ -8,6 +8,8 @@ interface News {
   title: string;
   date?: string;
   subtitle?: string;
+  body?: string;
+  localYMCA?: string;
   imageUrl?: string;
   category: string;
   topic: string;
@@ -18,15 +20,19 @@ const topics = ['Education', 'Training', 'Youth Leadership', 'Environment', 'You
 
 export default function AdminNews() {
   const [newsList, setNewsList] = useState<News[]>([]);
+  const [locals, setLocals] = useState<{ id: string; name: string }[]>([]);
   const [form, setForm] = useState<News>({
     path: '',
     title: '',
     date: '',
     subtitle: '',
+    body: '',
+    localYMCA: '',
     imageUrl: '',
     category: 'News',
     topic: '',
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -35,6 +41,7 @@ export default function AdminNews() {
 
   useEffect(() => {
     fetchNews();
+    fetchLocals();
   }, []);
 
   const fetchNews = async () => {
@@ -49,24 +56,67 @@ export default function AdminNews() {
     }
   };
 
+  const fetchLocals = async () => {
+    try {
+      const response = await axios.get(`${ADMIN_API_URL}/locals`);
+      setLocals(response.data);
+    } catch (error) {
+      console.error('Error fetching locals:', error);
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      setMessage({ type: 'error', text: 'Image must be 5 MB or smaller' });
+      return;
+    }
+
+    setImageFile(file);
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setForm((prev) => ({ ...prev, imageUrl: reader.result as string }));
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.title.trim() || !form.path.trim()) {
-      setMessage({ type: 'error', text: 'Title and path are required' });
+    if (!form.title.trim()) {
+      setMessage({ type: 'error', text: 'Title is required' });
       return;
     }
 
     try {
+      const formData = new FormData();
+      formData.append('title', form.title.trim());
+      formData.append('date', form.date || '');
+      formData.append('subtitle', form.subtitle || '');
+      formData.append('body', form.body || '');
+      formData.append('localYMCA', form.localYMCA || '');
+      formData.append('category', form.category || 'News');
+      formData.append('topic', form.topic || '');
+      if (imageFile) {
+        formData.append('image', imageFile);
+      } else if (form.imageUrl) {
+        formData.append('imageUrl', form.imageUrl);
+      }
+
       if (editingId) {
-        await axios.put(`${API_URL}/${editingId}`, form);
+        await axios.put(`${API_URL}/${editingId}`, formData);
         setMessage({ type: 'success', text: 'News updated successfully' });
       } else {
-        await axios.post(API_URL, form);
+        await axios.post(API_URL, formData);
         setMessage({ type: 'success', text: 'News added successfully' });
       }
       setForm({
@@ -74,10 +124,13 @@ export default function AdminNews() {
         title: '',
         date: '',
         subtitle: '',
+        body: '',
+        localYMCA: '',
         imageUrl: '',
         category: 'News',
         topic: '',
       });
+      setImageFile(null);
       setEditingId(null);
       fetchNews();
     } catch (error) {
@@ -104,6 +157,8 @@ export default function AdminNews() {
             title: '',
             date: '',
             subtitle: '',
+            body: '',
+            localYMCA: '',
             imageUrl: '',
             category: 'News',
             topic: '',
@@ -143,17 +198,6 @@ export default function AdminNews() {
         </div>
 
         <div className="form-group">
-          <label>Path *</label>
-          <input
-            type="text"
-            name="path"
-            placeholder="/news/Card_One"
-            value={form.path}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
           <label>Date</label>
           <input
             type="text"
@@ -178,9 +222,9 @@ export default function AdminNews() {
         <div className="form-group">
           <label>Topic</label>
           <select name="topic" value={form.topic} onChange={handleChange}>
-            <option value="">Select a topic</option>
+            <option key="topic-placeholder" value="">Select a topic</option>
             {topics.map((topic) => (
-              <option key={topic} value={topic}>
+              <option key={`topic-${topic}`} value={topic}>
                 {topic}
               </option>
             ))}
@@ -188,12 +232,37 @@ export default function AdminNews() {
         </div>
 
         <div className="form-group">
-          <label>Image URL</label>
-          <input
-            type="text"
-            name="imageUrl"
-            placeholder="https://..."
-            value={form.imageUrl || ''}
+          <label>Nearest Local YMCA</label>
+          <select name="localYMCA" value={form.localYMCA || ''} onChange={handleChange}>
+            <option key="local-placeholder" value="">Select nearest local YMCA (optional)</option>
+            {locals.map((local, index) => {
+              const optionKey = local.id ? `local-${local.id}` : `local-unknown-${index}`;
+              const optionValue = local.id ?? `${local.name}-${index}`;
+              return (
+                <option key={optionKey} value={optionValue}>
+                  {local.name}
+                </option>
+              );
+            })}
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label>Upload Image</label>
+          <input type="file" accept="image/*" onChange={handleFileChange} />
+          {form.imageUrl ? (
+            <div className="image-preview">
+              <img src={form.imageUrl} alt="News preview" style={{ maxWidth: '100%', marginTop: '0.75rem' }} />
+            </div>
+          ) : null}
+        </div>
+
+        <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+          <label>Paragraph</label>
+          <textarea
+            name="body"
+            placeholder="Main news paragraph or full article summary"
+            value={form.body || ''}
             onChange={handleChange}
           />
         </div>
@@ -221,10 +290,13 @@ export default function AdminNews() {
                   title: '',
                   date: '',
                   subtitle: '',
+                  body: '',
+                  localYMCA: '',
                   imageUrl: '',
                   category: 'News',
                   topic: '',
                 });
+                setImageFile(null);
                 setEditingId(null);
               }}
               className="btn btn-secondary"
@@ -243,6 +315,7 @@ export default function AdminNews() {
           <thead>
             <tr>
               <th>Title</th>
+              <th>Local YMCA</th>
               <th>Category</th>
               <th>Topic</th>
               <th>Date</th>
@@ -253,6 +326,7 @@ export default function AdminNews() {
             {newsList.map((news) => (
               <tr key={news.id}>
                 <td>{news.title}</td>
+                <td>{locals.find((local) => local.id === news.localYMCA)?.name || news.localYMCA || '-'}</td>
                 <td>{news.category}</td>
                 <td>{news.topic}</td>
                 <td>{news.date || '-'}</td>

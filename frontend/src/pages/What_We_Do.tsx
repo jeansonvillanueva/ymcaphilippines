@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useNews } from '../hooks/useApi';
 import ActivityCalendar, { type CalendarEvent } from '../components/ActivityCalendar';
 import Card from './Card-Media/Card';
 import SubjectHeader from '../components/SubjectHeader';
-import { LATEST_NEWS, NEWS_FEATURED_IMAGE, type NewsCategory } from '../data/news';
+import { NEWS_FEATURED_IMAGE, type NewsCategory } from '../data/news';
 import { CALENDAR_EVENT_RECORDS } from '../data/calendarEvents';
 import '../styles/design-system.css';
 import './What_We_Do.css';
@@ -32,6 +33,9 @@ const WhatWeDo: React.FC = () => {
   const [selected, setSelected] = useState<CalendarEvent | null>(initialEvent);
   const [currentPage, setCurrentPage] = useState(0);
 
+  const { news, loading, error } = useNews();
+  const newsItems = news;
+
   type CategoryFilter = 'All' | NewsCategory;
   const [category, setCategory] = useState<CategoryFilter>('All');
   const [topic, setTopic] = useState<string>('All');
@@ -40,24 +44,23 @@ const WhatWeDo: React.FC = () => {
   const categoryOptions: CategoryFilter[] = ['All', 'News', 'Articles', 'Features'];
 
   const topicOptions = useMemo(() => {
-    const unique = new Set(LATEST_NEWS.map((a) => a.topic).filter(Boolean));
+    const unique = new Set(newsItems.map((a) => a.topic).filter(Boolean));
     return Array.from(unique).sort((a, b) => a.localeCompare(b));
-  }, []);
+  }, [newsItems]);
 
   const archiveOptions = useMemo(() => {
     const years = new Set<string>();
-    for (const a of LATEST_NEWS) {
+    for (const a of newsItems) {
       const y = extractYear(a.date);
       if (y) years.add(y);
     }
     const derived = Array.from(years).sort((a, b) => Number(a) - Number(b));
-    // Prefer the requested order when both exist.
     if (derived.includes('2025') && derived.includes('2026')) return ['2025', '2026'];
     return derived;
-  }, []);
+  }, [newsItems]);
 
   const filteredItems = useMemo(() => {
-    return LATEST_NEWS.filter((item) => {
+    return newsItems.filter((item) => {
       if (category !== 'All' && item.category !== category) return false;
       if (topic !== 'All' && item.topic !== topic) return false;
       if (archiveYear !== 'All') {
@@ -66,14 +69,14 @@ const WhatWeDo: React.FC = () => {
       }
       return true;
     });
-  }, [archiveYear, category, topic]);
+  }, [archiveYear, category, topic, newsItems]);
 
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / CARDS_PER_PAGE));
   const safeCurrentPage = Math.min(currentPage, totalPages - 1);
   const start = safeCurrentPage * CARDS_PER_PAGE;
   const visibleItems = filteredItems.slice(start, start + CARDS_PER_PAGE);
 
-  const featuredItem = LATEST_NEWS[0];
+  const featuredItem = newsItems[0] ?? null;
 
   const selectedDate = selected?.date ?? null;
   const formattedDate = useMemo(() => {
@@ -117,6 +120,8 @@ const WhatWeDo: React.FC = () => {
           {/* All latest news — below the fold */}
           <div className="latest-news-archive">
           <SubjectHeader text="Y Latest News" className="reveal" />
+          {loading && <div className="latest-news-loading">Loading latest news…</div>}
+          {error && <div className="latest-news-error">{error}</div>}
 
           <div className="latest-news-layout">
             {/* LEFT: sticky filters */}

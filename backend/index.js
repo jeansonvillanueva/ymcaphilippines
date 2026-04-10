@@ -1,5 +1,9 @@
 import express from 'express';
 import cors from 'cors';
+import fs from 'fs';
+import path from 'path';
+import multer from 'multer';
+import { fileURLToPath } from 'url';
 import db from './db.js';
 import initializeTables from './database-init.js';
 
@@ -11,6 +15,42 @@ initializeTables();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const uploadDir = path.join(__dirname, 'uploads');
+fs.mkdirSync(uploadDir, { recursive: true });
+app.use('/uploads', express.static(uploadDir));
+
+const storage = multer.diskStorage({
+  destination: uploadDir,
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith('image/')) {
+      return cb(new Error('Only image uploads are allowed')); 
+    }
+    cb(null, true);
+  },
+});
+
+function createNewsPath(title) {
+  const slug = title
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+  return `/news/${slug || Date.now()}`;
+}
 
 // Ensure the feedback table exists, matching the actual schema in your database (feedback_id, phone_number)
 const feedbackTableSql = `
@@ -92,6 +132,17 @@ app.get("/", (req, res) => {
 // GET articles from database
 app.get("/api/articles", (req, res) => {
   db.query("SELECT * FROM submit_article", (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send(err);
+    }
+    res.json(result);
+  });
+});
+
+// GET news from database
+app.get("/api/news", (req, res) => {
+  db.query("SELECT * FROM news ORDER BY created_at DESC", (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send(err);
@@ -254,13 +305,16 @@ app.get("/admin/news", (req, res) => {
   });
 });
 
-app.post("/admin/news", (req, res) => {
-  const { path, title, date, subtitle, imageUrl, category, topic } = req.body;
-  if (!title || !path) return res.status(400).json({ error: "Title and path are required" });
-  
+app.post("/admin/news", upload.single('image'), (req, res) => {
+  const { path, title, date, subtitle, body, localYMCA, imageUrl, category, topic } = req.body || {};
+  if (!title) return res.status(400).json({ error: "Title is required" });
+
+  const newsPath = (path && path.trim()) || createNewsPath(title);
+  const imagePath = req.file ? `/uploads/${req.file.filename}` : imageUrl;
+
   db.query(
-    "INSERT INTO news (path, title, date, subtitle, imageUrl, category, topic) VALUES (?, ?, ?, ?, ?, ?, ?)",
-    [path, title, date, subtitle, imageUrl, category, topic],
+    "INSERT INTO news (path, title, date, subtitle, body, localYMCA, imageUrl, category, topic) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    [newsPath, title, date, subtitle, body, localYMCA, imagePath, category, topic],
     (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ id: result.insertId, message: "News added successfully" });
@@ -268,11 +322,14 @@ app.post("/admin/news", (req, res) => {
   );
 });
 
-app.put("/admin/news/:id", (req, res) => {
-  const { path, title, date, subtitle, imageUrl, category, topic } = req.body;
+app.put("/admin/news/:id", upload.single('image'), (req, res) => {
+  const { path, title, date, subtitle, body, localYMCA, imageUrl, category, topic } = req.body;
+  const newsPath = (path && path.trim()) || createNewsPath(title);
+  const imagePath = req.file ? `/uploads/${req.file.filename}` : imageUrl;
+
   db.query(
-    "UPDATE news SET path=?, title=?, date=?, subtitle=?, imageUrl=?, category=?, topic=? WHERE id=?",
-    [path, title, date, subtitle, imageUrl, category, topic, req.params.id],
+    "UPDATE news SET path=?, title=?, date=?, subtitle=?, body=?, localYMCA=?, imageUrl=?, category=?, topic=? WHERE id=?",
+    [newsPath, title, date, subtitle, body, localYMCA, imagePath, category, topic, req.params.id],
     (err) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ message: "News updated successfully" });
@@ -468,6 +525,19 @@ app.delete("/admin/staff/:id", (req, res) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ message: "Staff deleted successfully" });
   });
+});
+
+app.use((err, req, res, next) => {
+  if (err && err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({ error: 'Uploaded image is too large. Maximum size is 5 MB.' });
+  }
+  if (err && err.message === 'Only image uploads are allowed') {
+    return res.status(400).json({ error: err.message });
+  }
+  if (err) {
+    return res.status(500).json({ error: err.message });
+  }
+  next();
 });
 
 const port = process.env.PORT || 3000;

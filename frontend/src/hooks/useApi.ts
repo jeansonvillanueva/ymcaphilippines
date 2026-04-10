@@ -42,7 +42,7 @@ export function useNews() {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const response = await axios.get(`${ADMIN_API_URL}/news`);
+        const response = await axios.get(`${PUBLIC_API_URL}/news`);
         setNews(response.data);
         setError(null);
       } catch (err) {

@@ -23,6 +23,8 @@ export function initializeTables() {
       title VARCHAR(255) NOT NULL,
       date VARCHAR(100),
       subtitle TEXT,
+      body TEXT,
+      localYMCA VARCHAR(100),
       imageUrl VARCHAR(500),
       category VARCHAR(50),
       topic VARCHAR(100),
@@ -30,6 +32,25 @@ export function initializeTables() {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )
   `;
+
+  function ensureNewsColumn(column, definition) {
+    db.query(`SHOW COLUMNS FROM news LIKE '${column}'`, (err, result) => {
+      if (err) {
+        console.error(`Unable to check news.${column} column:`, err);
+        return;
+      }
+
+      if (!result || result.length === 0) {
+        db.query(`ALTER TABLE news ADD COLUMN ${column} ${definition}`, (alterErr) => {
+          if (alterErr) {
+            console.error(`Unable to add news.${column} column:`, alterErr);
+          } else {
+            console.log(`Added news.${column} column successfully`);
+          }
+        });
+      }
+    });
+  }
 
   // Calendar events table
   const calendarTableSql = `
@@ -63,22 +84,21 @@ export function initializeTables() {
     )
   `;
 
-  // Pillars table (local pillars)
+  // Pillars table (local pillars) - create without foreign key first
   const pillarsTableSql = `
     CREATE TABLE IF NOT EXISTS pillars (
       id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
       localId VARCHAR(100) NOT NULL,
-      key VARCHAR(50) NOT NULL,
+      \`key\` VARCHAR(50) NOT NULL,
       label VARCHAR(255) NOT NULL,
       color VARCHAR(50),
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      FOREIGN KEY (localId) REFERENCES locals(id),
-      UNIQUE KEY unique_local_pillar (localId, key)
+      UNIQUE KEY unique_local_pillar (localId, \`key\`)
     )
   `;
 
-  // Pillar programs table
+  // Pillar programs table - create without foreign key first
   const pillarProgramsTableSql = `
     CREATE TABLE IF NOT EXISTS pillar_programs (
       id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -87,8 +107,7 @@ export function initializeTables() {
       bullets JSON,
       sequenceOrder INT DEFAULT 0,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      FOREIGN KEY (pillarId) REFERENCES pillars(id) ON DELETE CASCADE
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )
   `;
 
@@ -106,26 +125,55 @@ export function initializeTables() {
     )
   `;
 
-  // Execute table creation
+  // Create news table and ensure new fields exist for body and localYMCA.
+  db.query(newsTableSql, (err) => {
+    if (err) {
+      console.error('Error creating news table:', err);
+    } else {
+      console.log('News table created or exists successfully');
+      ensureNewsColumn('body', 'TEXT');
+      ensureNewsColumn('localYMCA', 'VARCHAR(100)');
+    }
+  });
+
+  // Execute creation for remaining tables in correct dependency order
   const tables = [
     videosTableSql,
-    newsTableSql,
     calendarTableSql,
-    localsTableSql,
-    pillarsTableSql,
-    pillarProgramsTableSql,
+    localsTableSql,  // Must be created before pillars
+    pillarsTableSql, // References locals
+    pillarProgramsTableSql, // References pillars
     staffTableSql,
   ];
 
-  tables.forEach((sql, index) => {
+  // Create tables sequentially to handle foreign key dependencies
+  let tableIndex = 0;
+  const createNextTable = () => {
+    if (tableIndex >= tables.length) {
+      console.log('All tables created successfully');
+      // Now add foreign key constraints
+      addForeignKeyConstraints();
+      return;
+    }
+
+    const sql = tables[tableIndex];
     db.query(sql, (err) => {
       if (err) {
-        console.error(`Error creating table ${index}:`, err);
+        console.error(`Error creating table ${tableIndex}:`, err);
       } else {
-        console.log(`Table ${index} created or exists successfully`);
+        console.log(`Table ${tableIndex} created or exists successfully`);
       }
+      tableIndex++;
+      createNextTable();
     });
-  });
+  };
+
+  const addForeignKeyConstraints = () => {
+    // Skip foreign key constraints for now to avoid database compatibility issues
+    console.log('Skipping foreign key constraints to ensure database compatibility');
+  };
+
+  createNextTable();
 }
 
 export default initializeTables;

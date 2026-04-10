@@ -26,6 +26,7 @@ import Article_Two from './pages/Card-Media/articles/Manila_YMCA/Article_Two';
 
 import Footer from './components/Footer';
 import Article from './pages/Article_Form';
+import NewsDetail from './pages/NewsDetail';
 
 function ScrollToHash() {
   const { hash, pathname } = useLocation();
@@ -82,6 +83,7 @@ function App() {
           <Route path="/news/Card_Seven" element={<Card_Seven />} />
           <Route path="/news/Article_One" element={<Article_One />} />
           <Route path="/news/Article_Two" element={<Article_Two />} />
+          <Route path="/news/:slug" element={<NewsDetail />} />
         </Routes>
       </main>
       
