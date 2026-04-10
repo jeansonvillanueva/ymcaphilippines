@@ -10,8 +10,7 @@ import ImpactStats from '../components/ImpactStats';
 import EventVenueRental from '../components/EventVenueRental';
 import eventVenueImage1 from '../assets/images/rent/event1.jpg';
 import eventVenueImage2 from '../assets/images/rent/event2.jpg';
-import { LATEST_NEWS } from '../data/news';
-import { useVideos } from '../hooks/useApi';
+import { useVideos, useNews } from '../hooks/useApi';
 
 type HeroSlide = {
   image: string;
@@ -60,9 +59,10 @@ function Home() {
   const sectionRef = useScrollReveal<HTMLDivElement>();
   const [activeSlide, setActiveSlide] = useState(0);
   const { videos } = useVideos();
+  const { news } = useNews();
 
   const heroSlides = useMemo<HeroSlide[]>(() => {
-    const latest = [...LATEST_NEWS]
+    const latest = [...news]
       .sort((a, b) => parseNewsDate(b.date) - parseNewsDate(a.date))
       .slice(0, 3);
 
@@ -72,7 +72,7 @@ function Home() {
       subheading: item.subtitle ?? item.date ?? 'Latest YMCA update',
       path: item.path,
     }));
-  }, []);
+  }, [news]);
 
   const videoItems = useMemo<VideoItem[]>(() => {
     if (videos.length > 0) {

@@ -7,6 +7,8 @@ interface Local {
   name: string;
   established?: string;
   facebookUrl?: string;
+  instagramUrl?: string;
+  twitterUrl?: string;
   heroImageUrl?: string;
   logoImageUrl?: string;
   corporate: number;
@@ -24,6 +26,8 @@ export default function AdminLocals() {
     name: '',
     established: '',
     facebookUrl: '',
+    instagramUrl: '',
+    twitterUrl: '',
     heroImageUrl: '',
     logoImageUrl: '',
     corporate: 0,
@@ -172,6 +176,28 @@ export default function AdminLocals() {
               name="facebookUrl"
               placeholder="https://facebook.com/..."
               value={form.facebookUrl || ''}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+            <label>Instagram URL</label>
+            <input
+              type="text"
+              name="instagramUrl"
+              placeholder="https://instagram.com/..."
+              value={form.instagramUrl || ''}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+            <label>Twitter/X URL</label>
+            <input
+              type="text"
+              name="twitterUrl"
+              placeholder="https://twitter.com/..."
+              value={form.twitterUrl || ''}
               onChange={handleChange}
             />
           </div>

@@ -72,6 +72,8 @@ export function initializeTables() {
       name VARCHAR(255) NOT NULL,
       established VARCHAR(50),
       facebookUrl VARCHAR(500),
+      instagramUrl VARCHAR(500),
+      twitterUrl VARCHAR(500),
       heroImageUrl VARCHAR(500),
       logoImageUrl VARCHAR(500),
       corporate INT DEFAULT 0,
@@ -125,6 +127,26 @@ export function initializeTables() {
     )
   `;
 
+  // Ensure social media columns exist in locals table
+  function ensureLocalsColumn(column, definition) {
+    db.query(`SHOW COLUMNS FROM locals LIKE '${column}'`, (err, result) => {
+      if (err) {
+        console.error(`Unable to check locals.${column} column:`, err);
+        return;
+      }
+
+      if (!result || result.length === 0) {
+        db.query(`ALTER TABLE locals ADD COLUMN ${column} ${definition}`, (alterErr) => {
+          if (alterErr) {
+            console.error(`Unable to add locals.${column} column:`, alterErr);
+          } else {
+            console.log(`Added locals.${column} column successfully`);
+          }
+        });
+      }
+    });
+  }
+
   // Create news table and ensure new fields exist for body and localYMCA.
   db.query(newsTableSql, (err) => {
     if (err) {
@@ -135,6 +157,10 @@ export function initializeTables() {
       ensureNewsColumn('localYMCA', 'VARCHAR(100)');
     }
   });
+
+  // Ensure locals table has social media columns
+  ensureLocalsColumn('instagramUrl', 'VARCHAR(500)');
+  ensureLocalsColumn('twitterUrl', 'VARCHAR(500)');
 
   // Execute creation for remaining tables in correct dependency order
   const tables = [

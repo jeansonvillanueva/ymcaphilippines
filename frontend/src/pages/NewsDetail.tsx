@@ -1,9 +1,8 @@
 import { useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useNews } from '../hooks/useApi';
-import SubjectHeader from '../components/SubjectHeader';
+import NewsArticle from '../components/NewsArticle';
 import '../styles/design-system.css';
-import './What_We_Do.css';
 
 const NewsDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -24,31 +23,22 @@ const NewsDetail: React.FC = () => {
   if (!item) return <div className="latest-news-error">News article not found.</div>;
 
   return (
-    <div className="page-section page-section--white latest-news-section">
-      <div className="page-section__inner">
-        <SubjectHeader text={item.title} className="reveal" />
-        {item.imageUrl ? (
-          <img src={item.imageUrl} alt={item.title} className="latest-news-featured__image" />
-        ) : (
-          <div className="card-image card-image--placeholder" style={{ marginBottom: '1rem' }}>
-            No image available
-          </div>
-        )}
-
-        <div className="latest-news-article-meta">
-          {item.category && <span className="latest-news-article-category">{item.category}</span>}
-          {item.topic && <span className="latest-news-article-topic">{item.topic}</span>}
-          {item.date && <span className="latest-news-article-date">{item.date}</span>}
-        </div>
-
-        {item.subtitle && <p className="latest-news-article-subtitle">{item.subtitle}</p>}
-        {item.body && <div className="latest-news-article-body">{item.body}</div>}
-
-        <Link to="/calendar" className="latest-news-featured__cta" style={{ marginTop: '1.5rem', display: 'inline-block' }}>
-          Back to Latest News
-        </Link>
-      </div>
-    </div>
+    <NewsArticle
+      title={item.title}
+      date={item.date}
+      subtitle={item.subtitle}
+      imageUrl={item.imageUrl}
+      localYMCA={item.localYMCA}
+      websiteUrl={item.websiteUrl}
+      articlePath={currentPath || undefined}
+      layoutVariant="article"
+    >
+      {item.body ? (
+        <div dangerouslySetInnerHTML={{ __html: item.body }} />
+      ) : (
+        <p>No content available for this article.</p>
+      )}
+    </NewsArticle>
   );
 };
 

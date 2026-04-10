@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { LATEST_NEWS } from '../data/news';
 
 const API_HOST = window.location.hostname;
 const API_PORT = import.meta.env.VITE_BACKEND_PORT ?? '3000';
@@ -43,11 +44,18 @@ export function useNews() {
     const fetchNews = async () => {
       try {
         const response = await axios.get(`${PUBLIC_API_URL}/news`);
-        setNews(response.data);
+        // Only use API data if it has items; otherwise fallback to local data
+        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+          setNews(response.data);
+        } else {
+          setNews(LATEST_NEWS);
+        }
         setError(null);
       } catch (err) {
-        console.error('Error fetching news:', err);
-        setError('Failed to load news');
+        console.error('Error fetching news, using local data:', err);
+        // On error, fallback to local news data
+        setNews(LATEST_NEWS);
+        setError(null);
       } finally {
         setLoading(false);
       }

@@ -25,6 +25,8 @@ export type LocalConfig = {
   name: string;
   established?: string;
   facebookUrl?: string;
+  instagramUrl?: string;
+  twitterUrl?: string;
   heroImageUrl?: string; // background image for the top area
   logoImageUrl?: string; // local logo image (clickable to facebook)
   stats?: LocalStats;

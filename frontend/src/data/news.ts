@@ -1,5 +1,15 @@
 export type NewsCategory = 'News' | 'Articles' | 'Features';
 
+export type LocalYMCAMeta = {
+  name: string;
+  logoSrc: string;
+  socialLinks?: {
+    facebook?: string;
+    instagram?: string;
+    x?: string;
+  };
+};
+
 export type NewsArticleMeta = {
   /** Route path that must match `App.tsx` routes. */
   path: `/news/${string}`;
@@ -11,6 +21,12 @@ export type NewsArticleMeta = {
   category: NewsCategory;
   /** Used by the Topic filter in "Y Latest News". */
   topic: string;
+  /** Full article body content */
+  body?: string;
+  /** Local YMCA information for sidebar */
+  localYMCA?: LocalYMCAMeta;
+  /** Website URL for sidebar */
+  websiteUrl?: string;
 };
 
 import card1 from '../assets/images/latest_news/card1.jpg';
@@ -21,6 +37,7 @@ import card5 from '../assets/images/latest_news/card5.jpg';
 import card6 from '../assets/images/latest_news/card6.jpg';
 import card7 from '../assets/images/latest_news/card7.jpg';
 import card8 from '../assets/images/latest_news/card7.jpg';
+import ymcaLogo from '../assets/images/logo.webp';
 
 export const NEWS_FEATURED_IMAGE = card1;
 
@@ -92,6 +109,17 @@ export const LATEST_NEWS: NewsArticleMeta[] = [
     imageUrl: card8,
     category: 'Articles',
     topic: 'Youth Leadership',
+    body: '<p>Unity in action, service in spirit of responsibility of turning collective goals into action through teamwork, dedication and the true essence of "bayanihan".</p>\n<p>With the theme "BALAYANING: Tahanan ng mga Layunin, Nagkakaisa-ang Tuparin-sa" the event highlighted the spirit of unity and collaboration among youth leaders. Like a home built together, each member shares the responsibility of turning collective goals into action through teamwork, dedication and the true essence of "bayanihan".</p>\n<p>The induction ceremony marked a new chapter for the officers who have committed themselves to lead with integrity and passion in advancing the mission of the YMCA.</p>\n<p>Congratulations to all newly inducted officers and participating College Y chapters!</p>',
+    localYMCA: {
+      name: 'YMCA of Manila',
+      logoSrc: ymcaLogo,
+      socialLinks: {
+        facebook: 'https://www.facebook.com/ymcaofmanila',
+        instagram: 'https://www.instagram.com/ymcaofmanila',
+        x: 'https://twitter.com/ymcaofmanila',
+      },
+    },
+    websiteUrl: 'https://www.ymcaofmanila.org.ph',
   },
   {
     path: '/news/Article_Two',

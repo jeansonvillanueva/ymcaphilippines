@@ -4,6 +4,7 @@ import { useScrollReveal } from '../hooks/useScrollReveal';
 import InteractivePhilippinesMap, { type BranchMarker } from '../components/InteractivePhilippinesMap';
 import SubjectHeader from '../components/SubjectHeader';
 import { getLocalById, getLocalsAggregateStats } from '../data/locals';
+import { FaFacebookF, FaInstagram, FaTwitter } from 'react-icons/fa';
 import '../styles/design-system.css';
 import './Where_We_Are.css';
 import map from '../assets/images/Philippine-Map.png';
@@ -266,31 +267,76 @@ function Where_We_Are() {
                           onFocus={() => setActiveMarkerId(b.markerId)}
                           onMouseLeave={() => setActiveMarkerId(null)}
                         >
-                          {fb ? (
-                            <a
-                              className="find-ymca__branch-cta"
-                              href={b.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              aria-label={`${b.name} on Facebook`}
-                            >
-                              <img src={logoSrc} alt="" className="find-ymca__branch-logo" />
-                              <span className="find-ymca__branch-name">{b.name}</span>
-                            </a>
-                          ) : (
-                            <button
-                              type="button"
-                              className="find-ymca__branch-cta find-ymca__branch-cta--fallback"
-                              onClick={() => {
-                                if (local) navigate(`/find-ymca/${local.id}`);
-                              }}
-                              disabled={!local}
-                              aria-label={local ? `Open ${b.name} local page` : b.name}
-                            >
-                              <img src={logoSrc} alt="" className="find-ymca__branch-logo" />
-                              <span className="find-ymca__branch-name">{b.name}</span>
-                            </button>
+                          <div className="find-ymca__branch-content">
+                            {fb ? (
+                              <a
+                                className="find-ymca__branch-cta"
+                                href={b.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label={`${b.name} on Facebook`}
+                              >
+                                <img src={logoSrc} alt="" className="find-ymca__branch-logo" />
+                                <span className="find-ymca__branch-name">{b.name}</span>
+                              </a>
+                            ) : (
+                              <button
+                                type="button"
+                                className="find-ymca__branch-cta find-ymca__branch-cta--fallback"
+                                onClick={() => {
+                                  if (local) navigate(`/find-ymca/${local.id}`);
+                                }}
+                                disabled={!local}
+                                aria-label={local ? `Open ${b.name} local page` : b.name}
+                              >
+                                <img src={logoSrc} alt="" className="find-ymca__branch-logo" />
+                                <span className="find-ymca__branch-name">{b.name}</span>
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Social Media Icons */}
+                          {local && (local.facebookUrl || local.instagramUrl || local.twitterUrl) && (
+                            <div className="find-ymca__branch-social">
+                              {local.facebookUrl && (
+                                <a
+                                  href={local.facebookUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="find-ymca__social-icon"
+                                  title="Facebook"
+                                  aria-label={`${b.name} Facebook`}
+                                >
+                                  <FaFacebookF />
+                                </a>
+                              )}
+                              {local.instagramUrl && (
+                                <a
+                                  href={local.instagramUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="find-ymca__social-icon"
+                                  title="Instagram"
+                                  aria-label={`${b.name} Instagram`}
+                                >
+                                  <FaInstagram />
+                                </a>
+                              )}
+                              {local.twitterUrl && (
+                                <a
+                                  href={local.twitterUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="find-ymca__social-icon"
+                                  title="X (Twitter)"
+                                  aria-label={`${b.name} X/Twitter`}
+                                >
+                                  <FaTwitter />
+                                </a>
+                              )}
+                            </div>
                           )}
+
                           {local && fb ? (
                             <Link className="find-ymca__profile-pill" to={`/find-ymca/${local.id}`}>
                               Local page

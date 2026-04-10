@@ -278,6 +278,50 @@
   border-color: rgba(30, 42, 122, 0.45);
 }
 
+/* Branch content and social media styles */
+.find-ymca__branch-content {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.find-ymca__branch-social {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.find-ymca__social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(30, 42, 122, 0.08);
+  color: var(--ymca-navy);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all var(--duration-normal) var(--ease-out);
+  border: 1px solid rgba(30, 42, 122, 0.15);
+}
+
+.find-ymca__social-icon:hover,
+.find-ymca__social-icon:focus-visible {
+  background: rgba(196, 30, 58, 0.15);
+  color: var(--ymca-red);
+  border-color: rgba(196, 30, 58, 0.3);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.find-ymca__social-icon svg {
+  display: block;
+}
+
 @media (max-width: 900px) {
   .find-ymca__layout {
     grid-template-columns: 1fr;

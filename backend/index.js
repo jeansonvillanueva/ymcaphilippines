@@ -402,12 +402,12 @@ app.get("/admin/locals/:id", (req, res) => {
 });
 
 app.post("/admin/locals", (req, res) => {
-  const { id, name, established, facebookUrl, heroImageUrl, logoImageUrl, corporate, nonCorporate, youth, others, totalMembersAsOf } = req.body;
+  const { id, name, established, facebookUrl, instagramUrl, twitterUrl, heroImageUrl, logoImageUrl, corporate, nonCorporate, youth, others, totalMembersAsOf } = req.body;
   if (!id || !name) return res.status(400).json({ error: "ID and name are required" });
   
   db.query(
-    "INSERT INTO locals (id, name, established, facebookUrl, heroImageUrl, logoImageUrl, corporate, nonCorporate, youth, others, totalMembersAsOf) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-    [id, name, established, facebookUrl, heroImageUrl, logoImageUrl, corporate || 0, nonCorporate || 0, youth || 0, others || 0, totalMembersAsOf],
+    "INSERT INTO locals (id, name, established, facebookUrl, instagramUrl, twitterUrl, heroImageUrl, logoImageUrl, corporate, nonCorporate, youth, others, totalMembersAsOf) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    [id, name, established, facebookUrl, instagramUrl, twitterUrl, heroImageUrl, logoImageUrl, corporate || 0, nonCorporate || 0, youth || 0, others || 0, totalMembersAsOf],
     (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ id, message: "Local added successfully" });
@@ -416,10 +416,10 @@ app.post("/admin/locals", (req, res) => {
 });
 
 app.put("/admin/locals/:id", (req, res) => {
-  const { name, established, facebookUrl, heroImageUrl, logoImageUrl, corporate, nonCorporate, youth, others, totalMembersAsOf } = req.body;
+  const { name, established, facebookUrl, instagramUrl, twitterUrl, heroImageUrl, logoImageUrl, corporate, nonCorporate, youth, others, totalMembersAsOf } = req.body;
   db.query(
-    "UPDATE locals SET name=?, established=?, facebookUrl=?, heroImageUrl=?, logoImageUrl=?, corporate=?, nonCorporate=?, youth=?, others=?, totalMembersAsOf=? WHERE id=?",
-    [name, established, facebookUrl, heroImageUrl, logoImageUrl, corporate || 0, nonCorporate || 0, youth || 0, others || 0, totalMembersAsOf, req.params.id],
+    "UPDATE locals SET name=?, established=?, facebookUrl=?, instagramUrl=?, twitterUrl=?, heroImageUrl=?, logoImageUrl=?, corporate=?, nonCorporate=?, youth=?, others=?, totalMembersAsOf=? WHERE id=?",
+    [name, established, facebookUrl, instagramUrl, twitterUrl, heroImageUrl, logoImageUrl, corporate || 0, nonCorporate || 0, youth || 0, others || 0, totalMembersAsOf, req.params.id],
     (err) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ message: "Local updated successfully" });
