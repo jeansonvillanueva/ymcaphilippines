@@ -1,5 +1,4 @@
 import { LATEST_NEWS } from './news';
-import { CALENDAR_EVENT_RECORDS } from './calendarEvents';
 
 export type SearchResultType = 'news' | 'page' | 'event';
 
@@ -58,18 +57,6 @@ export function searchSite(rawQuery: string, limit = 12): SearchResult[] {
     const blob = `${p.title} ${p.subtitle ?? ''}`;
     if (matches(blob, q)) {
       out.push({ ...p });
-    }
-  }
-
-  for (const e of CALENDAR_EVENT_RECORDS) {
-    const blob = `${e.title} ${e.description ?? ''} ${e.date}`;
-    if (matches(blob, q)) {
-      out.push({
-        type: 'event',
-        title: e.title,
-        subtitle: e.date,
-        path: '/calendar#calendar',
-      });
     }
   }
 

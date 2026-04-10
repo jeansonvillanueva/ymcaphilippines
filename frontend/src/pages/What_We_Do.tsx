@@ -1,11 +1,10 @@
 import { useMemo, useState } from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
-import { useNews } from '../hooks/useApi';
+import { useNews, useCalendarEvents } from '../hooks/useApi';
 import ActivityCalendar, { type CalendarEvent } from '../components/ActivityCalendar';
 import Card from './Card-Media/Card';
 import SubjectHeader from '../components/SubjectHeader';
 import { NEWS_FEATURED_IMAGE, type NewsCategory } from '../data/news';
-import { CALENDAR_EVENT_RECORDS } from '../data/calendarEvents';
 import '../styles/design-system.css';
 import './What_We_Do.css';
 import { Link } from 'react-router-dom';
@@ -29,12 +28,21 @@ const WhatWeDo: React.FC = () => {
   const ref = useScrollReveal<HTMLDivElement>();
 
   const today = ymdToday();
-  const initialEvent = CALENDAR_EVENT_RECORDS.find((e) => e.date === today) ?? null;
+  const { news, loading, error } = useNews();
+  const { events: calendarEvents, loading: calendarLoading } = useCalendarEvents();
+  const newsItems = news;
+
+  const initialEvent = calendarEvents.find((e) => e.date === today)
+    ? {
+        title: calendarEvents.find((e) => e.date === today)?.title || '',
+        date: today,
+        description: calendarEvents.find((e) => e.date === today)?.description,
+        image: calendarEvents.find((e) => e.date === today)?.imageUrl,
+      }
+    : null;
+
   const [selected, setSelected] = useState<CalendarEvent | null>(initialEvent);
   const [currentPage, setCurrentPage] = useState(0);
-
-  const { news, loading, error } = useNews();
-  const newsItems = news;
 
   type CategoryFilter = 'All' | NewsCategory;
   const [category, setCategory] = useState<CategoryFilter>('All');
@@ -296,7 +304,7 @@ const WhatWeDo: React.FC = () => {
 
             {/* RIGHT: calendar */}
             <div className="calendar-board" aria-label="Calendar">
-              <ActivityCalendar onEventClick={(e) => setSelected(e)} />
+              <ActivityCalendar onEventClick={(e) => setSelected(e)} events={calendarEvents} />
             </div>
           </div>
         </div>

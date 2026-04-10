@@ -48,7 +48,15 @@ export default function AdminLocals() {
   const fetchLocals = async () => {
     try {
       const response = await axios.get(API_URL);
-      setLocals(response.data);
+      // Convert numeric fields to numbers
+      const localsWithNumbers = response.data.map((local: Local) => ({
+        ...local,
+        corporate: Number(local.corporate) || 0,
+        nonCorporate: Number(local.nonCorporate) || 0,
+        youth: Number(local.youth) || 0,
+        others: Number(local.others) || 0,
+      }));
+      setLocals(localsWithNumbers);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching locals:', error);
@@ -61,7 +69,15 @@ export default function AdminLocals() {
     setSelectedLocal(localId);
     try {
       const response = await axios.get(`${API_URL}/${localId}`);
-      setForm(response.data);
+      const data = response.data;
+      // Ensure numeric fields are numbers
+      setForm({
+        ...data,
+        corporate: Number(data.corporate) || 0,
+        nonCorporate: Number(data.nonCorporate) || 0,
+        youth: Number(data.youth) || 0,
+        others: Number(data.others) || 0,
+      });
     } catch (error) {
       console.error('Error fetching local:', error);
       setMessage({ type: 'error', text: 'Failed to load local details' });
@@ -289,11 +305,11 @@ export default function AdminLocals() {
 
           <div className="stats-preview" style={{ gridColumn: '1 / -1', marginTop: '2rem', padding: '1rem', background: '#f0f0f0', borderRadius: '6px' }}>
             <h5>Member Summary</h5>
-            <p><strong>Corporate:</strong> {form.corporate}</p>
-            <p><strong>Non-Corporate:</strong> {form.nonCorporate}</p>
-            <p><strong>Youth:</strong> {form.youth}</p>
-            <p><strong>Others:</strong> {form.others}</p>
-            <p><strong>Total:</strong> {form.corporate + form.nonCorporate + form.youth + form.others}</p>
+            <p><strong>Corporate:</strong> {Number(form.corporate) || 0}</p>
+            <p><strong>Non-Corporate:</strong> {Number(form.nonCorporate) || 0}</p>
+            <p><strong>Youth:</strong> {Number(form.youth) || 0}</p>
+            <p><strong>Others:</strong> {Number(form.others) || 0}</p>
+            <p><strong>Total:</strong> {(Number(form.corporate) || 0) + (Number(form.nonCorporate) || 0) + (Number(form.youth) || 0) + (Number(form.others) || 0)}</p>
           </div>
         </form>
       )}
@@ -312,16 +328,23 @@ export default function AdminLocals() {
             </tr>
           </thead>
           <tbody>
-            {locals.map((local) => (
-              <tr key={local.id} onClick={() => handleSelectLocal(local.id)} style={{ cursor: 'pointer' }}>
-                <td>{local.name}</td>
-                <td>{local.corporate}</td>
-                <td>{local.nonCorporate}</td>
-                <td>{local.youth}</td>
-                <td>{local.others}</td>
-                <td><strong>{local.corporate + local.nonCorporate + local.youth + local.others}</strong></td>
-              </tr>
-            ))}
+            {locals.map((local) => {
+              const corp = Number(local.corporate) || 0;
+              const nonCorp = Number(local.nonCorporate) || 0;
+              const youth = Number(local.youth) || 0;
+              const others = Number(local.others) || 0;
+              const total = corp + nonCorp + youth + others;
+              return (
+                <tr key={local.id} onClick={() => handleSelectLocal(local.id)} style={{ cursor: 'pointer' }}>
+                  <td>{local.name}</td>
+                  <td>{corp}</td>
+                  <td>{nonCorp}</td>
+                  <td>{youth}</td>
+                  <td>{others}</td>
+                  <td><strong>{total}</strong></td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

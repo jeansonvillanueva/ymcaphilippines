@@ -2,7 +2,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import type { EventClickArg } from '@fullcalendar/core';
-import { FULLCALENDAR_EVENTS } from '../data/calendarEvents';
+import type { EventInput } from '@fullcalendar/core';
 
 export type CalendarEvent = {
   title: string;
@@ -13,6 +13,7 @@ export type CalendarEvent = {
 
 type Props = {
   onEventClick?: (event: CalendarEvent) => void;
+  events?: Array<{ title: string; date: string; description?: string; imageUrl?: string }>;
 };
 
 function ymdToday() {
@@ -23,8 +24,15 @@ function ymdToday() {
   return `${y}-${m}-${day}`;
 }
 
-function ActivityCalendar({ onEventClick }: Props) {
+function ActivityCalendar({ onEventClick, events }: Props) {
   const todayStr = ymdToday();
+
+  // Convert API events to FullCalendar format - always use API events (no fallback to static)
+  const calendarEvents: EventInput[] = (events || []).map((e) => ({
+    title: e.title,
+    date: e.date,
+    extendedProps: { description: e.description, image: e.imageUrl },
+  }));
 
   const handleEventClick = (arg: EventClickArg) => {
     onEventClick?.({
@@ -39,7 +47,7 @@ function ActivityCalendar({ onEventClick }: Props) {
     <FullCalendar
       plugins={[dayGridPlugin, interactionPlugin]}
       initialView="dayGridMonth"
-      events={FULLCALENDAR_EVENTS}
+      events={calendarEvents}
       eventClick={handleEventClick}
       height="auto"
       dayCellClassNames={(arg) => {

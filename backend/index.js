@@ -14,8 +14,35 @@ initializeTables();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+
+// Global request logger - logs EVERY request
+app.use((req, res, next) => {
+  console.log(`\n[REQUEST] ${req.method} ${req.path} | Content-Type: ${req.headers['content-type'] || 'none'}`);
+  next();
+});
+
 app.use(express.urlencoded({ extended: true }));
+
+// Conditional JSON parser - skip for multipart requests
+const jsonParser = express.json();
+app.use((req, res, next) => {
+  // Check the Content-Type header to avoid parsing multipart data as JSON
+  const contentType = req.headers['content-type'] || '';
+  if (contentType.includes('multipart/form-data')) {
+    console.log(`[MIDDLEWARE] Skipping JSON parsing for multipart request`);
+    return next();
+  }
+  console.log(`[MIDDLEWARE] Applying JSON parser`);
+  return jsonParser(req, res, next);
+});
+
+// Additional logging middleware for debugging
+app.use((req, res, next) => {
+  if (req.path.includes('/admin/calendar')) {
+    console.log(`[CALENDAR] Received request | Body exists: ${!!req.body} | Body keys: ${req.body ? Object.keys(req.body) : 'N/A'}`);
+  }
+  next();
+});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -35,9 +62,12 @@ const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
+    console.log(`[Multer] Processing file: ${file.originalname}, mimetype: ${file.mimetype}`);
     if (!file.mimetype.startsWith('image/')) {
+      console.error(`[Multer] File rejected: not an image (${file.mimetype})`);
       return cb(new Error('Only image uploads are allowed')); 
     }
+    console.log('[Multer] File accepted by filter');
     cb(null, true);
   },
 });
@@ -214,7 +244,7 @@ app.get("/test-article", (req, res) => {
 });
 
 // POST - Submit feedback
-app.post('/api/feedback', (req, res) => {
+app.post('/api/feedback', express.json(), (req, res) => {
   const { name, surname, email, phone_num, message, phone_number } = req.body;
 
   console.log('POST /api/feedback request body:', { name, surname, email, phone_num, phone_number, message });
@@ -307,6 +337,7 @@ app.get("/admin/news", (req, res) => {
 
 app.post("/admin/news", upload.single('image'), (req, res) => {
   const { path, title, date, subtitle, body, localYMCA, imageUrl, category, topic } = req.body || {};
+  
   if (!title) return res.status(400).json({ error: "Title is required" });
 
   const newsPath = (path && path.trim()) || createNewsPath(title);
@@ -323,7 +354,8 @@ app.post("/admin/news", upload.single('image'), (req, res) => {
 });
 
 app.put("/admin/news/:id", upload.single('image'), (req, res) => {
-  const { path, title, date, subtitle, body, localYMCA, imageUrl, category, topic } = req.body;
+  const { path, title, date, subtitle, body, localYMCA, imageUrl, category, topic } = req.body || {};
+  
   const newsPath = (path && path.trim()) || createNewsPath(title);
   const imagePath = req.file ? `/uploads/${req.file.filename}` : imageUrl;
 
@@ -352,30 +384,82 @@ app.get("/admin/calendar", (req, res) => {
   });
 });
 
-app.post("/admin/calendar", (req, res) => {
-  const { title, date, description, imageUrl } = req.body;
-  if (!title || !date) return res.status(400).json({ error: "Title and date are required" });
-  
-  db.query(
-    "INSERT INTO calendar_events (title, date, description, imageUrl) VALUES (?, ?, ?, ?)",
-    [title, date, description, imageUrl],
-    (err, result) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ id: result.insertId, message: "Event added successfully" });
+app.post("/admin/calendar", upload.single('image'), (req, res) => {
+  try {
+    console.log('[POST /admin/calendar] Received request');
+    console.log('[POST /admin/calendar] req.body:', req.body);
+    console.log('[POST /admin/calendar] req.file:', req.file ? { filename: req.file.filename, size: req.file.size } : null);
+    console.log('[POST /admin/calendar] Content-Type:', req.headers['content-type']);
+    
+    // Safely extract fields
+    const title = req.body?.title;
+    const date = req.body?.date;
+    const description = req.body?.description;
+    const imageUrl = req.body?.imageUrl;
+    
+    console.log('[POST /admin/calendar] Extracted fields:', { title, date, description, imageUrl, hasFile: !!req.file });
+    
+    if (!title || !date) {
+      return res.status(400).json({ error: "Title and date are required" });
     }
-  );
+    
+    const imagePath = req.file ? `/uploads/${req.file.filename}` : (imageUrl || null);
+    
+    db.query(
+      "INSERT INTO calendar_events (title, date, description, imageUrl) VALUES (?, ?, ?, ?)",
+      [title, date, description, imagePath],
+      (err, result) => {
+        if (err) {
+          console.error('Database error:', err);
+          return res.status(500).json({ error: err.message });
+        }
+        console.log('Event added successfully with ID:', result.insertId);
+        res.json({ id: result.insertId, message: "Event added successfully" });
+      }
+    );
+  } catch (error) {
+    console.error('Error in POST /admin/calendar:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
-app.put("/admin/calendar/:id", (req, res) => {
-  const { title, date, description, imageUrl } = req.body;
-  db.query(
-    "UPDATE calendar_events SET title=?, date=?, description=?, imageUrl=? WHERE id=?",
-    [title, date, description, imageUrl, req.params.id],
-    (err) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ message: "Event updated successfully" });
+app.put("/admin/calendar/:id", upload.single('image'), (req, res) => {
+  try {
+    console.log('[PUT /admin/calendar/:id] Received request for ID:', req.params.id);
+    console.log('[PUT /admin/calendar/:id] req.body:', req.body);
+    console.log('[PUT /admin/calendar/:id] req.file:', req.file ? { filename: req.file.filename, size: req.file.size } : null);
+    console.log('[PUT /admin/calendar/:id] Content-Type:', req.headers['content-type']);
+    
+    // Safely extract fields
+    const title = req.body?.title;
+    const date = req.body?.date;
+    const description = req.body?.description;
+    const imageUrl = req.body?.imageUrl;
+    
+    console.log('[PUT /admin/calendar/:id] Extracted fields:', { id: req.params.id, title, date, description, imageUrl, hasFile: !!req.file });
+    
+    if (!title || !date) {
+      return res.status(400).json({ error: "Title and date are required" });
     }
-  );
+    
+    const imagePath = req.file ? `/uploads/${req.file.filename}` : (imageUrl || null);
+    
+    db.query(
+      "UPDATE calendar_events SET title=?, date=?, description=?, imageUrl=? WHERE id=?",
+      [title, date, description, imagePath, req.params.id],
+      (err) => {
+        if (err) {
+          console.error('Database error:', err);
+          return res.status(500).json({ error: err.message });
+        }
+        console.log('Event updated successfully with ID:', req.params.id);
+        res.json({ message: "Event updated successfully" });
+      }
+    );
+  } catch (error) {
+    console.error('Error in PUT /admin/calendar/:id:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 app.delete("/admin/calendar/:id", (req, res) => {
@@ -383,6 +467,31 @@ app.delete("/admin/calendar/:id", (req, res) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ message: "Event deleted successfully" });
   });
+});
+
+// Debug endpoint to test file uploads
+app.post("/admin/calendar-debug", upload.single('image'), (req, res) => {
+  console.log('[DEBUG] Full request received on /admin/calendar-debug');
+  console.log('[DEBUG] req.body:', req.body);
+  console.log('[DEBUG] req.file:', req.file);
+  console.log('[DEBUG] req.headers:', req.headers);
+  res.json({ 
+    body: req.body,
+    file: req.file ? { filename: req.file.filename, size: req.file.size } : null,
+    headers: req.headers
+  });
+});
+
+// Multer error handler middleware
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    console.error('Multer error:', err);
+    return res.status(400).json({ error: `Upload error: ${err.message}` });
+  } else if (err) {
+    console.error('Middleware error:', err);
+    return res.status(500).json({ error: err.message });
+  }
+  next();
 });
 
 // LOCALS (Where We Are) - Admin Management

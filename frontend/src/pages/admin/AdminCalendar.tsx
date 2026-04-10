@@ -18,6 +18,7 @@ export default function AdminCalendar() {
     description: '',
     imageUrl: '',
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -45,6 +46,26 @@ export default function AdminCalendar() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      setMessage({ type: 'error', text: 'Image must be 5 MB or smaller' });
+      return;
+    }
+
+    setImageFile(file);
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setForm((prev) => ({ ...prev, imageUrl: reader.result as string }));
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title.trim() || !form.date.trim()) {
@@ -53,19 +74,56 @@ export default function AdminCalendar() {
     }
 
     try {
+      // Auto-generate description if not provided
+      let description = (form.description || '').trim();
+      if (!description) {
+        const dateObj = new Date(form.date);
+        const formattedDate = dateObj.toLocaleDateString('en-US', { 
+          month: 'long', 
+          day: 'numeric', 
+          year: 'numeric' 
+        });
+        description = `${form.title} to be held on ${formattedDate}. Details to follow.`;
+      }
+
+      const formData = new FormData();
+      formData.append('title', form.title.trim());
+      formData.append('date', form.date);
+      formData.append('description', description);
+      if (imageFile) {
+        formData.append('image', imageFile);
+      } else if (form.imageUrl && !form.imageUrl.startsWith('data:')) {
+        formData.append('imageUrl', form.imageUrl);
+      }
+
+      console.log('Submitting event data:', {
+        title: form.title.trim(),
+        date: form.date,
+        description: description,
+        hasImage: !!imageFile,
+        imageUrl: form.imageUrl,
+        isEditing: !!editingId
+      });
+      
+      console.log('FormData entries:', Array.from(formData.entries()));
+
       if (editingId) {
-        await axios.put(`${API_URL}/${editingId}`, form);
+        console.log('Sending PUT request to:', `${API_URL}/${editingId}`);
+        await axios.put(`${API_URL}/${editingId}`, formData);
         setMessage({ type: 'success', text: 'Event updated successfully' });
       } else {
-        await axios.post(API_URL, form);
+        console.log('Sending POST request to:', API_URL);
+        await axios.post(API_URL, formData);
         setMessage({ type: 'success', text: 'Event added successfully' });
       }
       setForm({ title: '', date: '', description: '', imageUrl: '' });
+      setImageFile(null);
       setEditingId(null);
       fetchEvents();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving event:', error);
-      setMessage({ type: 'error', text: 'Failed to save event' });
+      const errorMessage = error.response?.data?.error || error.message || 'Failed to save event';
+      setMessage({ type: 'error', text: errorMessage });
     }
   };
 
@@ -83,6 +141,7 @@ export default function AdminCalendar() {
         fetchEvents();
         if (editingId === id) {
           setForm({ title: '', date: '', description: '', imageUrl: '' });
+          setImageFile(null);
           setEditingId(null);
         }
       } catch (error) {
@@ -140,24 +199,23 @@ export default function AdminCalendar() {
         </div>
 
         <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-          <label>Description</label>
+          <label>Description (optional)</label>
           <textarea
             name="description"
-            placeholder="Event details and description..."
+            placeholder="Event details and description... (Leave blank for auto-generated description)"
             value={form.description || ''}
             onChange={handleChange}
           />
         </div>
 
         <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-          <label>Image URL (for event photo/banner)</label>
-          <input
-            type="text"
-            name="imageUrl"
-            placeholder="https://..."
-            value={form.imageUrl || ''}
-            onChange={handleChange}
-          />
+          <label>Upload Image (optional)</label>
+          <input type="file" accept="image/*" onChange={handleFileChange} />
+          {form.imageUrl ? (
+            <div className="image-preview">
+              <img src={form.imageUrl} alt="Event preview" style={{ maxWidth: '100%', marginTop: '0.75rem' }} />
+            </div>
+          ) : null}
         </div>
 
         <div className="form-actions" style={{ gridColumn: '1 / -1' }}>
@@ -169,6 +227,7 @@ export default function AdminCalendar() {
               type="button"
               onClick={() => {
                 setForm({ title: '', date: '', description: '', imageUrl: '' });
+                setImageFile(null);
                 setEditingId(null);
               }}
               className="btn btn-secondary"
