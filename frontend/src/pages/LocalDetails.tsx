@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
-import { getDefaultPillars, getLocalById, resolveLocalHeroImage, type LocalPillarKey } from '../data/locals';
+import { useLocalById } from '../hooks/useApi';
+import { getDefaultPillars, getLocalById, resolveLocalHeroImage, type LocalPillarKey, type LocalConfig } from '../data/locals';
 import SubjectHeader from '../components/SubjectHeader';
 import pillarCommunityWellbeing from '../assets/images/pillars/community_wellbeing.png';
 import pillarMeaningWork from '../assets/images/pillars/meaning_work.png';
@@ -24,13 +25,44 @@ const PILLAR_ICONS: Record<LocalPillarKey, string> = {
 export default function LocalDetails() {
   const ref = useScrollReveal<HTMLDivElement>();
   const { localId } = useParams();
-  const local = getLocalById(localId);
+  const { local: apiLocal } = useLocalById(localId ?? '');
   const [activePillar, setActivePillar] = useState<LocalPillarKey | null>(null);
 
+  const normalizedLocal = useMemo<LocalConfig | null>(() => {
+    if (apiLocal) {
+      return {
+        id: apiLocal.id,
+        name: apiLocal.name,
+        established: apiLocal.established,
+        facebookUrl: apiLocal.facebookUrl,
+        instagramUrl: apiLocal.instagramUrl,
+        twitterUrl: apiLocal.twitterUrl,
+        heroImageUrl: apiLocal.heroImageUrl,
+        logoImageUrl: apiLocal.logoImageUrl,
+        stats: {
+          corporate: Number(apiLocal.corporate) || 0,
+          nonCorporate: Number(apiLocal.nonCorporate) || 0,
+          youth: Number(apiLocal.youth) || 0,
+          others: Number(apiLocal.others) || 0,
+          totalMembersAsOf: apiLocal.totalMembersAsOf || '',
+        },
+        pillars: Array.isArray(apiLocal.pillars)
+          ? apiLocal.pillars.map((pillar: any) => ({
+              ...pillar,
+              programs: Array.isArray(pillar.programs) ? pillar.programs : [],
+            }))
+          : [],
+      };
+    }
+
+    return localId ? getLocalById(localId) : null;
+  }, [apiLocal, localId]);
+
+  const local = normalizedLocal;
   const pillars = useMemo(() => {
     const base = getDefaultPillars();
     if (!local) return base;
-    const overrides = new Map(local.pillars.map((p) => [p.key, p]));
+    const overrides = new Map((local.pillars ?? []).map((p) => [p.key, p]));
     return base.map((p) => overrides.get(p.key) ?? p);
   }, [local]);
 

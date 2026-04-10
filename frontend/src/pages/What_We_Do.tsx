@@ -29,7 +29,7 @@ const WhatWeDo: React.FC = () => {
 
   const today = ymdToday();
   const { news, loading, error } = useNews();
-  const { events: calendarEvents, loading: calendarLoading } = useCalendarEvents();
+  const { events: calendarEvents } = useCalendarEvents();
   const newsItems = news;
 
   const initialEvent = calendarEvents.find((e) => e.date === today)

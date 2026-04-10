@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import InteractivePhilippinesMap, { type BranchMarker } from '../components/InteractivePhilippinesMap';
@@ -24,6 +24,19 @@ type Region = {
   id: string;
   name: string;
   branches: Branch[];
+};
+
+type LocalData = {
+  id: string;
+  name: string;
+  facebookUrl?: string;
+  instagramUrl?: string;
+  twitterUrl?: string;
+  logoImageUrl?: string;
+  corporate?: number;
+  nonCorporate?: number;
+  youth?: number;
+  others?: number;
 };
 
 // const [input, setInputs] = useState({});
@@ -147,9 +160,35 @@ function isValidPhPhone(raw: string) {
 function Where_We_Are() {
   const ref = useScrollReveal<HTMLDivElement>();
   const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null);
+  const [localsData, setLocalsData] = useState<LocalData[]>([]);
   const navigate = useNavigate();
 
-  const aggregate = useMemo(() => getLocalsAggregateStats(), []);
+  useEffect(() => {
+    const fetchLocalData = async () => {
+      try {
+        const response = await axios.get(`${PUBLIC_API_URL}/locals`);
+        setLocalsData(response.data || []);
+      } catch (err) {
+        console.error('Error fetching locals from backend:', err);
+        setLocalsData([]);
+      }
+    };
+
+    fetchLocalData();
+  }, []);
+
+  const aggregate = useMemo(() => {
+    if (localsData.length > 0) {
+      const corporate = localsData.reduce((sum, local) => sum + (Number(local.corporate) || 0), 0);
+      const nonCorporate = localsData.reduce((sum, local) => sum + (Number(local.nonCorporate) || 0), 0);
+      const youth = localsData.reduce((sum, local) => sum + (Number(local.youth) || 0), 0);
+      const others = localsData.reduce((sum, local) => sum + (Number(local.others) || 0), 0);
+      return { corporate, nonCorporate, youth, others, total: corporate + nonCorporate + youth + others };
+    }
+    return getLocalsAggregateStats();
+  }, [localsData]);
+
+  const localsById = useMemo(() => new Map(localsData.map((local) => [local.id, local])), [localsData]);
 
   const [contactName, setContactName] = useState('');
   const [contactSurname, setContactSurname] = useState('');
@@ -254,7 +293,8 @@ function Where_We_Are() {
                   <div className="find-ymca__region-title">{region.name}</div>
                   <ul className="find-ymca__branches" aria-label={`${region.name} branches`}>
                   {region.branches.map((b) => {
-                    const local = getLocalById(b.markerId);
+                    const backendLocal = localsById.get(b.markerId);
+                    const local = backendLocal || getLocalById(b.markerId);
                     const logoSrc = local?.logoImageUrl ?? defaultBranchLogo;
                     const fb = b.link && b.link !== '#';
                     const rowActive = activeMarkerId === b.markerId;

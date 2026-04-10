@@ -506,7 +506,52 @@ app.get("/admin/locals/:id", (req, res) => {
   db.query("SELECT * FROM locals WHERE id=?", [req.params.id], (err, result) => {
     if (err) return res.status(500).json({ error: err.message });
     if (!result.length) return res.status(404).json({ error: "Local not found" });
-    res.json(result[0]);
+
+    const local = result[0];
+    const pillarsQuery =
+      "SELECT p.id, p.localId, p.`key` AS `key`, p.label, p.color, " +
+      "pp.id AS programId, pp.title AS programTitle, pp.bullets AS programBullets, pp.sequenceOrder " +
+      "FROM pillars p " +
+      "LEFT JOIN pillar_programs pp ON p.id = pp.pillarId " +
+      "WHERE p.localId=? " +
+      "ORDER BY p.id, pp.sequenceOrder";
+
+    db.query(pillarsQuery, [req.params.id], (pillarErr, pillarRows) => {
+      if (pillarErr) return res.status(500).json({ error: pillarErr.message });
+
+      const pillarMap = new Map();
+      pillarRows.forEach((row) => {
+        if (!pillarMap.has(row.id)) {
+          pillarMap.set(row.id, {
+            id: row.id,
+            localId: row.localId,
+            key: row.key,
+            label: row.label,
+            color: row.color,
+            programs: [],
+          });
+        }
+
+        if (row.programId) {
+          const pillar = pillarMap.get(row.id);
+          let bullets = [];
+          try {
+            bullets = row.programBullets ? JSON.parse(row.programBullets) : [];
+          } catch (parseErr) {
+            bullets = [];
+          }
+          pillar.programs.push({
+            id: row.programId,
+            title: row.programTitle,
+            bullets,
+            sequenceOrder: row.sequenceOrder,
+          });
+        }
+      });
+
+      local.pillars = Array.from(pillarMap.values());
+      res.json(local);
+    });
   });
 });
 
@@ -536,14 +581,104 @@ app.put("/admin/locals/:id", (req, res) => {
   );
 });
 
+app.post("/admin/locals/:id/upload", upload.single('image'), (req, res) => {
+  const field = typeof req.query.field === 'string' ? req.query.field : null;
+  const allowedFields = ['heroImageUrl', 'logoImageUrl'];
+  if (!field || !allowedFields.includes(field)) {
+    return res.status(400).json({ error: 'Invalid upload field. Use heroImageUrl or logoImageUrl.' });
+  }
+
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded.' });
+  }
+
+  const imagePath = `/uploads/${req.file.filename}`;
+  db.query(
+    `UPDATE locals SET ${field}=? WHERE id=?`,
+    [imagePath, req.params.id],
+    (err) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ path: imagePath, message: 'Image uploaded successfully' });
+    }
+  );
+});
+
+// Public local data endpoints
+app.get("/api/locals", (req, res) => {
+  db.query("SELECT * FROM locals ORDER BY name", (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(result);
+  });
+});
+
+app.get("/api/locals/:id", (req, res) => {
+  db.query("SELECT * FROM locals WHERE id=?", [req.params.id], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!result.length) return res.status(404).json({ error: "Local not found" });
+
+    const local = result[0];
+    const pillarsQuery =
+      "SELECT p.id, p.localId, p.`key` AS `key`, p.label, p.color, " +
+      "pp.id AS programId, pp.title AS programTitle, pp.bullets AS programBullets, pp.sequenceOrder " +
+      "FROM pillars p " +
+      "LEFT JOIN pillar_programs pp ON p.id = pp.pillarId " +
+      "WHERE p.localId=? " +
+      "ORDER BY p.id, pp.sequenceOrder";
+
+    db.query(pillarsQuery, [req.params.id], (pillarErr, pillarRows) => {
+        if (pillarErr) return res.status(500).json({ error: pillarErr.message });
+
+        const pillarMap = new Map();
+        pillarRows.forEach((row) => {
+          if (!pillarMap.has(row.id)) {
+            pillarMap.set(row.id, {
+              id: row.id,
+              localId: row.localId,
+              key: row.key,
+              label: row.label,
+              color: row.color,
+              programs: [],
+            });
+          }
+          if (row.programId) {
+            const pillar = pillarMap.get(row.id);
+            let bullets = [];
+            try {
+              bullets = row.programBullets ? JSON.parse(row.programBullets) : [];
+            } catch (parseErr) {
+              bullets = [];
+            }
+            pillar.programs.push({
+              id: row.programId,
+              title: row.programTitle,
+              bullets,
+              sequenceOrder: row.sequenceOrder,
+            });
+          }
+        });
+
+        local.pillars = Array.from(pillarMap.values());
+        res.json(local);
+      }
+    );
+  });
+});
+
+app.get("/api/pillars/:localId", (req, res) => {
+  db.query(
+    "SELECT id, localId, `key`, label, color FROM pillars WHERE localId=? ORDER BY id",
+    [req.params.localId],
+    (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(result);
+    }
+  );
+});
+
 // PILLARS - Admin Management
 app.get("/admin/pillars/:localId", (req, res) => {
   db.query(
-    `SELECT p.*, GROUP_CONCAT(JSON_OBJECT('id', pp.id, 'title', pp.title, 'bullets', pp.bullets, 'sequenceOrder', pp.sequenceOrder) SEPARATOR ',') as programs
-     FROM pillars p
-     LEFT JOIN pillar_programs pp ON p.id = pp.pillarId
-     WHERE p.localId=?
-     GROUP BY p.id`,
+    "SELECT id, localId, `key`, label, color FROM pillars WHERE localId=? ORDER BY id",
     [req.params.localId],
     (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
@@ -560,6 +695,22 @@ app.put("/admin/pillars/:id", (req, res) => {
     (err) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ message: "Pillar updated successfully" });
+    }
+  );
+});
+
+app.post("/admin/pillars", (req, res) => {
+  const { localId, key, label, color } = req.body;
+  if (!localId || !key || !label) {
+    return res.status(400).json({ error: "localId, key, and label are required" });
+  }
+
+  db.query(
+    "INSERT INTO pillars (localId, `key`, label, color) VALUES (?, ?, ?, ?)",
+    [localId, key, label, color],
+    (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ id: result.insertId, message: "Pillar created successfully" });
     }
   );
 });

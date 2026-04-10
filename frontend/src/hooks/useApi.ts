@@ -159,7 +159,7 @@ export function useLocalById(id: string) {
 
     const fetchLocal = async () => {
       try {
-        const response = await axios.get(`${ADMIN_API_URL}/locals/${id}`);
+        const response = await axios.get(`${PUBLIC_API_URL}/locals/${id}`);
         setLocal(response.data);
         setError(null);
       } catch (err) {
