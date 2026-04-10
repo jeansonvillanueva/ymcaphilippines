@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { ADMIN_API_URL } from '../../hooks/useApi';
 
@@ -20,6 +20,9 @@ export default function AdminStaff() {
     departmentGroup: '',
     sequenceOrder: 0,
   });
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,6 +53,20 @@ export default function AdminStaff() {
     }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      setPhotoFile(file);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setPhotoPreview(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else if (file) {
+      setMessage({ type: 'error', text: 'Please select an image file' });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.position.trim()) {
@@ -58,21 +75,40 @@ export default function AdminStaff() {
     }
 
     try {
+      let submitData: any = form;
+      
+      // If there's a photo file, use FormData
+      if (photoFile) {
+        submitData = new FormData();
+        submitData.append('name', form.name);
+        submitData.append('position', form.position);
+        submitData.append('departmentGroup', form.departmentGroup || '');
+        submitData.append('sequenceOrder', String(form.sequenceOrder || 0));
+        submitData.append('photo', photoFile);
+      } else if (form.imageUrl) {
+        // Use URL if no file is selected
+        submitData = {
+          name: form.name,
+          position: form.position,
+          imageUrl: form.imageUrl,
+          departmentGroup: form.departmentGroup,
+          sequenceOrder: form.sequenceOrder || 0,
+        };
+      }
+
       if (editingId) {
-        await axios.put(`${API_URL}/${editingId}`, form);
+        await axios.put(`${API_URL}/${editingId}`, submitData, {
+          headers: photoFile ? { 'Content-Type': 'multipart/form-data' } : undefined,
+        });
         setMessage({ type: 'success', text: 'Staff updated successfully' });
       } else {
-        await axios.post(API_URL, form);
+        await axios.post(API_URL, submitData, {
+          headers: photoFile ? { 'Content-Type': 'multipart/form-data' } : undefined,
+        });
         setMessage({ type: 'success', text: 'Staff added successfully' });
       }
-      setForm({
-        name: '',
-        position: '',
-        imageUrl: '',
-        departmentGroup: '',
-        sequenceOrder: 0,
-      });
-      setEditingId(null);
+      
+      resetForm();
       fetchStaff();
     } catch (error) {
       console.error('Error saving staff:', error);
@@ -80,9 +116,27 @@ export default function AdminStaff() {
     }
   };
 
+  const resetForm = () => {
+    setForm({
+      name: '',
+      position: '',
+      imageUrl: '',
+      departmentGroup: '',
+      sequenceOrder: 0,
+    });
+    setPhotoFile(null);
+    setPhotoPreview(null);
+    setEditingId(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleEdit = (staff: Staff) => {
     setForm(staff);
     setEditingId(staff.id || null);
+    setPhotoFile(null);
+    setPhotoPreview(staff.imageUrl || null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -93,14 +147,7 @@ export default function AdminStaff() {
         setMessage({ type: 'success', text: 'Staff deleted successfully' });
         fetchStaff();
         if (editingId === id) {
-          setForm({
-            name: '',
-            position: '',
-            imageUrl: '',
-            departmentGroup: '',
-            sequenceOrder: 0,
-          });
-          setEditingId(null);
+          resetForm();
         }
       } catch (error) {
         console.error('Error deleting staff:', error);
@@ -189,7 +236,32 @@ export default function AdminStaff() {
         </div>
 
         <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-          <label>Photo URL</label>
+          <label>Upload Photo</label>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            style={{ display: 'block', marginBottom: '10px' }}
+          />
+          {(photoPreview || form.imageUrl) && (
+            <div style={{ marginBottom: '15px' }}>
+              <img
+                src={photoPreview || form.imageUrl}
+                alt="Preview"
+                style={{
+                  maxWidth: '200px',
+                  maxHeight: '200px',
+                  borderRadius: '8px',
+                  border: '1px solid #e0e0e0',
+                }}
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+          <label>Or use Photo URL</label>
           <input
             type="text"
             name="imageUrl"
@@ -197,6 +269,9 @@ export default function AdminStaff() {
             value={form.imageUrl || ''}
             onChange={handleChange}
           />
+          <small style={{ color: '#999', marginTop: '5px', display: 'block' }}>
+            Enter a URL if you don't want to upload a file
+          </small>
         </div>
 
         <div className="form-actions" style={{ gridColumn: '1 / -1' }}>
@@ -206,16 +281,7 @@ export default function AdminStaff() {
           {editingId && (
             <button
               type="button"
-              onClick={() => {
-                setForm({
-                  name: '',
-                  position: '',
-                  imageUrl: '',
-                  departmentGroup: '',
-                  sequenceOrder: 0,
-                });
-                setEditingId(null);
-              }}
+              onClick={resetForm}
               className="btn btn-secondary"
             >
               Cancel Edit

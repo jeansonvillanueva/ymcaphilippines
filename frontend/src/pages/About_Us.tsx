@@ -1,18 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import axios from 'axios';
+import { ADMIN_API_URL } from '../hooks/useApi';
 import '../styles/design-system.css';
 import './About_Us.css';
-
-import orlandoImage from '../assets/images/staff/orland_ocarreon.png';
-import christineImage from '../assets/images/staff/ianne_aquino.png';
-import cyrilImage from '../assets/images/staff/cyril_morris.png';
-import maricelImage from '../assets/images/staff/maricel_taguba.png';
-import angleImage from '../assets/images/staff/angel_barros.png';
-import edzinaImage from '../assets/images/staff/edzina_bedes.png';
-import marlonImage from '../assets/images/staff/marlon_mendoza.png';
-import christopherImage from '../assets/images/staff/christopher_annang.png';
-import armandoImage from '../assets/images/staff/armando_tan.png';
 
 import pillarCommunityWellbeing from '../assets/images/pillars/community_wellbeing.png';
 import pillarMeaningWork from '../assets/images/pillars/meaning_work.png';
@@ -49,63 +41,91 @@ type OrgBranch = {
   children?: OrgBranchChild[];
 };
 
-const ORG_STRUCTURE: { head: OrgMember; branches: OrgBranch[] } = {
-  head: {
-    name: 'Orlando F. Carreon',
-    position: 'OIC – National General Secretary',
-    imageUrl: orlandoImage,
-  },
-  branches: [
-    {
-      title: 'Secretary for Finance',
-      imageUrl: null,
-      children: [
-        { name: 'Maricel M. Taguba', position: 'Cashier', imageUrl: maricelImage },
-        { name: 'Angel Karen B. Barros', position: 'Accounting Clerk', imageUrl: angleImage },
-      ],
-    },
-    {
-      name: 'Ianne Christine J. Aquino',
-      position: 'OIC – National Program Secretary',
-      imageUrl: christineImage,
-      children: [
-        { name: 'Cyril James S. Morris', position: 'Program Assistant', imageUrl: cyrilImage },
-      ],
-    },
-    {
-      title: 'Secretary for Member Association',
-      imageUrl: null,
-      children: [
-      ],
-    },
-    {
-      title: 'Secretary for Operation',
-      imageUrl: null,
-      children: [
-        {
-          group: 'Line 1',
-          members: [
-            { name: 'Edzina T. Bedes', position: 'Office Secretary', imageUrl: edzinaImage },
-            { name: 'Marlon G. Mendoza', position: 'Maintenance', imageUrl: marlonImage },
-            { name: 'Christopher A. Annang', position: 'Parking Attendant', imageUrl: christopherImage },
-          ],
-        },
-        {
-          group: 'Line 2',
-          members: [
-            { name: 'Armando G. Tan', position: 'Janitor / Utility', imageUrl: armandoImage },
-          ],
-        },
-      ],
-    },
-  ],
-};
+interface StaffData {
+  id?: number;
+  name: string;
+  position: string;
+  imageUrl?: string;
+  departmentGroup?: string;
+  sequenceOrder?: number;
+}
 
 function AboutUs() {
   const sectionRef = useScrollReveal<HTMLDivElement>();
   const [selectedPillarKey, setSelectedPillarKey] = useState('');
   const [detailSlideIndex, setDetailSlideIndex] = useState(0);
   const [isPillarFlipped, setIsPillarFlipped] = useState(false);
+  const [orgStructure, setOrgStructure] = useState<{ head: OrgMember; branches: OrgBranch[] } | null>(null);
+  const [loadingStaff, setLoadingStaff] = useState(true);
+  const [staffError, setStaffError] = useState<string | null>(null);
+
+  // Fetch staff data on mount
+  useEffect(() => {
+    const fetchStaff = async () => {
+      try {
+        const response = await axios.get(`${ADMIN_API_URL}/staff`);
+        const staffList: StaffData[] = response.data;
+
+        if (!staffList || staffList.length === 0) {
+          setStaffError('No staff data available');
+          setOrgStructure(null);
+          setLoadingStaff(false);
+          return;
+        }
+
+        // Build org structure from API data
+        // Group by department
+        const byDept: Record<string, StaffData[]> = {};
+        staffList.forEach((staff) => {
+          const dept = staff.departmentGroup || 'Other';
+          if (!byDept[dept]) byDept[dept] = [];
+          byDept[dept].push(staff);
+        });
+
+        // Find head (OIC – National General Secretary)
+        const head = staffList.find(
+          (s) => s.departmentGroup === 'National General Secretary'
+        ) || staffList[0];
+
+        const branches: OrgBranch[] = Object.entries(byDept).map(([dept, members]) => {
+          // Don't include the head in branches
+          if (dept === 'National General Secretary') {
+            return null as any;
+          }
+
+          return {
+            title: dept,
+            imageUrl: null,
+            children: members
+              .sort((a, b) => (a.sequenceOrder || 0) - (b.sequenceOrder || 0))
+              .map((member) => ({
+                name: member.name,
+                position: member.position,
+                imageUrl: member.imageUrl || null,
+              })),
+          };
+        }).filter((branch) => branch !== null) as OrgBranch[];
+
+        setOrgStructure({
+          head: {
+            name: head?.name || 'Staff',
+            position: head?.position || 'Position',
+            imageUrl: head?.imageUrl || null,
+          },
+          branches,
+        });
+        setStaffError(null);
+      } catch (error) {
+        console.error('Error fetching staff:', error);
+        setStaffError('Unable to load staff data. Please try again later.');
+        setOrgStructure(null);
+      } finally {
+        setLoadingStaff(false);
+      }
+    };
+
+    fetchStaff();
+  }, []);
 
   const handlePillarSelect = (pillarKey: string) => {
     setSelectedPillarKey(pillarKey);
@@ -441,51 +461,59 @@ function AboutUs() {
           <SubjectHeader text="Meet Our Family" className="reveal" />
           <p className="meet-family__subtitle reveal">YMCA of the Philippines Organizational Chart</p>
 
-          <div className="org-tree">
-            <div className="org-tree__head">
-              <OrgChartCard {...ORG_STRUCTURE.head} />
+          {loadingStaff ? (
+            <div className="loading">Loading staff members...</div>
+          ) : staffError || !orgStructure ? (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
+              <p>{staffError || 'No staff data available'}</p>
             </div>
+          ) : (
+            <div className="org-tree">
+              <div className="org-tree__head">
+                <OrgChartCard {...orgStructure.head} />
+              </div>
 
-            <div className="org-tree__branches">
-              {ORG_STRUCTURE.branches.map((branch, i) => (
-                <div key={i} className="org-tree__branch">
-                  <OrgChartCard
-                    name={branch.name || branch.title || 'Vacant'}
-                    position={branch.position || 'Vacant'}
-                    imageUrl={branch.imageUrl || ymcaLogo}
-                  />
+              <div className="org-tree__branches">
+                {orgStructure.branches.map((branch, i) => (
+                  <div key={i} className="org-tree__branch">
+                    <OrgChartCard
+                      name={branch.name || branch.title || 'Vacant'}
+                      position={branch.position || 'Vacant'}
+                      imageUrl={branch.imageUrl || ymcaLogo}
+                    />
 
-                  <div className="org-tree__children">
-                    {branch.children?.map((child: OrgBranchChild, idx: number) => {
-                      if ('members' in child && Array.isArray(child.members)) {
+                    <div className="org-tree__children">
+                      {branch.children?.map((child: OrgBranchChild, idx: number) => {
+                        if ('members' in child && Array.isArray(child.members)) {
+                          return (
+                            <div key={idx} className="org-tree__subgroup">
+                              {child.members.map((m, j) => (
+                                <OrgChartCard
+                                  key={j}
+                                  name={m.name || 'Vacant'}
+                                  position={m.position || 'Vacant'}
+                                  imageUrl={m.imageUrl || ymcaLogo}
+                                />
+                              ))}
+                            </div>
+                          );
+                        }
+
                         return (
-                          <div key={idx} className="org-tree__subgroup">
-                            {child.members.map((m, j) => (
-                              <OrgChartCard
-                                key={j}
-                                name={m.name || 'Vacant'}
-                                position={m.position || 'Vacant'}
-                                imageUrl={m.imageUrl || ymcaLogo}
-                              />
-                            ))}
-                          </div>
+                          <OrgChartCard
+                            key={idx}
+                            name={(child as OrgMember).name || 'Vacant'}
+                            position={(child as OrgMember).position || 'Vacant'}
+                            imageUrl={(child as OrgMember).imageUrl || ymcaLogo}
+                          />
                         );
-                      }
-
-                      return (
-                        <OrgChartCard
-                          key={idx}
-                          name={(child as OrgMember).name || 'Vacant'}
-                          position={(child as OrgMember).position || 'Vacant'}
-                          imageUrl={(child as OrgMember).imageUrl || ymcaLogo}
-                        />
-                      );
-                    })}
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 

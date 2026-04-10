@@ -603,28 +603,43 @@ app.get("/admin/staff", (req, res) => {
   });
 });
 
-app.post("/admin/staff", (req, res) => {
+app.post("/admin/staff", upload.single('photo'), (req, res) => {
   const { name, position, imageUrl, departmentGroup, sequenceOrder } = req.body;
   if (!name || !position) return res.status(400).json({ error: "Name and position are required" });
   
+  // Use uploaded file URL if available, otherwise use provided imageUrl
+  let finalImageUrl = imageUrl || '';
+  if (req.file) {
+    finalImageUrl = `/uploads/${req.file.filename}`;
+    console.log(`[Staff Upload] File uploaded: ${req.file.filename}`);
+  }
+  
   db.query(
     "INSERT INTO staff (name, position, imageUrl, departmentGroup, sequenceOrder) VALUES (?, ?, ?, ?, ?)",
-    [name, position, imageUrl, departmentGroup, sequenceOrder || 0],
+    [name, position, finalImageUrl, departmentGroup, sequenceOrder || 0],
     (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
-      res.json({ id: result.insertId, message: "Staff added successfully" });
+      res.json({ id: result.insertId, imageUrl: finalImageUrl, message: "Staff added successfully" });
     }
   );
 });
 
-app.put("/admin/staff/:id", (req, res) => {
+app.put("/admin/staff/:id", upload.single('photo'), (req, res) => {
   const { name, position, imageUrl, departmentGroup, sequenceOrder } = req.body;
+  
+  // Determine which image URL to use
+  let finalImageUrl = imageUrl || '';
+  if (req.file) {
+    finalImageUrl = `/uploads/${req.file.filename}`;
+    console.log(`[Staff Update] File uploaded: ${req.file.filename}`);
+  }
+  
   db.query(
     "UPDATE staff SET name=?, position=?, imageUrl=?, departmentGroup=?, sequenceOrder=? WHERE id=?",
-    [name, position, imageUrl, departmentGroup, sequenceOrder || 0, req.params.id],
+    [name, position, finalImageUrl, departmentGroup, sequenceOrder || 0, req.params.id],
     (err) => {
       if (err) return res.status(500).json({ error: err.message });
-      res.json({ message: "Staff updated successfully" });
+      res.json({ imageUrl: finalImageUrl, message: "Staff updated successfully" });
     }
   );
 });
