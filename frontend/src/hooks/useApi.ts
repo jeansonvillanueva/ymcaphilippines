@@ -2,9 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { LATEST_NEWS } from '../data/news';
 
-const API_HOST = window.location.hostname;
-const API_PORT = import.meta.env.VITE_BACKEND_PORT ?? '3000';
-const API_BASE = `${window.location.protocol}//${API_HOST}:${API_PORT}`;
+const API_BASE = 'https://ymcaph-backend.onrender.com';
 export const ADMIN_API_URL = `${API_BASE}/admin`;
 export const PUBLIC_API_URL = `${API_BASE}/api`;
 
