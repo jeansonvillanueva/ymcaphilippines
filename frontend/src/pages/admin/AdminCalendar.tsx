@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { ADMIN_API_URL } from '../../hooks/useApi';
 
@@ -25,11 +25,7 @@ export default function AdminCalendar() {
 
   const API_URL = `${ADMIN_API_URL}/calendar`;
 
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       const response = await axios.get(API_URL);
       setEvents(response.data);
@@ -39,7 +35,11 @@ export default function AdminCalendar() {
       setMessage({ type: 'error', text: 'Failed to load events' });
       setLoading(false);
     }
-  };
+  }, [API_URL]);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;

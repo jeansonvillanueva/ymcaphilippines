@@ -76,8 +76,8 @@ function Home() {
 
   const videoItems = useMemo<VideoItem[]>(() => {
     if (videos.length > 0) {
-      return videos.map((video) => ({
-        id: video.id?.toString() ?? `${video.title}-${Math.random()}`,
+      return videos.map((video, index) => ({
+        id: video.id?.toString() ?? `video-${index}`,
         title: video.title,
         description: video.description,
         embedUrl: video.embedUrl,

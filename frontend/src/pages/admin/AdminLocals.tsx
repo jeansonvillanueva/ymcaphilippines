@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { ADMIN_API_URL } from '../../hooks/useApi';
 import { LOCALS_BY_ID, getLocalById, type LocalConfig } from '../../data/locals';
@@ -64,39 +64,7 @@ export default function AdminLocals() {
 
   const API_URL = `${ADMIN_API_URL}/locals`;
 
-  useEffect(() => {
-    fetchLocals();
-  }, []);
-
-  const mergeLocalRecords = (staticLocal: LocalConfig, backendLocal?: Local | null): Local => {
-    const backend = backendLocal || ({} as Local);
-    const staticStats = staticLocal.stats || { corporate: 0, nonCorporate: 0, youth: 0, others: 0, totalMembersAsOf: '' };
-
-    return {
-      id: staticLocal.id,
-      name: staticLocal.name,
-      established: backend.established ?? staticLocal.established,
-      facebookUrl: backend.facebookUrl ?? staticLocal.facebookUrl,
-      instagramUrl: backend.instagramUrl ?? staticLocal.instagramUrl,
-      twitterUrl: backend.twitterUrl ?? staticLocal.twitterUrl,
-      heroImageUrl: backend.heroImageUrl ?? staticLocal.heroImageUrl,
-      logoImageUrl: backend.logoImageUrl ?? staticLocal.logoImageUrl,
-      corporate: backend.corporate ?? staticStats.corporate,
-      nonCorporate: backend.nonCorporate ?? staticStats.nonCorporate ?? 0,
-      youth: backend.youth ?? staticStats.youth,
-      others: backend.others ?? staticStats.others ?? 0,
-      totalMembersAsOf: backend.totalMembersAsOf ?? staticStats.totalMembersAsOf,
-      pillars:
-        backend.pillars ??
-        staticLocal.pillars?.map((pillar, idx) => ({
-          ...pillar,
-          id: `new-${staticLocal.id}-${pillar.key}-${idx}`,
-          localId: staticLocal.id,
-        })) ?? [],
-    };
-  };
-
-  const fetchLocals = async () => {
+  const fetchLocals = useCallback(async () => {
     try {
       const response = await axios.get(API_URL);
       const backendMap = new Map((response.data as Local[]).map((local) => [local.id, local]));
@@ -112,7 +80,11 @@ export default function AdminLocals() {
       setLocals(staticLocals);
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchLocals();
+  }, [fetchLocals]);
 
   const handleSelectLocal = async (localId: string) => {
     setSelectedLocal(localId);
