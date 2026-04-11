@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# Handle all API routes
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Serve uploaded files
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^uploads/(.*)$ ../backend/uploads/$1 [L]
