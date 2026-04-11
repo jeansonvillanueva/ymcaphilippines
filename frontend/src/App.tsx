@@ -3,7 +3,7 @@ import './App.css';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 
-import About_Y from './pages/Home';
+import Home from './pages/Home';
 import Calendar from './pages/What_We_Do';
 import Find_Your_YMCA from './pages/Where_We_Are';
 import Donate from './pages/Donate';
@@ -63,7 +63,7 @@ function App() {
 
 function AppContent() {
   const location = useLocation();
-  const isAdminRoute = location.pathname === '/' || location.pathname.startsWith('/admin');
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   return (
     <>
@@ -72,7 +72,7 @@ function AppContent() {
 
       <main style={{ paddingTop: isAdminRoute ? 0 : undefined }}>
         <Routes>
-          <Route path="/" element={<AdminDashboard />} />
+          <Route path="/" element={<Home />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/find-ymca" element={<Find_Your_YMCA />} />
