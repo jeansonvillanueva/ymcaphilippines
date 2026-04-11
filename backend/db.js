@@ -1,7 +1,7 @@
 import mysql from 'mysql2';
 
 const db = mysql.createConnection({
-  host: 'mysql.ymca.ph',
+  host: 'ymca.ph',
   user: 'ymcaph_user',
   password: 'e8f133def539f610fe95fa789ac08d6ee8f133def539f610fe95fa789ac08d6e',
   database: 'ymcaph_db'
