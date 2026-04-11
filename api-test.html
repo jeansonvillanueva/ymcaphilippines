@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHP API Connection Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .loading { background-color: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>PHP API Connection Test</h1>
+    <p>This tool tests your PHP API endpoints to ensure database connectivity and functionality.</p>
+
+    <button onclick="runAllTests()">Run All Tests</button>
+    <button onclick="clearResults()">Clear Results</button>
+
+    <div id="test-results"></div>
+
+    <script>
+        const endpoints = [
+            { url: '/php-api/', description: 'API Root' },
+            { url: '/php-api/test-db', description: 'Database Connection Test' },
+            { url: '/php-api/test-article', description: 'Article Data Test' },
+            { url: '/php-api/api/news', description: 'News API' },
+            { url: '/php-api/api/locals', description: 'Locals API' },
+            { url: '/php-api/admin/feedback', description: 'Admin Feedback' },
+            { url: '/php-api/admin/videos', description: 'Admin Videos' }
+        ];
+
+        function runAllTests() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '';
+
+            endpoints.forEach(endpoint => {
+                testEndpoint(endpoint.url, endpoint.description);
+            });
+        }
+
+        function testEndpoint(url, description) {
+            const resultsDiv = document.getElementById('test-results');
+            const testDiv = document.createElement('div');
+            testDiv.className = 'test-result loading';
+            testDiv.innerHTML = `<h3>Testing: ${description}</h3><p>URL: ${url}</p><p>Status: Testing...</p>`;
+            resultsDiv.appendChild(testDiv);
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                const status = response.status;
+                return response.text().then(text => {
+                    let data;
+                    try {
+                        data = JSON.parse(text);
+                    } catch (e) {
+                        data = text;
+                    }
+                    return { status, data };
+                });
+            })
+            .then(result => {
+                testDiv.className = 'test-result ' + (result.status === 200 ? 'success' : 'error');
+                testDiv.innerHTML = `
+                    <h3>${result.status === 200 ? '✅' : '❌'} ${description}</h3>
+                    <p><strong>URL:</strong> ${url}</p>
+                    <p><strong>Status:</strong> ${result.status}</p>
+                    <p><strong>Response:</strong></p>
+                    <pre>${typeof result.data === 'object' ? JSON.stringify(result.data, null, 2) : result.data}</pre>
+                `;
+            })
+            .catch(error => {
+                testDiv.className = 'test-result error';
+                testDiv.innerHTML = `
+                    <h3>❌ ${description}</h3>
+                    <p><strong>URL:</strong> ${url}</p>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+            });
+        }
+
+        function clearResults() {
+            document.getElementById('test-results').innerHTML = '';
+        }
+
+        // Auto-run tests on page load
+        window.onload = function() {
+            // Optional: uncomment to auto-run tests
+            // runAllTests();
+        };
+    </script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { ADMIN_API_URL } from '../../hooks/useApi';
-import { LOCALS_BY_ID, getLocalById, type LocalConfig } from '../../data/locals';
+import { LOCALS_BY_ID, getLocalById, mergeLocalRecords } from '../../data/locals';
 
 interface LocalProgram {
   id?: number | string;

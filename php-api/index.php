@@ -9,9 +9,27 @@ $requestMethod = $_SERVER['REQUEST_METHOD'];
 // Remove query string from URI
 $path = parse_url($requestUri, PHP_URL_PATH);
 
-// Remove the base path if needed (adjust based on your cPanel setup)
-// For example, if your API is at /api/, remove that prefix
-$path = str_replace('/php-api/', '/', $path); // Adjust this based on your actual path
+// Remove the script base path (supports nested folders like /testsite/php-api/)
+$scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+$scriptDir = rtrim($scriptDir, '/');
+if ($scriptDir !== '' && strpos($path, $scriptDir) === 0) {
+    $path = substr($path, strlen($scriptDir));
+}
+if ($path === '') {
+    $path = '/';
+}
+
+// Remove index.php from the request path if it is included
+$path = preg_replace('#^/index\.php#', '', $path);
+if ($path === '') {
+    $path = '/';
+}
+
+// Remove the API folder prefix if present
+$path = preg_replace('#^/php-api#', '', $path);
+if ($path === '') {
+    $path = '/';
+}
 
 // Route the request
 switch ($path) {

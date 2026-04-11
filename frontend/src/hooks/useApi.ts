@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { LATEST_NEWS } from '../data/news';
 
-const API_BASE = 'https://ymcaph-backend.onrender.com';
+const API_BASE = 'https://ymca.ph/testsite/php-api';
 export const ADMIN_API_URL = `${API_BASE}/admin`;
 export const PUBLIC_API_URL = `${API_BASE}/api`;
 

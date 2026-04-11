@@ -33,6 +33,36 @@ export type LocalConfig = {
   pillars: LocalPillar[];
 };
 
+// Backend Local interface (for admin operations)
+export interface Local {
+  id: string;
+  name: string;
+  established?: string;
+  facebookUrl?: string;
+  instagramUrl?: string;
+  twitterUrl?: string;
+  heroImageUrl?: string;
+  logoImageUrl?: string;
+  corporate: number;
+  nonCorporate: number;
+  youth: number;
+  others: number;
+  totalMembersAsOf?: string;
+  pillars?: {
+    id: number | string;
+    localId: string;
+    key: string;
+    label: string;
+    color?: string;
+    programs?: {
+      id?: number | string;
+      title?: string;
+      bullets?: string[];
+      sequenceOrder?: number;
+    }[];
+  }[];
+}
+
 const manilaHero = new URL(
   '../assets/images/local_Y/Manila/651252800_1244340891210365_7254344077608894654_n.jpg',
   import.meta.url,
@@ -1498,3 +1528,66 @@ export function getDefaultPillars(): LocalPillar[] {
   return DEFAULT_PILLARS.map((p) => ({ ...p, programs: [...p.programs] }));
 }
 
+export function mergeLocalRecords(staticLocal: LocalConfig, backendLocal?: Local | null): Local {
+  if (!backendLocal) {
+    // Return static data as Local format
+    return {
+      id: staticLocal.id,
+      name: staticLocal.name,
+      established: staticLocal.established || '',
+      facebookUrl: staticLocal.facebookUrl || '',
+      instagramUrl: staticLocal.instagramUrl || '',
+      twitterUrl: staticLocal.twitterUrl || '',
+      heroImageUrl: staticLocal.heroImageUrl || '',
+      logoImageUrl: staticLocal.logoImageUrl || '',
+      corporate: staticLocal.stats?.corporate || 0,
+      nonCorporate: staticLocal.stats?.nonCorporate || 0,
+      youth: staticLocal.stats?.youth || 0,
+      others: staticLocal.stats?.others || 0,
+      totalMembersAsOf: staticLocal.stats?.totalMembersAsOf || '',
+      pillars: staticLocal.pillars.map((pillar) => ({
+        id: `${staticLocal.id}-${pillar.key}`,
+        localId: staticLocal.id,
+        key: pillar.key,
+        label: pillar.label,
+        color: pillar.color,
+        programs: pillar.programs.map((program, progIndex) => ({
+          id: `${staticLocal.id}-${pillar.key}-${progIndex}`,
+          title: program.title || '',
+          bullets: program.bullets || [],
+          sequenceOrder: progIndex,
+        })),
+      })),
+    };
+  }
+
+  // Merge backend data with static data, preferring backend values
+  return {
+    id: backendLocal.id,
+    name: backendLocal.name || staticLocal.name,
+    established: backendLocal.established || staticLocal.established || '',
+    facebookUrl: backendLocal.facebookUrl || staticLocal.facebookUrl || '',
+    instagramUrl: backendLocal.instagramUrl || staticLocal.instagramUrl || '',
+    twitterUrl: backendLocal.twitterUrl || staticLocal.twitterUrl || '',
+    heroImageUrl: backendLocal.heroImageUrl || staticLocal.heroImageUrl || '',
+    logoImageUrl: backendLocal.logoImageUrl || staticLocal.logoImageUrl || '',
+    corporate: backendLocal.corporate !== undefined ? backendLocal.corporate : (staticLocal.stats?.corporate || 0),
+    nonCorporate: backendLocal.nonCorporate !== undefined ? backendLocal.nonCorporate : (staticLocal.stats?.nonCorporate || 0),
+    youth: backendLocal.youth !== undefined ? backendLocal.youth : (staticLocal.stats?.youth || 0),
+    others: backendLocal.others !== undefined ? backendLocal.others : (staticLocal.stats?.others || 0),
+    totalMembersAsOf: backendLocal.totalMembersAsOf || staticLocal.stats?.totalMembersAsOf || '',
+    pillars: backendLocal.pillars || staticLocal.pillars.map((pillar) => ({
+      id: `${staticLocal.id}-${pillar.key}`,
+      localId: staticLocal.id,
+      key: pillar.key,
+      label: pillar.label,
+      color: pillar.color,
+      programs: pillar.programs.map((program, progIndex) => ({
+        id: `${staticLocal.id}-${pillar.key}-${progIndex}`,
+        title: program.title || '',
+        bullets: program.bullets || [],
+        sequenceOrder: progIndex,
+      })),
+    })),
+  };
+}

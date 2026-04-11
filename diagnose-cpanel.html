@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cPanel File Diagnostic</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { background: #f9f9f9; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        .warning { color: orange; }
+        .info { color: blue; }
+        pre { background: #eee; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        button { padding: 10px 15px; margin: 5px; border: none; border-radius: 3px; cursor: pointer; }
+        .run { background: #007bff; color: white; }
+        .run:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🔍 cPanel File Diagnostic Tool</h1>
+    <p>This tool checks what files are actually present on your cPanel server.</p>
+
+    <div class="section">
+        <h2>📂 File Existence Check</h2>
+        <button class="run" onclick="checkFiles()">Check Files</button>
+        <div id="file-check-results"></div>
+    </div>
+
+    <div class="section">
+        <h2>🌐 HTTP Response Check</h2>
+        <button class="run" onclick="checkHTTPResponses()">Check HTTP Status</button>
+        <div id="http-check-results"></div>
+    </div>
+
+    <div class="section">
+        <h2>📊 Directory Listing</h2>
+        <button class="run" onclick="listDirectories()">List Directories</button>
+        <div id="dir-list-results"></div>
+    </div>
+
+    <div class="section">
+        <h2>⚙️ Server Information</h2>
+        <div id="server-info"></div>
+    </div>
+
+    <script>
+        const filesToCheck = [
+            '/',
+            '/index.html',
+            '/cPanel-test.html',
+            '/php-api/index.php',
+            '/php-api/config.php',
+            '/backend/uploads/',
+            '/assets/',
+            '/.htaccess',
+            '/favicon.ico'
+        ];
+
+        const dirsToList = [
+            '/',
+            '/assets/',
+            '/php-api/',
+            '/backend/'
+        ];
+
+        async function checkFiles() {
+            const resultsDiv = document.getElementById('file-check-results');
+            resultsDiv.innerHTML = '<div class="info">Checking file existence...</div>';
+
+            for (const file of filesToCheck) {
+                try {
+                    const response = await fetch(file, { method: 'HEAD' });
+                    const statusClass = response.ok ? 'success' : 'error';
+                    const statusIcon = response.ok ? '✅' : '❌';
+
+                    resultsDiv.innerHTML += `<div class="${statusClass}">${statusIcon} ${file} - Status: ${response.status}</div>`;
+                } catch (error) {
+                    resultsDiv.innerHTML += `<div class="error">❌ ${file} - Error: ${error.message}</div>`;
+                }
+            }
+        }
+
+        async function checkHTTPResponses() {
+            const resultsDiv = document.getElementById('http-check-results');
+            resultsDiv.innerHTML = '<div class="info">Checking HTTP responses...</div>';
+
+            const urls = [
+                '/',
+                '/index.html',
+                '/cPanel-test.html',
+                '/php-api/test-db',
+                '/assets/index-abc123.js', // Test with a likely non-existent asset
+                '/php-api/index.php'
+            ];
+
+            for (const url of urls) {
+                try {
+                    const response = await fetch(url, { method: 'HEAD' });
+                    const statusClass = response.ok ? 'success' :
+                                      response.status >= 500 ? 'error' :
+                                      response.status >= 400 ? 'warning' : 'info';
+                    const statusIcon = response.ok ? '✅' :
+                                     response.status >= 500 ? '❌' :
+                                     response.status >= 400 ? '⚠️' : 'ℹ️';
+
+                    resultsDiv.innerHTML += `<div class="${statusClass}">${statusIcon} ${url} - ${response.status} ${response.statusText}</div>`;
+                } catch (error) {
+                    resultsDiv.innerHTML += `<div class="error">❌ ${url} - Network Error: ${error.message}</div>`;
+                }
+            }
+        }
+
+        async function listDirectories() {
+            const resultsDiv = document.getElementById('dir-list-results');
+            resultsDiv.innerHTML = '<div class="info">Attempting to list directories...</div>';
+
+            // Try to access directory listings (may be disabled)
+            for (const dir of dirsToList) {
+                try {
+                    const response = await fetch(dir);
+                    if (response.ok) {
+                        const text = await response.text();
+                        if (text.includes('Index of') || text.includes('<title>Index of')) {
+                            resultsDiv.innerHTML += `<div class="success">✅ ${dir} - Directory listing enabled</div>`;
+                            resultsDiv.innerHTML += `<pre>${text.substring(0, 500)}...</pre>`;
+                        } else {
+                            resultsDiv.innerHTML += `<div class="warning">⚠️ ${dir} - Directory accessible but no listing</div>`;
+                        }
+                    } else {
+                        resultsDiv.innerHTML += `<div class="error">❌ ${dir} - Status: ${response.status}</div>`;
+                    }
+                } catch (error) {
+                    resultsDiv.innerHTML += `<div class="error">❌ ${dir} - Error: ${error.message}</div>`;
+                }
+            }
+        }
+
+        function showServerInfo() {
+            const infoDiv = document.getElementById('server-info');
+            infoDiv.innerHTML = `
+                <div class="info">
+                    <strong>Current URL:</strong> ${window.location.href}<br>
+                    <strong>Domain:</strong> ${window.location.hostname}<br>
+                    <strong>Protocol:</strong> ${window.location.protocol}<br>
+                    <strong>Port:</strong> ${window.location.port || 'default'}<br>
+                    <strong>Path:</strong> ${window.location.pathname}<br>
+                    <strong>User Agent:</strong> ${navigator.userAgent}<br>
+                    <strong>Timestamp:</strong> ${new Date().toLocaleString()}<br>
+                    <strong>Screen Size:</strong> ${screen.width}x${screen.height}<br>
+                </div>
+            `;
+        }
+
+        // Auto-run on load
+        window.onload = function() {
+            showServerInfo();
+        };
+
+        // Add keyboard shortcut
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                checkFiles();
+                checkHTTPResponses();
+            }
+        });
+    </script>
+
+    <div class="section">
+        <h3>💡 Tips</h3>
+        <ul>
+            <li><strong>Ctrl+Enter:</strong> Run all checks</li>
+            <li><strong>Green ✅:</strong> File/endpoint working</li>
+            <li><strong>Red ❌:</strong> File/endpoint not accessible</li>
+            <li><strong>Orange ⚠️:</strong> Possible configuration issue</li>
+        </ul>
+        <p><strong>If all checks fail:</strong> Files may not be uploaded or domain not configured properly.</p>
+        <p><strong>If some work:</strong> Check file permissions and .htaccess configuration.</p>
+    </div>
+</body>
+</html>

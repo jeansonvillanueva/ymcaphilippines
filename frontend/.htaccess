@@ -1,0 +1,16 @@
+RewriteEngine On
+
+# Handle React Router (SPA routing)
+RewriteBase /testsite/
+RewriteRule ^index\.html$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /testsite/index.html [L]
+
+# Handle PHP API routes
+RewriteCond %{REQUEST_URI} ^/testsite/php-api/
+RewriteRule ^testsite/php-api/(.*)$ testsite/php-api/index.php [QSA,L]
+
+# Serve uploaded files
+RewriteCond %{REQUEST_URI} ^/testsite/uploads/
+RewriteRule ^testsite/uploads/(.*)$ testsite/backend/uploads/$1 [L]
