@@ -10,12 +10,12 @@ import './AdminDashboard.css';
 type AdminTab = 'videos' | 'news' | 'calendar' | 'locals' | 'staff' | 'dashboard';
 
 const tabs: { id: AdminTab; label: string; icon: string }[] = [
+  { id: 'dashboard', label: 'Dashboard', icon: '📊' },
   { id: 'videos', label: 'YMCA Videos', icon: '▶' },
   { id: 'news', label: 'Y Latest News', icon: '📄' },
   { id: 'calendar', label: 'Calendar of Activities', icon: '📅' },
   { id: 'locals', label: 'Find Your YMCA', icon: '📍' },
   { id: 'staff', label: 'Meet Our Family', icon: '👥' },
-  { id: 'dashboard', label: 'Dashboard', icon: '📊' },
 ];
 
 export default function AdminDashboard() {

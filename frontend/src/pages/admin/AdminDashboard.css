@@ -21,7 +21,12 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  min-height: calc(100vh - 3rem);
+  position: sticky;
+  top: 1.5rem;
+  align-self: start;
+  min-height: auto;
+  max-height: calc(100vh - 3rem);
+  overflow: auto;
 }
 
 .admin-sidebar__brand {

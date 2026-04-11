@@ -56,12 +56,24 @@ function ScrollToHash() {
 function App() {
   return (
     <Router basename="/testsite">
-      <Navbar />
+      <AppContent />
+    </Router>
+  );
+}
+
+function AppContent() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname === '/' || location.pathname.startsWith('/admin');
+
+  return (
+    <>
+      {!isAdminRoute && <Navbar />}
       <ScrollToHash />
 
-      <main>
-      <Routes>
-          <Route path="/" element={<About_Y />} />
+      <main style={{ paddingTop: isAdminRoute ? 0 : undefined }}>
+        <Routes>
+          <Route path="/" element={<AdminDashboard />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/find-ymca" element={<Find_Your_YMCA />} />
           <Route path="/find-ymca/:localId" element={<LocalDetails />} />
@@ -70,7 +82,6 @@ function App() {
           <Route path="/about-us" element={<About_Us />} />
           <Route path="/about-us/highlights" element={<AboutUsHighlights />} />
           <Route path="/developer" element={<Developer />} />
-          <Route path="/admin" element={<AdminDashboard />} />
 
           <Route path="/article" element={<Article />} />
 
@@ -86,9 +97,8 @@ function App() {
           <Route path="/news/:slug" element={<NewsDetail />} />
         </Routes>
       </main>
-      
-      <Footer />
-    </Router>
+      {!isAdminRoute && <Footer />}
+    </>
   );
 }
 
