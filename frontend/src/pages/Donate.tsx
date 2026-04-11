@@ -1,5 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
+import axios from 'axios';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { PUBLIC_API_URL } from '../hooks/useApi';
 import Partners from '../components/Partners';
 import '../styles/design-system.css';
 import './Donate.css';
@@ -44,9 +46,45 @@ function Donate() {
     return `≈ $${v.toFixed(0)} · ₱${php}`;
   }, [amountUsd, displayCurrency]);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    alert('Donation submitted');
+
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    const payload = {
+      amountUsd,
+      currency: displayCurrency,
+      paymentMethod,
+      name: data.get('name')?.toString().trim() ?? '',
+      surname: data.get('surname')?.toString().trim() ?? '',
+      email: data.get('email')?.toString().trim() ?? '',
+      phone: data.get('phone')?.toString().trim() ?? '',
+      country: data.get('country')?.toString().trim() ?? '',
+      address1: data.get('address1')?.toString().trim() ?? '',
+      address2: data.get('address2')?.toString().trim() ?? '',
+      city: data.get('city')?.toString().trim() ?? '',
+      region: data.get('region')?.toString().trim() ?? '',
+      zip: data.get('zip')?.toString().trim() ?? '',
+      comments: data.get('comments')?.toString().trim() ?? '',
+    };
+
+    if (!payload.name || !payload.surname || !payload.email || !payload.amountUsd) {
+      alert('Please fill in your full name, email, and donation amount.');
+      return;
+    }
+
+    try {
+      await axios.post(`${PUBLIC_API_URL}/donate`, payload);
+      alert('Donation submitted successfully. Thank you!');
+      form.reset();
+      setAmountUsd(100);
+      setIsCustom(false);
+      setCustomAmount('');
+      setPaymentMethod('Credit Card');
+    } catch (error) {
+      console.error('Error submitting donation:', error);
+      alert('Failed to submit donation. Please try again later.');
+    }
   };
 
   return (
@@ -95,6 +133,7 @@ function Donate() {
                 <div className="donate-amount-row" aria-label="Donation amount">
                   <span className="donate-currency">{currencySymbol}</span>
                   <input
+                    name="amount"
                     ref={amountInputRef}
                     className="donate-amount-input"
                     type="number"
@@ -174,19 +213,19 @@ function Donate() {
                 {paymentMethod === 'Credit Card' && (
                   <>
                     <h3 className="donate-section-title">Personal Info</h3>
-                    <input className="donate-input" type="text" placeholder="Name" required />
-                    <input className="donate-input" type="text" placeholder="Surname" required />
-                    <input className="donate-input" type="email" placeholder="Email" required />
-                    <input className="donate-input" type="text" placeholder="Phone Number" />
+                    <input name="name" className="donate-input" type="text" placeholder="Name" required />
+                    <input name="surname" className="donate-input" type="text" placeholder="Surname" required />
+                    <input name="email" className="donate-input" type="email" placeholder="Email" required />
+                    <input name="phone" className="donate-input" type="text" placeholder="Phone Number" />
 
                     <h3 className="donate-section-title">Billing Details</h3>
-                    <input className="donate-input" type="text" placeholder="Country" />
-                    <input className="donate-input" type="text" placeholder="Address 1" />
-                    <input className="donate-input" type="text" placeholder="Address 2" />
-                    <input className="donate-input" type="text" placeholder="City" />
+                    <input name="country" className="donate-input" type="text" placeholder="Country" />
+                    <input name="address1" className="donate-input" type="text" placeholder="Address 1" />
+                    <input name="address2" className="donate-input" type="text" placeholder="Address 2" />
+                    <input name="city" className="donate-input" type="text" placeholder="City" />
                     <div className="donate-two-inputs">
-                      <input className="donate-input" type="text" placeholder="Region" />
-                      <input className="donate-input" type="text" placeholder="Zip/Postal Code" />
+                      <input name="region" className="donate-input" type="text" placeholder="Region" />
+                      <input name="zip" className="donate-input" type="text" placeholder="Zip/Postal Code" />
                     </div>
                   </>
                 )}
@@ -194,7 +233,7 @@ function Donate() {
                 {paymentMethod === 'PayPal' && (
                   <>
                     <h3 className="donate-section-title">PayPal Details</h3>
-                    <input className="donate-input" type="email" placeholder="Email" required />
+                    <input name="email" className="donate-input" type="email" placeholder="Email" required />
                     <input className="donate-input" type="text" placeholder="Card Number" />
                     <div className="donate-two-inputs">
                       <input className="donate-input" type="text" placeholder="Expires" />
@@ -210,7 +249,7 @@ function Donate() {
                       <input className="donate-input" type="text" placeholder="Region" />
                       <input className="donate-input" type="text" placeholder="Zip/Postal Code" />
                     </div>
-                    <input className="donate-input" type="text" placeholder="Phone Number" />
+                    <input name="phone" className="donate-input" type="text" placeholder="Phone Number" />
                   </>
                 )}
 

@@ -127,6 +127,43 @@ export function initializeTables() {
     )
   `;
 
+  // Submitted YMCA updates table
+  const submitArticleTableSql = `
+    CREATE TABLE IF NOT EXISTS submit_article (
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      local_ymca VARCHAR(100) NOT NULL,
+      title VARCHAR(255) NOT NULL,
+      subtitle VARCHAR(255) NOT NULL,
+      article_link VARCHAR(1000) NOT NULL,
+      email VARCHAR(255) NOT NULL,
+      message TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `;
+
+  // Donations table for tracking submitted donations
+  const donationsTableSql = `
+    CREATE TABLE IF NOT EXISTS donations (
+      donation_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(100) NOT NULL,
+      surname VARCHAR(100) NOT NULL,
+      email VARCHAR(255) NOT NULL,
+      phone VARCHAR(50),
+      amount_usd DECIMAL(12,2) NOT NULL,
+      currency VARCHAR(10) NOT NULL,
+      payment_method VARCHAR(50),
+      country VARCHAR(100),
+      address1 VARCHAR(255),
+      address2 VARCHAR(255),
+      city VARCHAR(100),
+      region VARCHAR(100),
+      zip VARCHAR(50),
+      comments TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `;
+
   // Ensure social media columns exist in locals table
   function ensureLocalsColumn(column, definition) {
     db.query(`SHOW COLUMNS FROM locals LIKE '${column}'`, (err, result) => {
@@ -170,6 +207,8 @@ export function initializeTables() {
     pillarsTableSql, // References locals
     pillarProgramsTableSql, // References pillars
     staffTableSql,
+    submitArticleTableSql,
+    donationsTableSql,
   ];
 
   // Create tables sequentially to handle foreign key dependencies

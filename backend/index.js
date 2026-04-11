@@ -221,6 +221,43 @@ app.post('/api/submit-update', (req, res) => {
   );
 });
 
+// POST - Submit donation
+app.post('/api/donate', express.json(), (req, res) => {
+  const {
+    name,
+    surname,
+    email,
+    phone,
+    amountUsd,
+    currency,
+    paymentMethod,
+    country,
+    address1,
+    address2,
+    city,
+    region,
+    zip,
+    comments,
+  } = req.body;
+
+  if (!name || !surname || !email || !amountUsd || !currency) {
+    return res.status(400).json({ error: 'Required donation fields are missing' });
+  }
+
+  db.query(
+    `INSERT INTO donations (name, surname, email, phone, amount_usd, currency, payment_method, country, address1, address2, city, region, zip, comments)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [name, surname, email, phone, amountUsd, currency, paymentMethod, country, address1, address2, city, region, zip, comments],
+    (err, result) => {
+      if (err) {
+        console.error('Donation insert error:', err);
+        return res.status(500).json({ error: 'Failed to submit donation', details: err.message });
+      }
+      res.json({ message: 'Donation submitted successfully', id: result.insertId });
+    }
+  );
+});
+
 // TEST DATABASE CONNECTION
 app.get("/test-db", (req, res) => {
   db.query("SELECT 1", (err, result) => {
@@ -285,6 +322,30 @@ app.post('/api/feedback', express.json(), (req, res) => {
   });
 });
 // ============ ADMIN API ROUTES ============
+
+app.get('/admin/feedback', (req, res) => {
+  db.query('SELECT * FROM feedback ORDER BY created_at DESC', (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(result);
+  });
+});
+
+app.get('/admin/submit-updates', (req, res) => {
+  db.query(
+    'SELECT article_id AS id, name, local_ymca, title, subtitle, article_link, email, message FROM submit_article ORDER BY article_id DESC',
+    (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(result);
+    }
+  );
+});
+
+app.get('/admin/donations', (req, res) => {
+  db.query('SELECT * FROM donations ORDER BY created_at DESC', (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(result);
+  });
+});
 
 // VIDEOS - Admin Management
 app.get("/admin/videos", (req, res) => {

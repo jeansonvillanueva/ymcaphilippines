@@ -4,9 +4,10 @@ import AdminNews from './AdminNews';
 import AdminCalendar from './AdminCalendar';
 import AdminLocals from './AdminLocals';
 import AdminStaff from './AdminStaff';
+import AdminSubmissions from './AdminSubmissions';
 import './AdminDashboard.css';
 
-type AdminTab = 'videos' | 'news' | 'calendar' | 'locals' | 'staff' | 'donation';
+type AdminTab = 'videos' | 'news' | 'calendar' | 'locals' | 'staff' | 'dashboard';
 
 const tabs: { id: AdminTab; label: string; icon: string }[] = [
   { id: 'videos', label: 'YMCA Videos', icon: '▶' },
@@ -14,11 +15,11 @@ const tabs: { id: AdminTab; label: string; icon: string }[] = [
   { id: 'calendar', label: 'Calendar of Activities', icon: '📅' },
   { id: 'locals', label: 'Find Your YMCA', icon: '📍' },
   { id: 'staff', label: 'Meet Our Family', icon: '👥' },
-  { id: 'donation', label: 'Donation', icon: '💳' },
+  { id: 'dashboard', label: 'Dashboard', icon: '📊' },
 ];
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<AdminTab>('videos');
+  const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
 
   return (
     <div className="admin-dashboard">
@@ -57,11 +58,7 @@ export default function AdminDashboard() {
             {activeTab === 'calendar' && <AdminCalendar />}
             {activeTab === 'locals' && <AdminLocals />}
             {activeTab === 'staff' && <AdminStaff />}
-            {activeTab === 'donation' && (
-              <div className="admin-placeholder">
-                <p>Donation settings are not added yet. This section will let you manage donation content soon.</p>
-              </div>
-            )}
+            {activeTab === 'dashboard' && <AdminSubmissions />}
           </section>
         </main>
       </div>
