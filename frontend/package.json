@@ -6,6 +6,8 @@
   "engines": {
     "node": ">=18"
   },
+  "type": "module",
+  "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
