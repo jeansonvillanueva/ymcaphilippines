@@ -8,6 +8,14 @@ import pillarCommunityWellbeing from '../assets/images/pillars/community_wellbei
 import pillarMeaningWork from '../assets/images/pillars/meaning_work.png';
 import pillarSustainablePlanet from '../assets/images/pillars/sustainable_planet.png';
 import pillarJustWorld from '../assets/images/pillars/just_world.png';
+
+const normalizeImageUrl = (url?: string | null) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (url.startsWith('/testsite/') || url.startsWith('/testsite/uploads/')) return url;
+  if (url.startsWith('/uploads/')) return `/testsite${url}`;
+  return url;
+};
 import '../styles/design-system.css';
 import './LocalDetails.css';
 
@@ -122,7 +130,7 @@ export default function LocalDetails() {
                 aria-label={`${local.name} Facebook page`}
               >
                 {local.logoImageUrl ? (
-                  <img className="local-details-hero__logo" src={local.logoImageUrl} alt={`${local.name} logo`} />
+                  <img className="local-details-hero__logo" src={normalizeImageUrl(local.logoImageUrl)} alt={`${local.name} logo`} />
                 ) : (
                   <div className="local-details-hero__logoFallback" aria-hidden />
                 )}
@@ -130,7 +138,7 @@ export default function LocalDetails() {
             ) : (
               <>
                 {local.logoImageUrl ? (
-                  <img className="local-details-hero__logo" src={local.logoImageUrl} alt={`${local.name} logo`} />
+                  <img className="local-details-hero__logo" src={normalizeImageUrl(local.logoImageUrl)} alt={`${local.name} logo`} />
                 ) : (
                   <div className="local-details-hero__logoFallback" aria-hidden />
                 )}

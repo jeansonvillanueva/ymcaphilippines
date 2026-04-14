@@ -7,6 +7,14 @@ import { getRelatedNews } from '../data/news';
 import '../styles/design-system.css';
 import './NewsArticle.css';
 
+const normalizeImageUrl = (url?: string | null) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (url.startsWith('/testsite/') || url.startsWith('/testsite/uploads/')) return url;
+  if (url.startsWith('/uploads/')) return `/testsite${url}`;
+  return url;
+};
+
 export type LocalYMCAConfig = {
   name: string;
   logoSrc: string;
@@ -185,7 +193,7 @@ export default function NewsArticle({
                           <Link to={item.path} className="news-article-more__link">
                             <div className="news-article-more__thumb" aria-hidden>
                               {item.imageUrl ? (
-                                <img src={item.imageUrl} alt="" />
+                                <img src={normalizeImageUrl(item.imageUrl)} alt="" />
                               ) : null}
                             </div>
                             <div className="news-article-more__meta">
@@ -215,7 +223,7 @@ export default function NewsArticle({
                       <li key={item.path}>
                         <Link to={item.path} className="news-article-more__link">
                           <div className="news-article-more__thumb" aria-hidden>
-                            {item.imageUrl ? <img src={item.imageUrl} alt="" /> : null}
+                            {item.imageUrl ? <img src={normalizeImageUrl(item.imageUrl)} alt="" /> : null}
                           </div>
                           <div className="news-article-more__meta">
                             <div className="news-article-more__itemTitle">{item.title}</div>

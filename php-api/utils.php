@@ -38,12 +38,22 @@ function handleFileUpload($fieldName = 'image') {
     $filepath = $uploadDir . $filename;
 
     if (move_uploaded_file($file['tmp_name'], $filepath)) {
-        return '/uploads/' . $filename;
+        return getUploadBasePath() . '/uploads/' . $filename;
     } else {
         http_response_code(500);
         echo json_encode(['error' => 'Failed to upload file']);
         exit();
     }
+}
+
+function getUploadBasePath() {
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+    $phpApiPath = dirname($scriptName);
+    $basePath = dirname($phpApiPath);
+    if ($basePath === '/' || $basePath === '\\') {
+        return '';
+    }
+    return rtrim($basePath, '/');
 }
 
 // Function to get POST data

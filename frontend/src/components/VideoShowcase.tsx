@@ -6,6 +6,14 @@ type VideoItem = {
   videoUrl?: string;
 };
 
+const getVideoEmbedUrl = (url?: string) => {
+  if (!url) return '';
+  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  if (match) {
+    return `https://www.youtube.com/embed/${match[1]}`;
+  }
+  return url;
+};
 
 type VideoShowcaseProps = {
   id: string;
@@ -27,7 +35,7 @@ function VideoShowcase({ heading, videos }: VideoShowcaseProps) {
               <div className="home-videos__media">
                 {video.embedUrl ? (
                   <iframe
-                    src={video.embedUrl}
+                    src={getVideoEmbedUrl(video.embedUrl)}
                     title={video.title}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen

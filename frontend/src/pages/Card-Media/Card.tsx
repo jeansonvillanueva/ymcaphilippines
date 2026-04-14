@@ -1,6 +1,14 @@
 import React from 'react';
 import './Card.css';
 
+const normalizeImageUrl = (url?: string | null) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (url.startsWith('/testsite/') || url.startsWith('/testsite/uploads/')) return url;
+  if (url.startsWith('/uploads/')) return `/testsite${url}`;
+  return url;
+};
+
 interface CardProps {
   title: string;
   subtitle?: string;
@@ -18,7 +26,7 @@ const Card: React.FC<CardProps> = ({ title, subtitle, imageUrl, tag, description
       <div className="card-media">
         {tag ? <div className="card-tag">{tag}</div> : null}
         {imageUrl ? (
-          <img src={imageUrl} alt={title} className="card-image" />
+          <img src={normalizeImageUrl(imageUrl)} alt={title} className="card-image" />
         ) : (
           <div className="card-image card-image--placeholder" aria-hidden>
             Image template — to be modified later

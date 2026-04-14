@@ -28,6 +28,18 @@ export default function AdminVideos() {
     fetchVideos();
   }, []);
 
+  const normalizeYoutubeUrl = (url: string) => {
+    const value = url?.trim();
+    if (!value) return '';
+
+    const match = value.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+    if (match) {
+      return `https://www.youtube.com/embed/${match[1]}`;
+    }
+
+    return value;
+  };
+
   const fetchVideos = async () => {
     try {
       const response = await axios.get(API_URL);
@@ -52,17 +64,20 @@ export default function AdminVideos() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.title.trim() || !form.embedUrl?.trim()) {
+    const normalizedEmbedUrl = normalizeYoutubeUrl(form.embedUrl || '');
+    if (!form.title.trim() || !normalizedEmbedUrl) {
       setMessage({ type: 'error', text: 'Title and Youtube link are required' });
       return;
     }
 
+    const payload = { ...form, embedUrl: normalizedEmbedUrl };
+
     try {
       if (editingId) {
-        await axios.put(`${API_URL}/${editingId}`, form);
+        await axios.put(`${API_URL}/${editingId}`, payload);
         setMessage({ type: 'success', text: 'Video updated successfully' });
       } else {
-        await axios.post(API_URL, form);
+        await axios.post(API_URL, payload);
         setMessage({ type: 'success', text: 'Video added successfully' });
       }
       clearForm();
@@ -112,7 +127,7 @@ export default function AdminVideos() {
           <input
             type="text"
             name="embedUrl"
-            placeholder="https://youtu.be/your-video-id"
+            placeholder="https://www.youtube.com/watch?v=your-video-id"
             value={form.embedUrl || ''}
             onChange={handleChange}
           />

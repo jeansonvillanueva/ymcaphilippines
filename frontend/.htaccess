@@ -9,8 +9,8 @@ RewriteRule . /testsite/index.html [L]
 
 # Handle PHP API routes
 RewriteCond %{REQUEST_URI} ^/testsite/php-api/
-RewriteRule ^testsite/php-api/(.*)$ testsite/php-api/index.php [QSA,L]
+RewriteRule ^php-api/(.*)$ php-api/index.php [QSA,L]
 
 # Serve uploaded files
 RewriteCond %{REQUEST_URI} ^/testsite/uploads/
-RewriteRule ^testsite/uploads/(.*)$ testsite/backend/uploads/$1 [L]
+RewriteRule ^uploads/(.*)$ backend/uploads/$1 [L]
