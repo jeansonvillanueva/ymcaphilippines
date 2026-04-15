@@ -18,8 +18,12 @@ $youth = isset($data['youth']) ? intval($data['youth']) : 0;
 $others = isset($data['others']) ? intval($data['others']) : 0;
 $totalMembersAsOf = isset($data['totalMembersAsOf']) ? $conn->real_escape_string($data['totalMembersAsOf']) : '';
 
-$sql = "INSERT INTO locals (id, name, established, facebookUrl, instagramUrl, twitterUrl, heroImageUrl, logoImageUrl, corporate, nonCorporate, youth, others, totalMembersAsOf)
-        VALUES ('$id', '$name', '$established', '$facebookUrl', '$instagramUrl', '$twitterUrl', '$heroImageUrl', '$logoImageUrl', $corporate, $nonCorporate, $youth, $others, '$totalMembersAsOf')";
+// For YEAR columns, use NULL if empty; otherwise wrap in quotes
+$establishedClause = $established === '' ? 'NULL' : "'$established'";
+$totalMembersAsOfClause = $totalMembersAsOf === '' ? 'NULL' : "'$totalMembersAsOf'";
+
+$sql = "INSERT INTO `local` (local_id, name, established, facebook_url, instagramUrl, twitterUrl, hero_image_url, logo_image_url, corporate, non_corporate, youth, others, total_members_as_of)
+        VALUES ('$id', '$name', $establishedClause, '$facebookUrl', '$instagramUrl', '$twitterUrl', '$heroImageUrl', '$logoImageUrl', $corporate, $nonCorporate, $youth, $others, $totalMembersAsOfClause)";
 
 if ($conn->query($sql) === TRUE) {
     sendResponse(['id' => $id, 'message' => 'Local added successfully']);

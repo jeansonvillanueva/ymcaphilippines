@@ -167,7 +167,17 @@ function Where_We_Are() {
     const fetchLocalData = async () => {
       try {
         const response = await axios.get(`${PUBLIC_API_URL}/locals`);
-        setLocalsData(response.data || []);
+        const rawData = response.data;
+        const localsArray = Array.isArray(rawData)
+          ? rawData
+          : rawData?.locals || rawData?.data || [];
+
+        if (!Array.isArray(localsArray)) {
+          console.error('Unexpected locals response structure:', rawData);
+          setLocalsData([]);
+        } else {
+          setLocalsData(localsArray);
+        }
       } catch (err) {
         console.error('Error fetching locals from backend:', err);
         setLocalsData([]);

@@ -9,7 +9,7 @@ $key = $conn->real_escape_string($data['key']);
 $label = $conn->real_escape_string($data['label']);
 $color = isset($data['color']) ? $conn->real_escape_string($data['color']) : '';
 
-$sql = "INSERT INTO pillars (localId, `key`, label, color) VALUES ('$localId', '$key', '$label', '$color')";
+$sql = "INSERT INTO local_pillars (local_id, pillar_key, label, color) VALUES ('$localId', '$key', '$label', '$color')";
 
 if ($conn->query($sql) === TRUE) {
     sendResponse(['id' => $conn->insert_id, 'message' => 'Pillar created successfully']);

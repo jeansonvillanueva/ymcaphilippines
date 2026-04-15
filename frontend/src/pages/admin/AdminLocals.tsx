@@ -38,6 +38,20 @@ interface Local {
 
 type UploadField = 'heroImageUrl' | 'logoImageUrl';
 
+const normalizeImageUrl = (url?: string | null) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+
+  const apiBasePath = new URL(ADMIN_API_URL).pathname.replace(/\/admin$/, '');
+  if (url.startsWith(apiBasePath)) return url;
+  if (url.startsWith('/uploads/')) return `${apiBasePath}${url}`;
+  if (url.startsWith('/php-api/uploads/')) {
+    return `${apiBasePath}${url.replace(/^\/php-api/, '')}`;
+  }
+
+  return url;
+};
+
 export default function AdminLocals() {
   const [locals, setLocals] = useState<Local[]>([]);
   const [selectedLocal, setSelectedLocal] = useState<string | null>(null);
@@ -67,7 +81,17 @@ export default function AdminLocals() {
   const fetchLocals = useCallback(async () => {
     try {
       const response = await axios.get(API_URL);
-      const backendMap = new Map((response.data as Local[]).map((local) => [local.id, local]));
+      const rawData = response.data;
+      const localsArray = Array.isArray(rawData)
+        ? rawData
+        : rawData?.locals || rawData?.data || [];
+
+      if (!Array.isArray(localsArray)) {
+        console.error('Unexpected locals response shape:', rawData);
+        throw new Error('Invalid locals payload');
+      }
+
+      const backendMap = new Map((localsArray as Local[]).map((local) => [local.id, local]));
       const mergedLocals = Object.values(LOCALS_BY_ID).map((staticLocal) =>
         mergeLocalRecords(staticLocal, backendMap.get(staticLocal.id) ?? null),
       );
@@ -151,9 +175,10 @@ export default function AdminLocals() {
       const response = await axios.post(`${API_URL}/${selectedLocal}/upload?field=${field}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
+      const normalizedPath = normalizeImageUrl(response.data.path || '');
       setForm((prev) => ({
         ...prev,
-        [field]: response.data.path || prev[field],
+        [field]: normalizedPath || prev[field],
       }));
       setMessage({ type: 'success', text: 'Image uploaded successfully' });
     } catch (error) {
@@ -360,11 +385,27 @@ export default function AdminLocals() {
     }
 
     try {
+      // Convert form object to FormData to ensure proper transmission
+      const formData = new FormData();
+      (Object.keys(form) as (keyof Local)[]).forEach(key => {
+        const value = form[key];
+        if (value !== null && value !== undefined) {
+          formData.append(key, String(value));
+        }
+      });
+
+      console.log('Sending form data keys:', Object.keys(form));
+      console.log('Sending form data:', form);
+
       if (isNewLocal) {
-        await axios.post(API_URL, form);
+        await axios.post(API_URL, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
         setMessage({ type: 'success', text: 'Local created successfully' });
       } else {
-        await axios.put(`${API_URL}/${selectedLocal}`, form);
+        await axios.put(`${API_URL}/${selectedLocal}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
         setMessage({ type: 'success', text: 'Local updated successfully' });
       }
       setIsNewLocal(false);
@@ -464,7 +505,7 @@ export default function AdminLocals() {
             />
             {form.heroImageUrl && (
               <img
-                src={form.heroImageUrl}
+                src={normalizeImageUrl(form.heroImageUrl)}
                 alt="Current hero"
                 style={{ marginTop: '0.75rem', width: '100%', maxHeight: '240px', objectFit: 'cover', borderRadius: '6px' }}
               />
@@ -480,7 +521,7 @@ export default function AdminLocals() {
             />
             {form.logoImageUrl && (
               <img
-                src={form.logoImageUrl}
+                src={normalizeImageUrl(form.logoImageUrl)}
                 alt="Current logo"
                 style={{ marginTop: '0.75rem', width: '120px', height: 'auto', objectFit: 'contain', borderRadius: '6px' }}
               />

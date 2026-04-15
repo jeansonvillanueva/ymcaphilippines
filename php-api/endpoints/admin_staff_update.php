@@ -1,7 +1,14 @@
 <?php
 // PUT /admin/staff/:id
-$data = $_POST;
+$data = getPostData();
 $id = intval($_GET['id']);
+
+if (!isset($data['name']) || empty($data['name'])) {
+    sendResponse(['error' => "Field 'name' is required"], 400);
+}
+if (!isset($data['position']) || empty($data['position'])) {
+    sendResponse(['error' => "Field 'position' is required"], 400);
+}
 
 $name = $conn->real_escape_string($data['name']);
 $position = $conn->real_escape_string($data['position']);
@@ -15,11 +22,24 @@ if ($uploadedImagePath) {
     $imageUrl = $uploadedImagePath;
 }
 
-$sql = "UPDATE staff SET name='$name', position='$position', imageUrl='$imageUrl', departmentGroup='$departmentGroup', sequenceOrder=$sequenceOrder WHERE id=$id";
+$updateParts = [
+    "name='$name'",
+    "position='$position'",
+    "imageUrl='$imageUrl'",
+    "departmentGroup='$departmentGroup'",
+    "sequenceOrder=$sequenceOrder",
+];
+
+$updatedAtExists = $conn->query("SHOW COLUMNS FROM staff LIKE 'updated_at'");
+if ($updatedAtExists && $updatedAtExists->num_rows > 0) {
+    $updateParts[] = 'updated_at=NOW()';
+}
+
+$sql = "UPDATE staff SET " . implode(', ', $updateParts) . " WHERE id=$id";
 
 if ($conn->query($sql) === TRUE) {
     sendResponse(['imageUrl' => $imageUrl, 'message' => 'Staff updated successfully']);
 } else {
-    sendResponse(['error' => $conn->error], 500);
+    sendResponse(['error' => 'Database error: ' . $conn->error], 500);
 }
 ?>

@@ -82,9 +82,10 @@ export default function AdminVideos() {
       }
       clearForm();
       fetchVideos();
-    } catch (error) {
-      console.error('Error saving video:', error);
-      setMessage({ type: 'error', text: 'Failed to save video' });
+    } catch (error: any) {
+      console.error('Error saving video:', error.response?.data || error.message || error);
+      const serverMessage = error.response?.data?.error;
+      setMessage({ type: 'error', text: serverMessage ? `Failed to save video: ${serverMessage}` : 'Failed to save video' });
     }
   };
 

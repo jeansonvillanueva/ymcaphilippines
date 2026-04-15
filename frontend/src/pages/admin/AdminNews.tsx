@@ -113,7 +113,8 @@ export default function AdminNews() {
       }
 
       if (editingId) {
-        await axios.put(`${API_URL}/${editingId}`, formData);
+        formData.append('_method', 'PUT');
+        await axios.post(`${API_URL}/${editingId}`, formData);
         setMessage({ type: 'success', text: 'News updated successfully' });
       } else {
         await axios.post(API_URL, formData);
@@ -133,9 +134,13 @@ export default function AdminNews() {
       setImageFile(null);
       setEditingId(null);
       fetchNews();
-    } catch (error) {
-      console.error('Error saving news:', error);
-      setMessage({ type: 'error', text: 'Failed to save news' });
+    } catch (error: any) {
+      console.error('Error saving news:', error.response?.data || error);
+      const serverMessage = error.response?.data?.error;
+      setMessage({
+        type: 'error',
+        text: serverMessage ? `Failed to save news: ${serverMessage}` : 'Failed to save news',
+      });
     }
   };
 
@@ -187,8 +192,9 @@ export default function AdminNews() {
 
       <form className="admin-form expanded" onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Title *</label>
+          <label htmlFor="news-title">Title *</label>
           <input
+            id="news-title"
             type="text"
             name="title"
             placeholder="News title"
@@ -198,8 +204,9 @@ export default function AdminNews() {
         </div>
 
         <div className="form-group">
-          <label>Date</label>
+          <label htmlFor="news-date">Date</label>
           <input
+            id="news-date"
             type="text"
             name="date"
             placeholder="e.g., November 6-7, 2026"
@@ -209,8 +216,8 @@ export default function AdminNews() {
         </div>
 
         <div className="form-group">
-          <label>Category</label>
-          <select name="category" value={form.category} onChange={handleChange}>
+          <label htmlFor="news-category">Category</label>
+          <select id="news-category" name="category" value={form.category} onChange={handleChange}>
             {categories.map((cat) => (
               <option key={cat} value={cat}>
                 {cat}
@@ -220,8 +227,8 @@ export default function AdminNews() {
         </div>
 
         <div className="form-group">
-          <label>Topic</label>
-          <select name="topic" value={form.topic} onChange={handleChange}>
+          <label htmlFor="news-topic">Topic</label>
+          <select id="news-topic" name="topic" value={form.topic} onChange={handleChange}>
             <option key="topic-placeholder" value="">Select a topic</option>
             {topics.map((topic) => (
               <option key={`topic-${topic}`} value={topic}>
@@ -232,8 +239,8 @@ export default function AdminNews() {
         </div>
 
         <div className="form-group">
-          <label>Nearest Local YMCA</label>
-          <select name="localYMCA" value={form.localYMCA || ''} onChange={handleChange}>
+          <label htmlFor="news-local">Nearest Local YMCA</label>
+          <select id="news-local" name="localYMCA" value={form.localYMCA || ''} onChange={handleChange}>
             <option key="local-placeholder" value="">Select nearest local YMCA (optional)</option>
             {locals.map((local, index) => {
               const optionKey = local.id ? `local-${local.id}` : `local-unknown-${index}`;
@@ -248,8 +255,8 @@ export default function AdminNews() {
         </div>
 
         <div className="form-group">
-          <label>Upload Image</label>
-          <input type="file" accept="image/*" onChange={handleFileChange} />
+          <label htmlFor="news-image">Upload Image</label>
+          <input id="news-image" type="file" accept="image/*" onChange={handleFileChange} />
           {form.imageUrl ? (
             <div className="image-preview">
               <img src={form.imageUrl} alt="News preview" style={{ maxWidth: '100%', marginTop: '0.75rem' }} />
@@ -258,8 +265,9 @@ export default function AdminNews() {
         </div>
 
         <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-          <label>Paragraph</label>
+          <label htmlFor="news-body">Paragraph</label>
           <textarea
+            id="news-body"
             name="body"
             placeholder="Main news paragraph or full article summary"
             value={form.body || ''}
@@ -268,8 +276,9 @@ export default function AdminNews() {
         </div>
 
         <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-          <label>Subtitle</label>
+          <label htmlFor="news-subtitle">Subtitle</label>
           <textarea
+            id="news-subtitle"
             name="subtitle"
             placeholder="Subtitle or description"
             value={form.subtitle || ''}

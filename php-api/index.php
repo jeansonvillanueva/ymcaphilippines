@@ -6,6 +6,35 @@ require_once 'utils.php';
 $requestUri = $_SERVER['REQUEST_URI'];
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 
+// Allow HTML forms and FormData to override method via _method field
+if ($requestMethod === 'POST') {
+    // Check $_POST first (for regular form submissions)
+    if (isset($_POST['_method'])) {
+        $override = strtoupper($_POST['_method']);
+        if (in_array($override, ['PUT', 'DELETE', 'PATCH'], true)) {
+            $requestMethod = $override;
+            $_SERVER['REQUEST_METHOD'] = $override;
+        }
+    }
+    // For FormData requests, check if _method is in the raw input
+    else {
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+        if (strpos($contentType, 'multipart/form-data') !== false) {
+            // Parse the raw multipart data to find _method field
+            $rawInput = file_get_contents('php://input');
+            if (strpos($rawInput, 'name="_method"') !== false) {
+                // Extract the _method value from the multipart data
+                preg_match('/name="_method"[\r\n]+[\r\n]+(PUT|DELETE|PATCH)/i', $rawInput, $matches);
+                if (isset($matches[1])) {
+                    $override = strtoupper($matches[1]);
+                    $requestMethod = $override;
+                    $_SERVER['REQUEST_METHOD'] = $override;
+                }
+            }
+        }
+    }
+}
+
 // Remove query string from URI
 $path = parse_url($requestUri, PHP_URL_PATH);
 
@@ -249,6 +278,31 @@ switch ($path) {
     case '/test-article':
         if ($requestMethod === 'GET') {
             require_once 'endpoints/test_article.php';
+        }
+        break;
+
+    // Diagnostic and testing routes
+    case '/diagnose':
+        if ($requestMethod === 'GET') {
+            require_once 'diagnose.php';
+        }
+        break;
+
+    case '/database-init':
+        if ($requestMethod === 'GET' || $requestMethod === 'POST') {
+            require_once 'database-init.php';
+        }
+        break;
+
+    case '/test-data-receipt':
+        if ($requestMethod === 'GET' || $requestMethod === 'POST' || $requestMethod === 'PUT') {
+            require_once 'test-data-receipt.php';
+        }
+        break;
+
+    case '/test-update':
+        if ($requestMethod === 'GET') {
+            require_once 'test-update.php';
         }
         break;
 
