@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import AdminVideos from './AdminVideos';
 import AdminNews from './AdminNews';
 import AdminCalendar from './AdminCalendar';
@@ -6,6 +8,8 @@ import AdminLocals from './AdminLocals';
 import AdminStaff from './AdminStaff';
 import AdminSubmissions from './AdminSubmissions';
 import './AdminDashboard.css';
+
+const LOGOUT_URL = '/testsite/php-api/admin/logout';
 
 type AdminTab = 'videos' | 'news' | 'calendar' | 'locals' | 'staff' | 'dashboard';
 
@@ -20,6 +24,16 @@ const tabs: { id: AdminTab; label: string; icon: string }[] = [
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await axios.post(LOGOUT_URL);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+    navigate('/admin/login');
+  };
 
   return (
     <div className="admin-dashboard">
@@ -50,6 +64,9 @@ export default function AdminDashboard() {
               <p className="admin-main__subtitle">Site Management</p>
               <h1 className="admin-main__title">{tabs.find((tab) => tab.id === activeTab)?.label}</h1>
             </div>
+            <button onClick={handleLogout} className="admin-logout-button">
+              Logout
+            </button>
           </header>
 
           <section className="admin-content">

@@ -102,6 +102,9 @@
   padding: 2rem;
   border-bottom: 1px solid #e7eaf7;
   background: #f8fbff;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 }
 
 .admin-main__subtitle {
@@ -302,6 +305,28 @@
   padding: 2rem;
   color: #4b5563;
   font-size: 1.1rem;
+}
+
+.admin-logout-button {
+  padding: 0.65rem 1.2rem;
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.admin-logout-button:hover {
+  background-color: #ff7875;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(255, 77, 79, 0.3);
+}
+
+.admin-logout-button:active {
+  transform: translateY(0);
 }
 
 @media (max-width: 1100px) {

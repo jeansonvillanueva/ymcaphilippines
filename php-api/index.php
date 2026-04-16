@@ -1,6 +1,7 @@
 <?php
 require_once 'config.php';
 require_once 'utils.php';
+require_once 'auth.php';
 
 // Get the request URI and method
 $requestUri = $_SERVER['REQUEST_URI'];
@@ -58,6 +59,12 @@ if ($path === '') {
 $path = preg_replace('#^/php-api#', '', $path);
 if ($path === '') {
     $path = '/';
+}
+
+// Protect admin routes unless they are public auth endpoints.
+$publicAdminRoutes = ['/admin/login', '/admin/status', '/admin/logout'];
+if (strpos($path, '/admin') === 0 && !in_array($path, $publicAdminRoutes, true)) {
+    requireAdminAuth();
 }
 
 // Route the request
@@ -124,6 +131,25 @@ switch ($path) {
     case '/api/feedback':
         if ($requestMethod === 'POST') {
             require_once 'endpoints/feedback.php';
+        }
+        break;
+
+    // Admin auth routes
+    case '/admin/login':
+        if ($requestMethod === 'POST') {
+            require_once 'endpoints/admin_login.php';
+        }
+        break;
+
+    case '/admin/logout':
+        if ($requestMethod === 'POST') {
+            require_once 'endpoints/admin_logout.php';
+        }
+        break;
+
+    case '/admin/status':
+        if ($requestMethod === 'GET') {
+            require_once 'endpoints/admin_status.php';
         }
         break;
 

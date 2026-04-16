@@ -1,0 +1,17 @@
+# Enable URL rewriting for the single-page app
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /testsite/
+
+  # If the request is not a file or directory, rewrite to index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^.*$ /testsite/index.html [L,QSA]
+</IfModule>
+
+# Optional: serve compressed assets if available
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css|svg|png|jpg|jpeg|gif|webp)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>

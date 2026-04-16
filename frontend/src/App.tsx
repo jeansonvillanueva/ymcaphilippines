@@ -1,6 +1,6 @@
 import Navbar from './components/Navbar';
 import './App.css';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 
 import Home from './pages/Home';
@@ -13,6 +13,8 @@ import About_Us from './pages/About_Us';
 import AboutUsHighlights from './pages/Card-Media/articles/about_us';
 import Developer from './pages/developer';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminLogin from './pages/admin/AdminLogin';
+import ProtectedRoute from './components/ProtectedRoute';
 
 import Card_One from './pages/Card-Media/news/Card_One';
 import Card_Two from './pages/Card-Media/news/Card_Two';
@@ -73,7 +75,9 @@ function AppContent() {
       <main style={{ paddingTop: isAdminRoute ? 0 : undefined }}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/find-ymca" element={<Find_Your_YMCA />} />
           <Route path="/find-ymca/:localId" element={<LocalDetails />} />
