@@ -47,6 +47,7 @@ interface StaffData {
   position: string;
   imageUrl?: string;
   departmentGroup?: string;
+  secretaryType?: string;
   sequenceOrder?: number;
 }
 
@@ -56,6 +57,7 @@ function AboutUs() {
   const [detailSlideIndex, setDetailSlideIndex] = useState(0);
   const [isPillarFlipped, setIsPillarFlipped] = useState(false);
   const [orgStructure, setOrgStructure] = useState<{ head: OrgMember; branches: OrgBranch[] } | null>(null);
+  const [secretaries, setSecretaries] = useState<StaffData[]>([]);
   const [loadingStaff, setLoadingStaff] = useState(true);
   const [staffError, setStaffError] = useState<string | null>(null);
 
@@ -69,9 +71,14 @@ function AboutUs() {
         if (!staffList || staffList.length === 0) {
           setStaffError('No staff data available');
           setOrgStructure(null);
+          setSecretaries([]);
           setLoadingStaff(false);
           return;
         }
+
+        // Extract secretaries with secretaryType (featured section)
+        const featuredSecretaries = staffList.filter((staff) => staff.secretaryType && staff.secretaryType.trim());
+        setSecretaries(featuredSecretaries);
 
         // Build org structure from API data
         // Group by department
@@ -119,6 +126,7 @@ function AboutUs() {
         console.error('Error fetching staff:', error);
         setStaffError('Unable to load staff data. Please try again later.');
         setOrgStructure(null);
+        setSecretaries([]);
       } finally {
         setLoadingStaff(false);
       }
@@ -460,6 +468,56 @@ function AboutUs() {
         <div className="page-section__inner">
           <SubjectHeader text="Meet Our Family" className="reveal" />
           <p className="meet-family__subtitle reveal">YMCA of the Philippines Organizational Chart</p>
+
+          {/* Featured Secretaries Section */}
+          {secretaries.length > 0 && (
+            <div style={{ marginBottom: '2rem' }}>
+              <h3 style={{ textAlign: 'center', marginBottom: '1.5rem', color: '#003d82' }}>Leadership</h3>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                gap: '2rem',
+                marginBottom: '2rem'
+              }}>
+                {secretaries.map((secretary) => (
+                  <div key={secretary.id} style={{
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center'
+                  }}>
+                    <div style={{
+                      width: '180px',
+                      height: '220px',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      marginBottom: '1rem',
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                    }}>
+                      <img 
+                        src={secretary.imageUrl || ymcaLogo}
+                        alt={secretary.name}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover'
+                        }}
+                      />
+                    </div>
+                    <h4 style={{ margin: '0.5rem 0', color: '#003d82', fontSize: '1.1rem' }}>
+                      {secretary.name}
+                    </h4>
+                    <p style={{ margin: '0.25rem 0 0.5rem 0', color: '#666', fontSize: '0.9rem' }}>
+                      {secretary.position}
+                    </p>
+                    <p style={{ margin: '0', color: '#0066cc', fontSize: '0.85rem', fontWeight: '600' }}>
+                      {secretary.secretaryType || 'Secretary'}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {loadingStaff ? (
             <div className="loading">Loading staff members...</div>

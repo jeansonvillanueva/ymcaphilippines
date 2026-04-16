@@ -1,6 +1,19 @@
 -- YMCA Philippines Database Schema
 -- This SQL creates all tables needed for the application
 
+-- Create staff table
+CREATE TABLE IF NOT EXISTS `staff` (
+  `id` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `name` varchar(200) NOT NULL,
+  `position` varchar(255) NOT NULL,
+  `imageUrl` varchar(500) DEFAULT NULL,
+  `departmentGroup` varchar(100) DEFAULT NULL,
+  `secretaryType` varchar(100) DEFAULT NULL,
+  `sequenceOrder` int DEFAULT 0,
+  INDEX idx_department (departmentGroup),
+  INDEX idx_sequence (sequenceOrder)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- Create local table
 CREATE TABLE IF NOT EXISTS `local` (
   `local_id` varchar(50) NOT NULL PRIMARY KEY,

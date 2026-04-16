@@ -8,6 +8,7 @@ interface Staff {
   position: string;
   imageUrl?: string;
   departmentGroup?: string;
+  secretaryType?: string;
   sequenceOrder?: number;
 }
 
@@ -18,6 +19,7 @@ export default function AdminStaff() {
     position: '',
     imageUrl: '',
     departmentGroup: '',
+    secretaryType: '',
     sequenceOrder: 0,
   });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -83,6 +85,7 @@ export default function AdminStaff() {
         submitData.append('name', form.name);
         submitData.append('position', form.position);
         submitData.append('departmentGroup', form.departmentGroup || '');
+        submitData.append('secretaryType', form.secretaryType || '');
         submitData.append('sequenceOrder', String(form.sequenceOrder || 0));
         submitData.append('photo', photoFile);
       } else if (form.imageUrl) {
@@ -92,6 +95,7 @@ export default function AdminStaff() {
           position: form.position,
           imageUrl: form.imageUrl,
           departmentGroup: form.departmentGroup,
+          secretaryType: form.secretaryType,
           sequenceOrder: form.sequenceOrder || 0,
         };
       }
@@ -122,6 +126,7 @@ export default function AdminStaff() {
       position: '',
       imageUrl: '',
       departmentGroup: '',
+      secretaryType: '',
       sequenceOrder: 0,
     });
     setPhotoFile(null);
@@ -223,6 +228,23 @@ export default function AdminStaff() {
             ))}
           </select>
         </div>
+
+        {/* Conditional Secretary Type Dropdown */}
+        {form.position && form.position.toLowerCase().includes('secretary') && (
+          <div className="form-group">
+            <label>Secretary Type</label>
+            <select name="secretaryType" value={form.secretaryType || ''} onChange={handleChange}>
+              <option value="">-- Leave Blank (Optional) --</option>
+              <option value="SECRETARY FOR FINANCE">SECRETARY FOR FINANCE</option>
+              <option value="NATIONAL PROGRAM SECRETARY">NATIONAL PROGRAM SECRETARY</option>
+              <option value="SECRETARY FOR MEMBER ASSOCIATION">SECRETARY FOR MEMBER ASSOCIATION</option>
+              <option value="SECRETARY FOR OPERATION">SECRETARY FOR OPERATION</option>
+            </select>
+            <small style={{ color: '#999', marginTop: '5px', display: 'block' }}>
+              Shows on main display area if selected (optional)
+            </small>
+          </div>
+        )}
 
         <div className="form-group">
           <label>Display Order</label>
