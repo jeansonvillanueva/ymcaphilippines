@@ -14,6 +14,7 @@ $name = $conn->real_escape_string($data['name']);
 $position = $conn->real_escape_string($data['position']);
 $imageUrl = isset($data['imageUrl']) ? $conn->real_escape_string($data['imageUrl']) : '';
 $departmentGroup = isset($data['departmentGroup']) ? $conn->real_escape_string($data['departmentGroup']) : '';
+$headPosition = isset($data['headPosition']) ? $conn->real_escape_string($data['headPosition']) : '';
 $sequenceOrder = isset($data['sequenceOrder']) ? intval($data['sequenceOrder']) : 0;
 
 // Handle file upload
@@ -27,6 +28,7 @@ $updateParts = [
     "position='$position'",
     "imageUrl='$imageUrl'",
     "departmentGroup='$departmentGroup'",
+    "headPosition='$headPosition'",
     "sequenceOrder=$sequenceOrder",
 ];
 

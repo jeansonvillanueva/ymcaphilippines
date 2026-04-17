@@ -43,7 +43,7 @@ function handleFileUpload($fieldName = 'image') {
     $filepath = $uploadDir . $filename;
 
     if (move_uploaded_file($file['tmp_name'], $filepath)) {
-        $url = getUploadBasePath() . '/uploads/' . $filename;
+        $url = getUploadBasePath() . '/backend/uploads/' . $filename;
         error_log('[handleFileUpload] File uploaded successfully: ' . $url);
         return $url;
     } else {

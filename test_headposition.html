@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Head Position Save</title>
+</head>
+<body>
+    <h1>Test Head Position Save</h1>
+
+    <form id="testForm">
+        <label>Name: <input type="text" id="name" value="Test Secretary"></label><br>
+        <label>Position: <input type="text" id="position" value="National Program Secretary"></label><br>
+        <label>Department: <input type="text" id="departmentGroup" value="National Program Secretary"></label><br>
+        <label>Head Position:
+            <select id="headPosition">
+                <option value="">-- Not a Department Head --</option>
+                <option value="SECRETARY FOR FINANCE">SECRETARY FOR FINANCE</option>
+                <option value="NATIONAL PROGRAM SECRETARY" selected>NATIONAL PROGRAM SECRETARY</option>
+                <option value="SECRETARY FOR MEMBER ASSOCIATION">SECRETARY FOR MEMBER ASSOCIATION</option>
+                <option value="SECRETARY FOR OPERATION">SECRETARY FOR OPERATION</option>
+            </select>
+        </label><br>
+        <label>Sequence Order: <input type="number" id="sequenceOrder" value="1"></label><br>
+        <button type="submit">Test Save</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('testForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const data = {
+                name: document.getElementById('name').value,
+                position: document.getElementById('position').value,
+                departmentGroup: document.getElementById('departmentGroup').value,
+                headPosition: document.getElementById('headPosition').value,
+                sequenceOrder: parseInt(document.getElementById('sequenceOrder').value) || 0
+            };
+
+            try {
+                const response = await fetch('/php-api/admin/staff', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                document.getElementById('result').innerHTML = '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+
+                if (response.ok) {
+                    // Now fetch all staff to verify it was saved
+                    const fetchResponse = await fetch('/php-api/admin/staff');
+                    const staffList = await fetchResponse.json();
+                    const savedStaff = staffList.find(s => s.name === data.name);
+
+                    document.getElementById('result').innerHTML += '<h3>Saved Staff Data:</h3><pre>' + JSON.stringify(savedStaff, null, 2) + '</pre>';
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML = '<p style="color: red;">Error: ' + error.message + '</p>';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-import { LATEST_NEWS } from '../data/news';
+import { LATEST_NEWS, type NewsArticleMeta } from '../data/news';
 
 const API_BASE = 'https://ymca.ph/testsite/php-api';
 export const ADMIN_API_URL = `${API_BASE}/admin`;
@@ -34,7 +34,7 @@ export function useVideos() {
 
 // Hook for fetching news
 export function useNews() {
-  const [news, setNews] = useState<any[]>([]);
+  const [news, setNews] = useState<NewsArticleMeta[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -63,6 +63,16 @@ export function useNews() {
   }, []);
 
   return { news, loading, error };
+}
+
+export function useNewsItem(path: NewsArticleMeta['path']) {
+  const { news, loading, error } = useNews();
+  const item = useMemo(
+    () => news.find((newsItem) => newsItem.path === path) ?? null,
+    [news, path]
+  );
+
+  return { item, loading, error };
 }
 
 // Hook for fetching calendar events

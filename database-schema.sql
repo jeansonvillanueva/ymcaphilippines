@@ -9,9 +9,11 @@ CREATE TABLE IF NOT EXISTS `staff` (
   `imageUrl` varchar(500) DEFAULT NULL,
   `departmentGroup` varchar(100) DEFAULT NULL,
   `secretaryType` varchar(100) DEFAULT NULL,
+  `headPosition` varchar(100) DEFAULT NULL,
   `sequenceOrder` int DEFAULT 0,
   INDEX idx_department (departmentGroup),
-  INDEX idx_sequence (sequenceOrder)
+  INDEX idx_sequence (sequenceOrder),
+  INDEX idx_head_position (headPosition)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Create local table

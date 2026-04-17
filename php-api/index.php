@@ -115,6 +115,13 @@ switch ($path) {
         }
         break;
 
+    // Public staff directory endpoint
+    case '/api/staff':
+        if ($requestMethod === 'GET') {
+            require_once 'endpoints/staff.php';
+        }
+        break;
+
     // Form submission routes
     case '/api/submit-update':
         if ($requestMethod === 'POST') {

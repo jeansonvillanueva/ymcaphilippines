@@ -13,6 +13,7 @@ $name = $conn->real_escape_string($data['name']);
 $position = $conn->real_escape_string($data['position']);
 $imageUrl = isset($data['imageUrl']) ? $conn->real_escape_string($data['imageUrl']) : '';
 $departmentGroup = isset($data['departmentGroup']) ? $conn->real_escape_string($data['departmentGroup']) : '';
+$headPosition = isset($data['headPosition']) ? $conn->real_escape_string($data['headPosition']) : '';
 $sequenceOrder = isset($data['sequenceOrder']) ? intval($data['sequenceOrder']) : 0;
 
 // Handle file upload
@@ -23,11 +24,11 @@ if ($uploadedImagePath) {
 
 $createdAtExists = $conn->query("SHOW COLUMNS FROM staff LIKE 'created_at'");
 if ($createdAtExists && $createdAtExists->num_rows > 0) {
-    $sql = "INSERT INTO staff (name, position, imageUrl, departmentGroup, sequenceOrder, created_at)
-            VALUES ('$name', '$position', '$imageUrl', '$departmentGroup', $sequenceOrder, NOW())";
+    $sql = "INSERT INTO staff (name, position, imageUrl, departmentGroup, headPosition, sequenceOrder, created_at)
+            VALUES ('$name', '$position', '$imageUrl', '$departmentGroup', '$headPosition', $sequenceOrder, NOW())";
 } else {
-    $sql = "INSERT INTO staff (name, position, imageUrl, departmentGroup, sequenceOrder)
-            VALUES ('$name', '$position', '$imageUrl', '$departmentGroup', $sequenceOrder)";
+    $sql = "INSERT INTO staff (name, position, imageUrl, departmentGroup, headPosition, sequenceOrder)
+            VALUES ('$name', '$position', '$imageUrl', '$departmentGroup', '$headPosition', $sequenceOrder)";
 }
 
 if ($conn->query($sql) === TRUE) {

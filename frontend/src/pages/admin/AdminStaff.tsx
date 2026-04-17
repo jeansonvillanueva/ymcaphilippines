@@ -8,7 +8,7 @@ interface Staff {
   position: string;
   imageUrl?: string;
   departmentGroup?: string;
-  secretaryType?: string;
+  headPosition?: string;
   sequenceOrder?: number;
 }
 
@@ -19,7 +19,7 @@ export default function AdminStaff() {
     position: '',
     imageUrl: '',
     departmentGroup: '',
-    secretaryType: '',
+    headPosition: '',
     sequenceOrder: 0,
   });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -49,10 +49,21 @@ export default function AdminStaff() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === 'number' ? parseInt(value) || 0 : value,
-    }));
+
+    setForm((prev) => {
+      if (name === 'headPosition') {
+        return {
+          ...prev,
+          headPosition: value,
+          departmentGroup: value || prev.departmentGroup,
+        };
+      }
+
+      return {
+        ...prev,
+        [name]: type === 'number' ? parseInt(value) || 0 : value,
+      };
+    });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,7 +96,7 @@ export default function AdminStaff() {
         submitData.append('name', form.name);
         submitData.append('position', form.position);
         submitData.append('departmentGroup', form.departmentGroup || '');
-        submitData.append('secretaryType', form.secretaryType || '');
+        submitData.append('headPosition', form.headPosition || '');
         submitData.append('sequenceOrder', String(form.sequenceOrder || 0));
         submitData.append('photo', photoFile);
       } else if (form.imageUrl) {
@@ -95,20 +106,16 @@ export default function AdminStaff() {
           position: form.position,
           imageUrl: form.imageUrl,
           departmentGroup: form.departmentGroup,
-          secretaryType: form.secretaryType,
+          headPosition: form.headPosition,
           sequenceOrder: form.sequenceOrder || 0,
         };
       }
 
       if (editingId) {
-        await axios.put(`${API_URL}/${editingId}`, submitData, {
-          headers: photoFile ? { 'Content-Type': 'multipart/form-data' } : undefined,
-        });
+        await axios.put(`${API_URL}/${editingId}`, submitData);
         setMessage({ type: 'success', text: 'Staff updated successfully' });
       } else {
-        await axios.post(API_URL, submitData, {
-          headers: photoFile ? { 'Content-Type': 'multipart/form-data' } : undefined,
-        });
+        await axios.post(API_URL, submitData);
         setMessage({ type: 'success', text: 'Staff added successfully' });
       }
       
@@ -126,7 +133,7 @@ export default function AdminStaff() {
       position: '',
       imageUrl: '',
       departmentGroup: '',
-      secretaryType: '',
+      headPosition: '',
       sequenceOrder: 0,
     });
     setPhotoFile(null);
@@ -229,22 +236,20 @@ export default function AdminStaff() {
           </select>
         </div>
 
-        {/* Conditional Secretary Type Dropdown */}
-        {form.position && form.position.toLowerCase().includes('secretary') && (
-          <div className="form-group">
-            <label>Secretary Type</label>
-            <select name="secretaryType" value={form.secretaryType || ''} onChange={handleChange}>
-              <option value="">-- Leave Blank (Optional) --</option>
-              <option value="SECRETARY FOR FINANCE">SECRETARY FOR FINANCE</option>
-              <option value="NATIONAL PROGRAM SECRETARY">NATIONAL PROGRAM SECRETARY</option>
-              <option value="SECRETARY FOR MEMBER ASSOCIATION">SECRETARY FOR MEMBER ASSOCIATION</option>
-              <option value="SECRETARY FOR OPERATION">SECRETARY FOR OPERATION</option>
-            </select>
-            <small style={{ color: '#999', marginTop: '5px', display: 'block' }}>
-              Shows on main display area if selected (optional)
-            </small>
-          </div>
-        )}
+        {/* Head Position Dropdown */}
+        <div className="form-group">
+          <label>Head Position (Department Head)</label>
+          <select name="headPosition" value={form.headPosition || ''} onChange={handleChange}>
+            <option value="">-- Not a Department Head --</option>
+            <option value="SECRETARY FOR FINANCE">SECRETARY FOR FINANCE</option>
+            <option value="NATIONAL PROGRAM SECRETARY">NATIONAL PROGRAM SECRETARY</option>
+            <option value="SECRETARY FOR MEMBER ASSOCIATION">SECRETARY FOR MEMBER ASSOCIATION</option>
+            <option value="SECRETARY FOR OPERATION">SECRETARY FOR OPERATION</option>
+          </select>
+          <small style={{ color: '#999', marginTop: '5px', display: 'block' }}>
+            Select if this person is a department head. This will identify them as a secretary.
+          </small>
+        </div>
 
         <div className="form-group">
           <label>Display Order</label>
@@ -337,6 +342,9 @@ export default function AdminStaff() {
                         <div className="staff-info">
                           <h5>{staff.name}</h5>
                           <p className="staff-position">{staff.position}</p>
+                          {staff.headPosition && (
+                            <p className="staff-meta">{staff.headPosition}</p>
+                          )}
                         </div>
                         <div className="staff-actions">
                           <button onClick={() => handleEdit(staff)} className="btn btn-secondary btn-small">

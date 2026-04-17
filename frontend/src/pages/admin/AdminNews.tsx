@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ADMIN_API_URL } from '../../hooks/useApi';
+import RichTextEditor from '../../components/RichTextEditor';
 
 interface News {
   id?: number;
@@ -265,13 +266,11 @@ export default function AdminNews() {
         </div>
 
         <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-          <label htmlFor="news-body">Paragraph</label>
-          <textarea
-            id="news-body"
-            name="body"
-            placeholder="Main news paragraph or full article summary"
+          <label>Paragraph (with formatting)</label>
+          <RichTextEditor
             value={form.body || ''}
-            onChange={handleChange}
+            onChange={(html) => setForm((prev) => ({ ...prev, body: html }))}
+            placeholder="Main news paragraph or full article summary"
           />
         </div>
 

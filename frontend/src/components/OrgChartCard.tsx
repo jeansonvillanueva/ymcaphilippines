@@ -10,8 +10,10 @@ export interface OrgChartCardProps {
 const normalizeImageUrl = (url?: string | null) => {
   if (!url) return '';
   if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  if (url.startsWith('/testsite/') || url.startsWith('/testsite/uploads/')) return url;
-  if (url.startsWith('/uploads/')) return `/testsite${url}`;
+  if (url.startsWith('/testsite/') || url.startsWith('/testsite/backend/uploads/')) return url;
+  if (url.startsWith('/backend/uploads/')) return url;
+  if (url.startsWith('/uploads/')) return `/testsite/backend${url}`;
+  if (url.startsWith('/php-api/uploads/')) return `/testsite/backend/${url.substring('/php-api/uploads/'.length)}`;
   return url;
 };
 

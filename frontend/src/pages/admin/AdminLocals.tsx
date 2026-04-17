@@ -43,10 +43,12 @@ const normalizeImageUrl = (url?: string | null) => {
   if (url.startsWith('http://') || url.startsWith('https://')) return url;
 
   const apiBasePath = new URL(ADMIN_API_URL).pathname.replace(/\/admin$/, '');
+  const siteBasePath = apiBasePath.replace(/\/php-api$/, '');
   if (url.startsWith(apiBasePath)) return url;
-  if (url.startsWith('/uploads/')) return `${apiBasePath}${url}`;
+  if (url.startsWith('/backend/uploads/')) return url;
+  if (url.startsWith('/uploads/')) return `${siteBasePath}/backend${url}`;
   if (url.startsWith('/php-api/uploads/')) {
-    return `${apiBasePath}${url.replace(/^\/php-api/, '')}`;
+    return `${siteBasePath}/backend/${url.substring('/php-api/uploads/'.length)}`;
   }
 
   return url;

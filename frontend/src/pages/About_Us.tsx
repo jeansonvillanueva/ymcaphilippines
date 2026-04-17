@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import axios from 'axios';
-import { ADMIN_API_URL } from '../hooks/useApi';
+import { PUBLIC_API_URL } from '../hooks/useApi';
 import '../styles/design-system.css';
 import './About_Us.css';
 
@@ -47,7 +47,7 @@ interface StaffData {
   position: string;
   imageUrl?: string;
   departmentGroup?: string;
-  secretaryType?: string;
+  headPosition?: string;
   sequenceOrder?: number;
 }
 
@@ -57,7 +57,6 @@ function AboutUs() {
   const [detailSlideIndex, setDetailSlideIndex] = useState(0);
   const [isPillarFlipped, setIsPillarFlipped] = useState(false);
   const [orgStructure, setOrgStructure] = useState<{ head: OrgMember; branches: OrgBranch[] } | null>(null);
-  const [secretaries, setSecretaries] = useState<StaffData[]>([]);
   const [loadingStaff, setLoadingStaff] = useState(true);
   const [staffError, setStaffError] = useState<string | null>(null);
 
@@ -65,20 +64,15 @@ function AboutUs() {
   useEffect(() => {
     const fetchStaff = async () => {
       try {
-        const response = await axios.get(`${ADMIN_API_URL}/staff`);
+        const response = await axios.get(`${PUBLIC_API_URL}/staff`);
         const staffList: StaffData[] = response.data;
 
         if (!staffList || staffList.length === 0) {
           setStaffError('No staff data available');
           setOrgStructure(null);
-          setSecretaries([]);
           setLoadingStaff(false);
           return;
         }
-
-        // Extract secretaries with secretaryType (featured section)
-        const featuredSecretaries = staffList.filter((staff) => staff.secretaryType && staff.secretaryType.trim());
-        setSecretaries(featuredSecretaries);
 
         // Build org structure from API data
         // Group by department
@@ -88,6 +82,28 @@ function AboutUs() {
           if (!byDept[dept]) byDept[dept] = [];
           byDept[dept].push(staff);
         });
+
+        // Sort each department by headPosition first, then by sequenceOrder
+        Object.keys(byDept).forEach((dept) => {
+          byDept[dept].sort((a, b) => {
+            // Staff with headPosition come first
+            const aHasHead = a.headPosition && a.headPosition.trim() ? 1 : 0;
+            const bHasHead = b.headPosition && b.headPosition.trim() ? 1 : 0;
+            if (aHasHead !== bHasHead) {
+              return bHasHead - aHasHead; // Head positions first
+            }
+            // Then sort by sequence order
+            return (a.sequenceOrder || 0) - (b.sequenceOrder || 0);
+          });
+        });
+
+        // Define secretary positions and their corresponding departments
+        const secretaryMappings: Record<string, string> = {
+          'Secretary for Finance': 'SECRETARY FOR FINANCE',
+          'National Program Secretary': 'NATIONAL PROGRAM SECRETARY',
+          'Secretary for Member Association': 'SECRETARY FOR MEMBER ASSOCIATION',
+          'Secretary for Operation': 'SECRETARY FOR OPERATION'
+        };
 
         // Find head (OIC – National General Secretary)
         const head = staffList.find(
@@ -100,16 +116,37 @@ function AboutUs() {
             return null as any;
           }
 
+          // Prepare children array
+          const children: OrgMember[] = members.map((member) => ({
+            name: member.name,
+            position: member.position,
+            imageUrl: member.imageUrl || null,
+          }));
+
+          // Check if this department should have a secretary position
+          const secretaryPosition = secretaryMappings[dept];
+          if (secretaryPosition) {
+            // Find if there's already a secretary assigned to this department
+            const existingSecretary = members.find((m) => {
+              const memberHeadPosition = (m.headPosition || '').trim().toLowerCase();
+              const targetHeadPosition = secretaryPosition.trim().toLowerCase();
+              return memberHeadPosition === targetHeadPosition;
+            });
+
+            if (!existingSecretary) {
+              // Add vacant secretary position at the top only when no secretary record exists
+              children.unshift({
+                name: 'Vacant',
+                position: secretaryPosition,
+                imageUrl: ymcaLogo,
+              });
+            }
+          }
+
           return {
             title: dept,
             imageUrl: null,
-            children: members
-              .sort((a, b) => (a.sequenceOrder || 0) - (b.sequenceOrder || 0))
-              .map((member) => ({
-                name: member.name,
-                position: member.position,
-                imageUrl: member.imageUrl || null,
-              })),
+            children,
           };
         }).filter((branch) => branch !== null) as OrgBranch[];
 
@@ -124,9 +161,46 @@ function AboutUs() {
         setStaffError(null);
       } catch (error) {
         console.error('Error fetching staff:', error);
-        setStaffError('Unable to load staff data. Please try again later.');
-        setOrgStructure(null);
-        setSecretaries([]);
+        // Load fallback org structure when API is unavailable
+        const fallbackOrgStructure = {
+          head: {
+            name: 'OIC – National General Secretary',
+            position: 'Leadership',
+            imageUrl: ymcaLogo,
+          },
+          branches: [
+            {
+              title: 'Secretary for Finance',
+              imageUrl: null,
+              children: [
+                { name: 'Vacant', position: 'SECRETARY FOR FINANCE', imageUrl: ymcaLogo },
+              ],
+            },
+            {
+              title: 'National Program Secretary',
+              imageUrl: null,
+              children: [
+                { name: 'Vacant', position: 'NATIONAL PROGRAM SECRETARY', imageUrl: ymcaLogo },
+              ],
+            },
+            {
+              title: 'Secretary for Member Association',
+              imageUrl: null,
+              children: [
+                { name: 'Vacant', position: 'SECRETARY FOR MEMBER ASSOCIATION', imageUrl: ymcaLogo },
+              ],
+            },
+            {
+              title: 'Secretary for Operation',
+              imageUrl: null,
+              children: [
+                { name: 'Vacant', position: 'SECRETARY FOR OPERATION', imageUrl: ymcaLogo },
+              ],
+            },
+          ],
+        };
+        setOrgStructure(fallbackOrgStructure);
+        setStaffError(null);
       } finally {
         setLoadingStaff(false);
       }
@@ -469,56 +543,6 @@ function AboutUs() {
           <SubjectHeader text="Meet Our Family" className="reveal" />
           <p className="meet-family__subtitle reveal">YMCA of the Philippines Organizational Chart</p>
 
-          {/* Featured Secretaries Section */}
-          {secretaries.length > 0 && (
-            <div style={{ marginBottom: '2rem' }}>
-              <h3 style={{ textAlign: 'center', marginBottom: '1.5rem', color: '#003d82' }}>Leadership</h3>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                gap: '2rem',
-                marginBottom: '2rem'
-              }}>
-                {secretaries.map((secretary) => (
-                  <div key={secretary.id} style={{
-                    textAlign: 'center',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center'
-                  }}>
-                    <div style={{
-                      width: '180px',
-                      height: '220px',
-                      borderRadius: '8px',
-                      overflow: 'hidden',
-                      marginBottom: '1rem',
-                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-                    }}>
-                      <img 
-                        src={secretary.imageUrl || ymcaLogo}
-                        alt={secretary.name}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover'
-                        }}
-                      />
-                    </div>
-                    <h4 style={{ margin: '0.5rem 0', color: '#003d82', fontSize: '1.1rem' }}>
-                      {secretary.name}
-                    </h4>
-                    <p style={{ margin: '0.25rem 0 0.5rem 0', color: '#666', fontSize: '0.9rem' }}>
-                      {secretary.position}
-                    </p>
-                    <p style={{ margin: '0', color: '#0066cc', fontSize: '0.85rem', fontWeight: '600' }}>
-                      {secretary.secretaryType || 'Secretary'}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           {loadingStaff ? (
             <div className="loading">Loading staff members...</div>
           ) : staffError || !orgStructure ? (
@@ -534,12 +558,6 @@ function AboutUs() {
               <div className="org-tree__branches">
                 {orgStructure.branches.map((branch, i) => (
                   <div key={i} className="org-tree__branch">
-                    <OrgChartCard
-                      name={branch.name || branch.title || 'Vacant'}
-                      position={branch.position || 'Vacant'}
-                      imageUrl={branch.imageUrl || ymcaLogo}
-                    />
-
                     <div className="org-tree__children">
                       {branch.children?.map((child: OrgBranchChild, idx: number) => {
                         if ('members' in child && Array.isArray(child.members)) {
