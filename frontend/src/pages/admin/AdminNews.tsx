@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ADMIN_API_URL } from '../../hooks/useApi';
 import RichTextEditor from '../../components/RichTextEditor';
+import { LOCALS_BY_ID } from '../../data/locals';
 
 interface News {
   id?: number;
@@ -21,7 +22,6 @@ const topics = ['Education', 'Training', 'Youth Leadership', 'Environment', 'You
 
 export default function AdminNews() {
   const [newsList, setNewsList] = useState<News[]>([]);
-  const [locals, setLocals] = useState<{ id: string; name: string }[]>([]);
   const [form, setForm] = useState<News>({
     path: '',
     title: '',
@@ -42,7 +42,6 @@ export default function AdminNews() {
 
   useEffect(() => {
     fetchNews();
-    fetchLocals();
   }, []);
 
   const fetchNews = async () => {
@@ -57,14 +56,7 @@ export default function AdminNews() {
     }
   };
 
-  const fetchLocals = async () => {
-    try {
-      const response = await axios.get(`${ADMIN_API_URL}/locals`);
-      setLocals(response.data);
-    } catch (error) {
-      console.error('Error fetching locals:', error);
-    }
-  };
+  const localOptions = Object.values(LOCALS_BY_ID).map((local) => ({ id: local.id, name: local.name }));
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -240,14 +232,13 @@ export default function AdminNews() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="news-local">Nearest Local YMCA</label>
+          <label htmlFor="news-local">Local YMCA</label>
           <select id="news-local" name="localYMCA" value={form.localYMCA || ''} onChange={handleChange}>
-            <option key="local-placeholder" value="">Select nearest local YMCA (optional)</option>
-            {locals.map((local, index) => {
+            <option key="local-placeholder" value="">Select local YMCA (optional)</option>
+            {localOptions.map((local, index) => {
               const optionKey = local.id ? `local-${local.id}` : `local-unknown-${index}`;
-              const optionValue = local.id ?? `${local.name}-${index}`;
               return (
-                <option key={optionKey} value={optionValue}>
+                <option key={optionKey} value={local.id}>
                   {local.name}
                 </option>
               );
@@ -334,7 +325,7 @@ export default function AdminNews() {
             {newsList.map((news) => (
               <tr key={news.id}>
                 <td>{news.title}</td>
-                <td>{locals.find((local) => local.id === news.localYMCA)?.name || news.localYMCA || '-'}</td>
+                <td>{localOptions.find((local) => local.id === news.localYMCA)?.name || news.localYMCA || '-'}</td>
                 <td>{news.category}</td>
                 <td>{news.topic}</td>
                 <td>{news.date || '-'}</td>

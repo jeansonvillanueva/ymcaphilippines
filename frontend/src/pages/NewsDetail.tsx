@@ -1,8 +1,42 @@
 import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useNews } from '../hooks/useApi';
-import NewsArticle from '../components/NewsArticle';
+import NewsArticle, { type LocalYMCAConfig } from '../components/NewsArticle';
+import { LOCALS_BY_ID } from '../data/locals';
 import '../styles/design-system.css';
+
+function resolveLocalYMCA(localYMCA?: string | LocalYMCAConfig | null): LocalYMCAConfig | undefined {
+  if (!localYMCA) return undefined;
+  if (typeof localYMCA !== 'string') return localYMCA;
+
+  const normalized = localYMCA.trim().toLowerCase();
+  const normalizedKey = normalized.replace(/[-_\s]/g, '');
+
+  const localConfig = LOCALS_BY_ID[localYMCA] ??
+    Object.values(LOCALS_BY_ID).find((local) => {
+      const localName = local.name.trim().toLowerCase();
+      const localId = local.id.toLowerCase();
+      const normalizedLocalId = localId.replace(/[-_\s]/g, '');
+      return (
+        local.id === localYMCA ||
+        local.id.toLowerCase() === normalized ||
+        normalizedLocalId === normalizedKey ||
+        localName === normalized
+      );
+    });
+
+  if (!localConfig) return undefined;
+
+  return {
+    name: localConfig.name,
+    logoSrc: localConfig.logoImageUrl ?? '',
+    socialLinks: {
+      facebook: localConfig.facebookUrl,
+      instagram: localConfig.instagramUrl,
+      x: localConfig.twitterUrl,
+    },
+  };
+}
 
 const NewsDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -28,7 +62,7 @@ const NewsDetail: React.FC = () => {
       date={item.date}
       subtitle={item.subtitle}
       imageUrl={item.imageUrl}
-      localYMCA={item.localYMCA}
+      localYMCA={resolveLocalYMCA(item.localYMCA as any)}
       websiteUrl={item.websiteUrl}
       articlePath={currentPath || undefined}
       layoutVariant="article"
