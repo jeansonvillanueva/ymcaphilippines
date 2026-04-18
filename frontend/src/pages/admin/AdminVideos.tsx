@@ -34,7 +34,7 @@ export default function AdminVideos() {
 
     const match = value.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
     if (match) {
-      return `https://www.youtube.com/embed/${match[1]}`;
+      return `https://www.youtube.com/embed/${match[1]}?rel=0`;
     }
 
     return value;

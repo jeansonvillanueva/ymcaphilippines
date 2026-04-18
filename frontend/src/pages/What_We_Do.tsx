@@ -8,6 +8,16 @@ import { NEWS_FEATURED_IMAGE, type NewsCategory } from '../data/news';
 import '../styles/design-system.css';
 import './What_We_Do.css';
 import { Link } from 'react-router-dom';
+
+const normalizeImageUrl = (url?: string | null) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (url.startsWith('/testsite/') || url.startsWith('/testsite/backend/uploads/')) return url;
+  if (url.startsWith('/backend/uploads/')) return url;
+  if (url.startsWith('/uploads/')) return `/testsite/backend${url}`;
+  if (url.startsWith('/php-api/uploads/')) return `/testsite/backend/${url.substring('/php-api/uploads/'.length)}`;
+  return url;
+};
 const CARDS_PER_PAGE = 3;
 
 function extractYear(date?: string) {
@@ -108,7 +118,7 @@ const WhatWeDo: React.FC = () => {
           {/* Featured / latest showcase — first screen */}
           <div className="latest-news-featured reveal reveal-delay-1">
             <img
-              src={featuredItem?.imageUrl ?? NEWS_FEATURED_IMAGE}
+              src={normalizeImageUrl(featuredItem?.imageUrl) || NEWS_FEATURED_IMAGE}
               alt="Latest news featured"
               className="latest-news-featured__image"
             />

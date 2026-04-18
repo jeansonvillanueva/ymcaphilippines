@@ -10,7 +10,7 @@ const getVideoEmbedUrl = (url?: string) => {
   if (!url) return '';
   const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
   if (match) {
-    return `https://www.youtube.com/embed/${match[1]}`;
+    return `https://www.youtube.com/embed/${match[1]}?rel=0`;
   }
   return url;
 };
@@ -39,6 +39,7 @@ function VideoShowcase({ heading, videos }: VideoShowcaseProps) {
                     title={video.title}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
+                    referrerPolicy="strict-origin-when-cross-origin"
                   />
                 ) : (
                   <video src={video.videoUrl} controls preload="metadata" />

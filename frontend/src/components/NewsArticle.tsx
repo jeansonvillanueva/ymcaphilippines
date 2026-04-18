@@ -89,7 +89,7 @@ export default function NewsArticle({
 
   const articleInner = (
     <>
-      {slides.length > 0 ? (
+      {layoutVariant !== 'article' && slides.length > 0 ? (
         <div className="news-article-hero" aria-label="Article header images">
           {slides.map((src, i) => (
             <div
@@ -120,10 +120,26 @@ export default function NewsArticle({
         </div>
       ) : null}
 
-      <h1 className="news-article__title reveal">{title}</h1>
-      {subtitle ? <p className="news-article__subtitle reveal reveal-delay-1">{subtitle}</p> : null}
-      {date ? <p className="news-article__date reveal reveal-delay-1">{date}</p> : null}
-      <div className="news-article__body reveal reveal-delay-3">{children}</div>
+      {layoutVariant === 'article' ? (
+        <div className="news-article__body reveal reveal-delay-3">
+          {slides.length > 0 ? (
+            <div className="news-article__content-image">
+              <img src={normalizeImageUrl(slides[clampedHeroIndex])} alt={title} />
+            </div>
+          ) : null}
+          <h1 className="news-article__title">{title}</h1>
+          {subtitle ? <p className="news-article__subtitle">{subtitle}</p> : null}
+          {date ? <p className="news-article__date">{date}</p> : null}
+          {children}
+        </div>
+      ) : (
+        <>
+          <h1 className="news-article__title reveal">{title}</h1>
+          {subtitle ? <p className="news-article__subtitle reveal reveal-delay-1">{subtitle}</p> : null}
+          {date ? <p className="news-article__date reveal reveal-delay-1">{date}</p> : null}
+          <div className="news-article__body reveal reveal-delay-3">{children}</div>
+        </>
+      )}
     </>
   );
 

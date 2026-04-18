@@ -12,6 +12,16 @@ import eventVenueImage1 from '../assets/images/rent/event1.jpg';
 import eventVenueImage2 from '../assets/images/rent/event2.jpg';
 import { useVideos, useNews } from '../hooks/useApi';
 
+const normalizeImageUrl = (url?: string | null) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (url.startsWith('/testsite/') || url.startsWith('/testsite/backend/uploads/')) return url;
+  if (url.startsWith('/backend/uploads/')) return url;
+  if (url.startsWith('/uploads/')) return `/testsite/backend${url}`;
+  if (url.startsWith('/php-api/uploads/')) return `/testsite/backend/${url.substring('/php-api/uploads/'.length)}`;
+  return url;
+};
+
 type HeroSlide = {
   image: string;
   heading: string;
@@ -67,7 +77,7 @@ function Home() {
       .slice(0, 3);
 
     return latest.map((item) => ({
-      image: item.imageUrl ?? '',
+      image: normalizeImageUrl(item.imageUrl),
       heading: item.title,
       subheading: item.subtitle ?? item.date ?? 'Latest YMCA update',
       path: item.path,

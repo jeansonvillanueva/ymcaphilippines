@@ -120,6 +120,18 @@
   text-justify: inter-word;
 }
 
+.news-article__content-image {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.news-article__content-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
 .news-article__body p {
   margin: 0 0 1rem;
 }
