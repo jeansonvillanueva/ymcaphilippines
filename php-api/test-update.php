@@ -3,6 +3,13 @@ require_once 'config.php';
 
 header('Content-Type: application/json');
 
+$conn = getDatabaseConnection();
+if (!$conn) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Database connection failed']);
+    exit;
+}
+
 if (!isset($_GET['id'])) {
     http_response_code(400);
     echo json_encode(['error' => 'Missing local ID parameter. Usage: test-update.php?id=MANILA']);

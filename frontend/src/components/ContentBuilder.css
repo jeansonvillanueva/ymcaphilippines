@@ -1,0 +1,239 @@
+.content-builder {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  background: #fafafa;
+}
+
+.content-builder__toolbar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.content-builder__blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.content-builder__empty {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-style: italic;
+}
+
+.content-builder__block {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 1rem;
+  cursor: move;
+  transition: all 0.2s ease;
+}
+
+.content-builder__block:hover {
+  border-color: #007bff;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
+}
+
+.content-builder__block.dragging {
+  opacity: 0.5;
+  transform: rotate(2deg);
+}
+
+.content-builder__block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.content-builder__block-type {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.content-builder__block-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background: #c82333;
+}
+
+.content-builder__block-content textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.content-builder__block-content textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.image-block {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.image-upload {
+  position: relative;
+}
+
+.image-upload__label {
+  display: block;
+  cursor: pointer;
+}
+
+.image-upload__placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  border: 2px dashed #ddd;
+  border-radius: 6px;
+  background: #f8f9fa;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.image-upload__placeholder:hover {
+  border-color: #007bff;
+  background: #e3f2fd;
+}
+
+.image-upload__placeholder span {
+  font-weight: 500;
+  color: #333;
+}
+
+.image-upload__placeholder small {
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.image-preview {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+}
+
+.image-preview img {
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: cover;
+  display: block;
+}
+
+.image-replace-btn {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s ease;
+}
+
+.image-replace-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.image-alt-input {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.image-alt-input label {
+  font-weight: 500;
+  color: #333;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.image-alt-input input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.image-alt-input input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.content-builder__help {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: #e3f2fd;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.content-builder__help small {
+  color: #1565c0;
+  font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .content-builder__toolbar {
+    flex-direction: column;
+  }
+
+  .content-builder__block-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .image-block {
+    gap: 0.75rem;
+  }
+
+  .image-alt-input {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

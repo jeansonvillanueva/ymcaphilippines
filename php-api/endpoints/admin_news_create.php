@@ -42,6 +42,7 @@ while (true) {
 $date = isset($data['date']) ? $conn->real_escape_string($data['date']) : '';
 $subtitle = isset($data['subtitle']) ? $conn->real_escape_string($data['subtitle']) : '';
 $body = isset($data['body']) ? $conn->real_escape_string($data['body']) : '';
+$contentBlocks = isset($data['contentBlocks']) ? $conn->real_escape_string($data['contentBlocks']) : '[]';
 $localYMCA = isset($data['localYMCA']) ? $conn->real_escape_string($data['localYMCA']) : '';
 $imageUrl = isset($data['imageUrl']) ? $conn->real_escape_string($data['imageUrl']) : '';
 $category = isset($data['category']) ? $conn->real_escape_string($data['category']) : 'News';
@@ -56,7 +57,7 @@ if ($uploadedImagePath) {
 $createdAtExists = $conn->query("SHOW COLUMNS FROM news LIKE 'created_at'");
 $updatedAtExists = $conn->query("SHOW COLUMNS FROM news LIKE 'updated_at'");
 
-// Match the EXACT table column order: path, title, date, subtitle, imageUrl, category, topic, created_at, updated_at, body, localYMCA
+// Match the EXACT table column order: path, title, date, subtitle, imageUrl, category, topic, created_at, updated_at, body, contentBlocks, localYMCA
 $columns = ['path', 'title', 'date', 'subtitle', 'imageUrl', 'category', 'topic'];
 $values = ["'$path'", "'$title'", "'$date'", "'$subtitle'", "'$imageUrl'", "'$category'", "'$topic'"];
 
@@ -71,8 +72,8 @@ if ($updatedAtExists && $updatedAtExists->num_rows > 0) {
 }
 
 // Add the remaining columns that come after timestamps
-$columns = array_merge($columns, ['body', 'localYMCA']);
-$values = array_merge($values, ["'$body'", "'$localYMCA'"]);
+$columns = array_merge($columns, ['body', 'contentBlocks', 'localYMCA']);
+$values = array_merge($values, ["'$body'", "'$contentBlocks'", "'$localYMCA'"]);
 
 $sql = "INSERT INTO news (" . implode(', ', $columns) . ") VALUES (" . implode(', ', $values) . ")";
 
@@ -97,7 +98,8 @@ if ($result !== false && $conn->affected_rows > 0) {
         if ($verify && $verify->num_rows > 0) {
             $row = $verify->fetch_assoc();
             error_log('[admin_news_create] Verification SUCCESS - record exists: ' . json_encode($row));
-            sendResponse(['id' => $newId, 'message' => 'News added successfully']);
+            error_log('[admin_news_create] Full inserted record: ID=' . $newId . ', Title=' . substr($title, 0, 50) . ', ContentBlocks size: ' . strlen($contentBlocks));
+            sendResponse(['id' => $newId, 'message' => 'News added successfully', 'title' => $row['title']]);
         } else {
             error_log('[admin_news_create] Verification FAILED - record not found after insert');
             sendResponse(['error' => 'Record verification failed after insert'], 500);

@@ -10,6 +10,13 @@ export type LocalYMCAMeta = {
   };
 };
 
+export type ContentBlock = {
+  id: string;
+  type: 'text' | 'image';
+  content: string;
+  alt?: string;
+};
+
 export type NewsArticleMeta = {
   /** Route path that must match `App.tsx` routes. */
   path: `/news/${string}`;
@@ -23,6 +30,7 @@ export type NewsArticleMeta = {
   topic: string;
   /** Full article body content */
   body?: string;
+  contentBlocks?: ContentBlock[] | string;
   /** Local YMCA information for sidebar */
   localYMCA?: LocalYMCAMeta;
   /** Website URL for sidebar */

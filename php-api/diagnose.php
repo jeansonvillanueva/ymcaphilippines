@@ -39,8 +39,9 @@ $diagnostics = [
 ];
 
 // Test database connection
-if ($conn->connect_error) {
-    $diagnostics['database']['error'] = $conn->connect_error;
+$conn = getDatabaseConnection();
+if (!$conn || $conn->connect_error) {
+    $diagnostics['database']['error'] = $conn ? $conn->connect_error : 'Failed to establish connection';
     $diagnostics['status'] = 'ERROR: Database not connected';
 } else {
     $diagnostics['database']['connected'] = true;

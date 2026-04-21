@@ -2,9 +2,11 @@ import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { LATEST_NEWS, type NewsArticleMeta } from '../data/news';
 
-const API_BASE = 'https://ymca.ph/testsite/php-api';
-export const ADMIN_API_URL = `${API_BASE}/admin`;
-export const PUBLIC_API_URL = `${API_BASE}/api`;
+// Use query parameter routing instead of path-based routing
+// This works on cPanel without needing .htaccess rewrites
+const API_BASE = 'https://ymca.ph/testsite/php-api/index.php';
+export const ADMIN_API_URL = `${API_BASE}?path=/admin`;
+export const PUBLIC_API_URL = `${API_BASE}?path=/api`;
 
 // Hook for fetching videos
 export function useVideos() {

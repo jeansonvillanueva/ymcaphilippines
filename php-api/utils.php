@@ -31,8 +31,8 @@ function handleFileUpload($fieldName = 'image') {
         return null;
     }
 
-    // Check file size (5MB limit)
-    if ($file['size'] > 5 * 1024 * 1024) {
+    // Check file size (2MB limit to match frontend compression)
+    if ($file['size'] > 2 * 1024 * 1024) {
         error_log('[handleFileUpload] File too large: ' . $file['size']);
         return null;
     }
@@ -93,6 +93,12 @@ function getTableColumn($conn, $table, $column) {
 function getPostData() {
     $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
     $requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
+    // Check for method override
+    $methodOverride = $_POST['_method'] ?? $_GET['_method'] ?? null;
+    if ($methodOverride) {
+        $requestMethod = strtoupper($methodOverride);
+    }
 
     error_log('[getPostData] Method: ' . $requestMethod . ', Content-Type: ' . $contentType);
     error_log('[getPostData] _POST count: ' . count($_POST) . ', _FILES count: ' . count($_FILES));

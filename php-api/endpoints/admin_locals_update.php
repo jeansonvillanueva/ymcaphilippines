@@ -1,5 +1,10 @@
 <?php
 // PUT /admin/locals/:id
+$conn = getDatabaseConnection();
+if (!$conn) {
+    sendResponse(['error' => 'Database connection failed'], 500);
+}
+
 $data = getPostData();
 $id = $conn->real_escape_string($_GET['id']);
 

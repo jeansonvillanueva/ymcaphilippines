@@ -46,16 +46,24 @@ $user = 'ymcaph_user';
 $password = 'e8f133def539f610fe95fa789ac08d6ee8f133def539f610fe95fa789ac08d6e';
 $database = 'ymcaph_db';
 
-// Create database connection
-$conn = new mysqli($host, $user, $password, $database);
+// Create database connection (lazy loading - only connect when needed)
+$conn = null;
 
-// Check connection
-if ($conn->connect_error) {
-    http_response_code(500);
-    echo json_encode(['error' => 'Database connection failed: ' . $conn->connect_error]);
-    exit();
+function getDatabaseConnection() {
+    global $conn, $host, $user, $password, $database;
+    if ($conn === null) {
+        if (!class_exists('mysqli')) {
+            error_log('MySQLi extension not available');
+            return null;
+        }
+        $conn = new mysqli($host, $user, $password, $database);
+        if ($conn->connect_error) {
+            error_log('Database connection failed: ' . $conn->connect_error);
+            // Don't exit here - let individual endpoints handle it
+            return null;
+        }
+        $conn->set_charset('utf8');
+    }
+    return $conn;
 }
-
-// Set charset to utf8
-$conn->set_charset('utf8');
 ?>

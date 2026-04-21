@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useNews } from '../hooks/useApi';
 import NewsArticle, { type LocalYMCAConfig } from '../components/NewsArticle';
+import ContentRenderer from '../components/ContentRenderer';
 import { LOCALS_BY_ID } from '../data/locals';
 import '../styles/design-system.css';
 
@@ -42,6 +43,10 @@ const NewsDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { news, loading, error } = useNews();
 
+  type NewsWithContentBlocks = {
+    contentBlocks?: any[] | string;
+  } & typeof news[number];
+
   const currentPath = useMemo(() => {
     if (!slug) return null;
     return `/news/${slug}`;
@@ -49,7 +54,7 @@ const NewsDetail: React.FC = () => {
 
   const item = useMemo(() => {
     if (!currentPath) return null;
-    return news.find((n) => n.path === currentPath) ?? null;
+    return (news.find((n) => n.path === currentPath) ?? null) as NewsWithContentBlocks | null;
   }, [currentPath, news]);
 
   if (loading) return <div className="loading">Loading news...</div>;
@@ -67,7 +72,13 @@ const NewsDetail: React.FC = () => {
       articlePath={currentPath || undefined}
       layoutVariant="article"
     >
-      {item.body ? (
+      {item.contentBlocks && item.contentBlocks.length > 0 ? (
+        <ContentRenderer contentBlocks={
+          typeof item.contentBlocks === 'string'
+            ? JSON.parse(item.contentBlocks)
+            : item.contentBlocks
+        } />
+      ) : item.body ? (
         <div dangerouslySetInnerHTML={{ __html: item.body }} />
       ) : (
         <p>No content available for this article.</p>

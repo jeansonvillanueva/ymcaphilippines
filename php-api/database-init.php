@@ -3,6 +3,13 @@ require_once 'config.php';
 
 header('Content-Type: application/json');
 
+$conn = getDatabaseConnection();
+if (!$conn) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Database connection failed']);
+    exit;
+}
+
 // Check if form submitted to create tables
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 

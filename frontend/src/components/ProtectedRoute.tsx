@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import axios from 'axios';
+import { ADMIN_API_URL } from '../hooks/useApi';
 
-const AUTH_STATUS_URL = '/testsite/php-api/admin/status';
+const AUTH_STATUS_URL = `${ADMIN_API_URL}/status`;
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

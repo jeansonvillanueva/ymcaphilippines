@@ -4,11 +4,29 @@ require_once 'config.php';
 // Start a secure session for admin authentication.
 // Uses standard PHP session cookies and keeps login state on the server.
 if (session_status() === PHP_SESSION_NONE) {
-    session_start([
+    // Try to set a custom session save path if possible
+    $possiblePaths = [
+        '/tmp',
+        '/var/tmp',
+        sys_get_temp_dir(),
+        __DIR__ . '/sessions'
+    ];
+    
+    foreach ($possiblePaths as $path) {
+        if (is_dir($path) && is_writable($path)) {
+            session_save_path($path);
+            break;
+        }
+    }
+    
+    if (!session_start([
         'cookie_httponly' => true,
-        'cookie_samesite' => 'Lax',
-        'cookie_secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
-    ]);
+        // Removed cookie_samesite for local development compatibility
+        'cookie_secure' => false,
+    ])) {
+        error_log('Failed to start session');
+        // Continue without session - admin features will not work
+    }
 }
 
 const ADMIN_USERNAME = 'ymcaph';
@@ -27,13 +45,18 @@ function requireAdminAuth() {
 }
 
 function loginAdmin(string $username, string $password): bool {
-    if ($username === ADMIN_USERNAME && hash_equals(ADMIN_PASSWORD, $password)) {
-        session_regenerate_id(true);
+    error_log("[loginAdmin] Attempting login for username: '$username', password length: " . strlen($password));
+    error_log("[loginAdmin] Expected username: '" . ADMIN_USERNAME . "', expected password: '" . ADMIN_PASSWORD . "'");
+
+    if ($username === ADMIN_USERNAME && $password === ADMIN_PASSWORD) {
+        error_log("[loginAdmin] Login successful");
+        // session_regenerate_id(true); // Temporarily disabled for debugging
         $_SESSION['admin_authenticated'] = true;
         $_SESSION['admin_username'] = $username;
         return true;
     }
 
+    error_log("[loginAdmin] Login failed - credentials don't match");
     return false;
 }
 

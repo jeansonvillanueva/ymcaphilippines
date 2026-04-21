@@ -3,6 +3,9 @@ require_once 'config.php';
 require_once 'utils.php';
 require_once 'auth.php';
 
+// Initialize database connection globally so all endpoints have access to $conn
+$conn = getDatabaseConnection();
+
 // Get the request URI and method
 $requestUri = $_SERVER['REQUEST_URI'];
 $requestMethod = $_SERVER['REQUEST_METHOD'];
@@ -38,6 +41,11 @@ if ($requestMethod === 'POST') {
 
 // Remove query string from URI
 $path = parse_url($requestUri, PHP_URL_PATH);
+
+// Support query parameter routing (?path=/...) as fallback for .htaccess issues
+if (isset($_GET['path']) && !empty($_GET['path'])) {
+    $path = $_GET['path'];
+}
 
 // Remove the script base path (supports nested folders like /testsite/php-api/)
 $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));

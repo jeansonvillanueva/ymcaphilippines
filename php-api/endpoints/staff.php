@@ -1,5 +1,6 @@
 <?php
 // GET /api/staff - Public endpoint for staff directory
+$conn = getDatabaseConnection();
 $result = $conn->query("SELECT * FROM staff ORDER BY departmentGroup, sequenceOrder");
 if ($result) {
     $staff = [];

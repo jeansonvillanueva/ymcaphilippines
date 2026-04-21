@@ -1,5 +1,10 @@
 <?php
 // GET /admin/feedback
+$conn = getDatabaseConnection();
+if (!$conn) {
+    sendResponse(['error' => 'Database connection failed'], 500);
+}
+
 $result = $conn->query("SELECT * FROM feedback ORDER BY created_at DESC");
 if ($result) {
     $feedback = [];

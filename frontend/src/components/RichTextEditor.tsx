@@ -1,5 +1,6 @@
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import Underline from '@tiptap/extension-underline';
 import { useState, useEffect } from 'react';
 import '../styles/RichTextEditor.css';
 
@@ -13,7 +14,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
   const [isReady, setIsReady] = useState(false);
 
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit.configure({
+        // Disable underline from StarterKit to avoid duplicate
+        underline: false,
+      }),
+      Underline,
+    ],
     content: value || '',
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
@@ -26,10 +33,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
   });
 
   useEffect(() => {
-    if (editor && value && editor.getHTML() !== value) {
+    if (editor && value !== undefined && editor.getHTML() !== value) {
       editor.commands.setContent(value);
     }
-  }, []);
+  }, [editor, value]);
 
   useEffect(() => {
     setIsReady(true);
@@ -44,10 +51,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
       if (command === 'toggleBold') editor.chain().focus().toggleBold().run();
       else if (command === 'toggleItalic') editor.chain().focus().toggleItalic().run();
       else if (command === 'toggleStrike') editor.chain().focus().toggleStrike().run();
-      else if (command === 'toggleUnderline') {
-        // Using paragraph mark as underline substitute since Underline extension needs to be added
-        editor.chain().focus().setParagraph().run();
-      } else if (command === 'toggleBulletList') editor.chain().focus().toggleBulletList().run();
+      else if (command === 'toggleUnderline') editor.chain().focus().toggleUnderline().run();
+      else if (command === 'toggleBulletList') editor.chain().focus().toggleBulletList().run();
       else if (command === 'toggleOrderedList') editor.chain().focus().toggleOrderedList().run();
       else if (command === 'toggleBlockquote') editor.chain().focus().toggleBlockquote().run();
       else if (command === 'toggleHeading1') editor.chain().focus().toggleHeading({ level: 1 }).run();
@@ -100,6 +105,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
             title="Italic"
           >
             <em>I</em>
+          </button>
+          <button
+            type="button"
+            onClick={() => applyFormat('toggleUnderline')}
+            className={`toolbar-btn ${editor.isActive('underline') ? 'active' : ''}`}
+            title="Underline"
+          >
+            <u>U</u>
           </button>
           <button
             type="button"

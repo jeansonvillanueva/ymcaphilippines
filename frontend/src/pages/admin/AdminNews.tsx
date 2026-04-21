@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ADMIN_API_URL } from '../../hooks/useApi';
-import RichTextEditor from '../../components/RichTextEditor';
+import ContentBuilder from '../../components/ContentBuilder';
+import type { ContentBlock } from '../../components/ContentBuilder';
 import { LOCALS_BY_ID } from '../../data/locals';
 
 interface News {
@@ -11,23 +12,75 @@ interface News {
   date?: string;
   subtitle?: string;
   body?: string;
+  contentBlocks?: ContentBlock[] | string;
   localYMCA?: string;
   imageUrl?: string;
   category: string;
   topic: string;
 }
 
+type NewsForm = Omit<News, 'contentBlocks'> & {
+  contentBlocks?: ContentBlock[];
+};
+
 const categories = ['News', 'Articles', 'Features'];
 const topics = ['Education', 'Training', 'Youth Leadership', 'Environment', 'Youth Summit', 'Leadership', 'National Youth Assembly', 'Careers'];
 
+// Image compression utility
+const compressImage = (file: File, quality: number = 0.8, maxWidth: number = 1200, maxHeight: number = 1200): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+
+    img.onload = () => {
+      // Calculate new dimensions
+      let { width, height } = img;
+
+      if (width > height) {
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxHeight) {
+          width = (width * maxHeight) / height;
+          height = maxHeight;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+
+      ctx?.drawImage(img, 0, 0, width, height);
+
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const compressedFile = new File([blob], file.name, {
+            type: file.type,
+            lastModified: Date.now(),
+          });
+          resolve(compressedFile);
+        } else {
+          reject(new Error('Compression failed'));
+        }
+      }, file.type, quality);
+    };
+
+    img.onerror = () => reject(new Error('Image loading failed'));
+    img.src = URL.createObjectURL(file);
+  });
+};
+
 export default function AdminNews() {
   const [newsList, setNewsList] = useState<News[]>([]);
-  const [form, setForm] = useState<News>({
+  const [form, setForm] = useState<NewsForm>({
     path: '',
     title: '',
     date: '',
     subtitle: '',
     body: '',
+    contentBlocks: [],
     localYMCA: '',
     imageUrl: '',
     category: 'News',
@@ -46,12 +99,19 @@ export default function AdminNews() {
 
   const fetchNews = async () => {
     try {
-      const response = await axios.get(API_URL);
-      setNewsList(response.data);
+      const timestamp = Date.now();
+      const response = await axios.get(`${API_URL}?t=${timestamp}`);
+      if (Array.isArray(response.data)) {
+        setNewsList(response.data);
+      } else {
+        console.error('Unexpected API response format:', response.data);
+        setMessage({ type: 'error', text: 'Unexpected data format from server' });
+      }
       setLoading(false);
-    } catch (error) {
-      console.error('Error fetching news:', error);
-      setMessage({ type: 'error', text: 'Failed to load news' });
+    } catch (error: any) {
+      console.error('Error fetching news:', error.response?.data || error.message);
+      const serverError = error.response?.data?.error;
+      setMessage({ type: 'error', text: serverError ? `Failed to load news: ${serverError}` : 'Failed to load news' });
       setLoading(false);
     }
   };
@@ -67,20 +127,34 @@ export default function AdminNews() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    const MAX_FILE_SIZE = 2 * 1024 * 1024; // Reduced to 2MB
     if (file.size > MAX_FILE_SIZE) {
-      setMessage({ type: 'error', text: 'Image must be 5 MB or smaller' });
+      setMessage({ type: 'error', text: 'Image must be 2 MB or smaller' });
       return;
     }
 
-    setImageFile(file);
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        setForm((prev) => ({ ...prev, imageUrl: reader.result as string }));
-      }
-    };
-    reader.readAsDataURL(file);
+    // Compress image if it's large
+    compressImage(file, 0.8, 1200, 1200).then((compressedFile) => {
+      setImageFile(compressedFile);
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          setForm((prev) => ({ ...prev, imageUrl: reader.result as string }));
+        }
+      };
+      reader.readAsDataURL(compressedFile);
+    }).catch((error) => {
+      console.error('Image compression failed:', error);
+      // Fallback to original file
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          setForm((prev) => ({ ...prev, imageUrl: reader.result as string }));
+        }
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -90,12 +164,20 @@ export default function AdminNews() {
       return;
     }
 
+    // Validate contentBlocks size - increased limit for rich content with multiple images
+    const contentBlocksJson = JSON.stringify(form.contentBlocks || []);
+    if (contentBlocksJson.length > 10000000) { // ~10MB limit (increased for 10+ images)
+      setMessage({ type: 'error', text: 'Content is too large. Please reduce the amount of content or use fewer images.' });
+      return;
+    }
+
     try {
       const formData = new FormData();
       formData.append('title', form.title.trim());
       formData.append('date', form.date || '');
       formData.append('subtitle', form.subtitle || '');
-      formData.append('body', form.body || '');
+      formData.append('body', form.body || ''); // Keep for backward compatibility
+      formData.append('contentBlocks', contentBlocksJson);
       formData.append('localYMCA', form.localYMCA || '');
       formData.append('category', form.category || 'News');
       formData.append('topic', form.topic || '');
@@ -107,10 +189,25 @@ export default function AdminNews() {
 
       if (editingId) {
         formData.append('_method', 'PUT');
-        await axios.post(`${API_URL}/${editingId}`, formData);
+        await axios.post(`${API_URL}/${editingId}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          timeout: 120000, // 2 minutes
+          maxContentLength: Infinity,
+          maxBodyLength: Infinity,
+        });
         setMessage({ type: 'success', text: 'News updated successfully' });
       } else {
-        await axios.post(API_URL, formData);
+        const createResponse = await axios.post(API_URL, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          timeout: 120000, // 2 minutes
+          maxContentLength: Infinity,
+          maxBodyLength: Infinity,
+        });
+        console.log('[AdminNews] Create response:', createResponse.data);
         setMessage({ type: 'success', text: 'News added successfully' });
       }
       setForm({
@@ -119,6 +216,7 @@ export default function AdminNews() {
         date: '',
         subtitle: '',
         body: '',
+        contentBlocks: [],
         localYMCA: '',
         imageUrl: '',
         category: 'News',
@@ -126,7 +224,10 @@ export default function AdminNews() {
       });
       setImageFile(null);
       setEditingId(null);
-      fetchNews();
+      // Add a small delay to ensure database has processed the insert
+      setTimeout(() => {
+        fetchNews();
+      }, 500);
     } catch (error: any) {
       console.error('Error saving news:', error.response?.data || error);
       const serverMessage = error.response?.data?.error;
@@ -138,7 +239,13 @@ export default function AdminNews() {
   };
 
   const handleEdit = (news: News) => {
-    setForm(news);
+    const parsedContentBlocks: ContentBlock[] = news.contentBlocks
+      ? (Array.isArray(news.contentBlocks) ? news.contentBlocks : JSON.parse(news.contentBlocks))
+      : [];
+    setForm({
+      ...news,
+      contentBlocks: parsedContentBlocks,
+    });
     setEditingId(news.id || null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -156,6 +263,7 @@ export default function AdminNews() {
             date: '',
             subtitle: '',
             body: '',
+            contentBlocks: [],
             localYMCA: '',
             imageUrl: '',
             category: 'News',
@@ -257,11 +365,10 @@ export default function AdminNews() {
         </div>
 
         <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-          <label>Paragraph (with formatting)</label>
-          <RichTextEditor
-            value={form.body || ''}
-            onChange={(html) => setForm((prev) => ({ ...prev, body: html }))}
-            placeholder="Main news paragraph or full article summary"
+          <label>Article Content (Paragraphs & Images)</label>
+          <ContentBuilder
+            blocks={Array.isArray(form.contentBlocks) ? form.contentBlocks : []}
+            onChange={(blocks) => setForm((prev) => ({ ...prev, contentBlocks: blocks }))}
           />
         </div>
 

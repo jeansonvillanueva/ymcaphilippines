@@ -1,5 +1,6 @@
 <?php
 // GET /api/news
+$conn = getDatabaseConnection();
 error_log('[public_news] Fetching news from database');
 $result = $conn->query("SELECT * FROM news ORDER BY created_at DESC");
 

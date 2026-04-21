@@ -29,14 +29,15 @@ $path = isset($data['path']) && !empty($data['path']) ? $conn->real_escape_strin
 $date = isset($data['date']) ? $conn->real_escape_string($data['date']) : '';
 $subtitle = isset($data['subtitle']) ? $conn->real_escape_string($data['subtitle']) : '';
 $body = isset($data['body']) ? $conn->real_escape_string($data['body']) : '';
+$contentBlocks = isset($data['contentBlocks']) ? $conn->real_escape_string($data['contentBlocks']) : '[]';
 $localYMCA = isset($data['localYMCA']) ? $conn->real_escape_string($data['localYMCA']) : '';
 $imageUrl = isset($data['imageUrl']) ? $conn->real_escape_string($data['imageUrl']) : '';
 $category = isset($data['category']) ? $conn->real_escape_string($data['category']) : 'News';
 $topic = isset($data['topic']) ? $conn->real_escape_string($data['topic']) : '';
 
-// Handle file upload - only for POST requests, not PUT
+// Handle file upload - allow for both POST and PUT (via _method)
 $uploadedImagePath = null;
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' || (isset($_POST['_method']) && $_POST['_method'] === 'PUT')) {
     $uploadedImagePath = handleFileUpload('image');
 }
 if ($uploadedImagePath) {
@@ -49,6 +50,7 @@ $updateParts = [
     "date='$date'",
     "subtitle='$subtitle'",
     "body='$body'",
+    "contentBlocks='$contentBlocks'",
     "localYMCA='$localYMCA'",
     "imageUrl='$imageUrl'",
     "category='$category'",

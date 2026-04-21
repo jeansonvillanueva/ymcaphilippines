@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { ADMIN_API_URL } from '../../hooks/useApi';
 import AdminVideos from './AdminVideos';
 import AdminNews from './AdminNews';
 import AdminCalendar from './AdminCalendar';
@@ -9,7 +10,7 @@ import AdminStaff from './AdminStaff';
 import AdminSubmissions from './AdminSubmissions';
 import './AdminDashboard.css';
 
-const LOGOUT_URL = '/testsite/php-api/admin/logout';
+const LOGOUT_URL = `${ADMIN_API_URL}/logout`;
 
 type AdminTab = 'videos' | 'news' | 'calendar' | 'locals' | 'staff' | 'dashboard';
 

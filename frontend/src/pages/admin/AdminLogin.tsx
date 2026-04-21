@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { ADMIN_API_URL } from '../../hooks/useApi';
 import Footer from '../../components/Footer';
 import logo from '../../assets/images/logo.webp';
 import './AdminLogin.css';
 
-const LOGIN_URL = '/testsite/php-api/admin/login';
-const STATUS_URL = '/testsite/php-api/admin/status';
+const LOGIN_URL = `${ADMIN_API_URL}/login`;
+const STATUS_URL = `${ADMIN_API_URL}/status`;
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('');
@@ -44,10 +45,18 @@ export default function AdminLogin() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(LOGIN_URL, {
-        username,
-        password,
-      });
+      const response = await axios.post(
+        LOGIN_URL,
+        {
+          username,
+          password,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
       if (response.data?.authenticated) {
         navigate('/admin/dashboard');
@@ -56,7 +65,18 @@ export default function AdminLogin() {
         setPassword('');
       }
     } catch (err) {
-      setError('Invalid username or password');
+      const axiosError = err as any;
+      const serverError = axiosError?.response?.data?.error;
+      const status = axiosError?.response?.status;
+
+      if (serverError) {
+        setError(serverError);
+      } else if (status === 503) {
+        setError('Server unavailable. Please try again later.');
+      } else {
+        setError('Invalid username or password');
+      }
+
       setPassword('');
       console.error('Login error:', err);
     } finally {
