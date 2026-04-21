@@ -100,7 +100,7 @@ export default function AdminNews() {
   const fetchNews = async () => {
     try {
       const timestamp = Date.now();
-      const response = await axios.get(`${API_URL}?t=${timestamp}`);
+      const response = await axios.get(`${API_URL}&t=${timestamp}`);
       if (Array.isArray(response.data)) {
         setNewsList(response.data);
       } else {

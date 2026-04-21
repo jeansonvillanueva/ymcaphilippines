@@ -192,6 +192,7 @@ export function initializeTables() {
       console.log('News table created or exists successfully');
       ensureNewsColumn('body', 'TEXT');
       ensureNewsColumn('localYMCA', 'VARCHAR(100)');
+      ensureNewsColumn('contentBlocks', 'LONGTEXT');
     }
   });
 

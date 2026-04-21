@@ -253,4 +253,23 @@ function validateRequired($data, $requiredFields) {
         }
     }
 }
+
+// Function to ensure database has required columns
+function ensureDatabaseSchema($conn) {
+    if (!$conn) {
+        return;
+    }
+    
+    // Check if contentBlocks column exists in news table
+    $result = $conn->query("SHOW COLUMNS FROM news LIKE 'contentBlocks'");
+    if (!$result || $result->num_rows === 0) {
+        error_log('[ensureDatabaseSchema] Adding contentBlocks column to news table');
+        $alterResult = $conn->query("ALTER TABLE news ADD COLUMN contentBlocks LONGTEXT AFTER body");
+        if ($alterResult) {
+            error_log('[ensureDatabaseSchema] Successfully added contentBlocks column');
+        } else {
+            error_log('[ensureDatabaseSchema] Failed to add contentBlocks column: ' . $conn->error);
+        }
+    }
+}
 ?>
