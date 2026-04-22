@@ -210,6 +210,7 @@ function Where_We_Are() {
   const emailInvalid = contactTouched && contactEmail.length > 0 && !STRICT_EMAIL.test(contactEmail.trim());
   const phoneInvalid =
     contactTouched && contactPhone.trim().length > 0 && !isValidPhPhone(contactPhone.trim());
+  const messageInvalid = contactTouched && contactMessage.trim().length === 0;
 
   const activeLabel = useMemo(() => {
     if (!activeMarkerId) return null;
@@ -504,11 +505,16 @@ function Where_We_Are() {
               ) : null}
 
               <textarea 
-                className="contact-textarea" 
+                className={`contact-textarea ${messageInvalid ? 'contact-textarea--invalid' : ''}`}
                 placeholder="Your Message" 
                 value={contactMessage}
                 onChange={(e) => setContactMessage(e.target.value)}
+                onBlur={() => setContactTouched(true)}
+                required
               />
+              {messageInvalid ? (
+                <p className="contact-field-error">Please enter your message.</p>
+              ) : null}
 
               <div className="contact-actions">
                 <button className="contact-submit" type="submit">

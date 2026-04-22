@@ -1,5 +1,5 @@
 import './Footer.css';
-import { FaFacebookF, FaInstagram, FaTwitter, FaPhoneAlt, FaEnvelope, FaMapMarkerAlt, FaTiktok, FaYoutube } from 'react-icons/fa';
+import { FaFacebookF, FaInstagram, FaPhoneAlt, FaEnvelope, FaMapMarkerAlt, FaTiktok, FaYoutube } from 'react-icons/fa';
 import logo from '../assets/images/logo.webp';
 import { Link } from 'react-router-dom';
 
@@ -36,7 +36,7 @@ export default function Footer() {
 
           <a className="footer-item footer-item--link" href="tel:+63285280557">
             <FaPhoneAlt className="footer-icon" aria-hidden />
-            <span>02)8528-0557 / (02)8711-9012</span>
+            <span>(02)8528-0557 / (02)8711-9012</span>
           </a>
 
           <div className="footer-item footer-item--stack">
@@ -55,9 +55,6 @@ export default function Footer() {
           <a href="https://www.instagram.com/ymcaphilippines/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
             <FaInstagram />
           </a>
-          <a href="https://x.com/YMCAPhilippines" target="_blank" rel="noopener noreferrer" aria-label="X">
-            <FaTwitter />
-          </a>
           <a href="https://www.tiktok.com/@ymcaphilippines" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
             <FaTiktok />
           </a>
@@ -67,7 +64,7 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="footer-bottom">Copyright © 2026 YMCA of the Philippines | Powered by YMCA of the Philippines</div>
+      <div className="footer-bottom">Copyright © 2026 YMCA of the Philippines</div>
     </footer>
   );
 }

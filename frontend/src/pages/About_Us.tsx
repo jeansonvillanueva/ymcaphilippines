@@ -136,7 +136,7 @@ function AboutUs() {
             if (!existingSecretary) {
               // Add vacant secretary position at the top only when no secretary record exists
               children.unshift({
-                name: 'Vacant',
+                name: '',
                 position: secretaryPosition,
                 imageUrl: ymcaLogo,
               });
@@ -172,30 +172,22 @@ function AboutUs() {
             {
               title: 'Secretary for Finance',
               imageUrl: null,
-              children: [
-                { name: 'Vacant', position: 'SECRETARY FOR FINANCE', imageUrl: ymcaLogo },
-              ],
+              children: [],
             },
             {
               title: 'National Program Secretary',
               imageUrl: null,
-              children: [
-                { name: 'Vacant', position: 'NATIONAL PROGRAM SECRETARY', imageUrl: ymcaLogo },
-              ],
+              children: [],
             },
             {
               title: 'Secretary for Member Association',
               imageUrl: null,
-              children: [
-                { name: 'Vacant', position: 'SECRETARY FOR MEMBER ASSOCIATION', imageUrl: ymcaLogo },
-              ],
+              children: [],
             },
             {
               title: 'Secretary for Operation',
               imageUrl: null,
-              children: [
-                { name: 'Vacant', position: 'SECRETARY FOR OPERATION', imageUrl: ymcaLogo },
-              ],
+              children: [],
             },
           ],
         };
@@ -542,7 +534,7 @@ function AboutUs() {
         <div className="page-section__inner">
           <SubjectHeader text="Meet Our Family" className="reveal" />
           <p className="meet-family__subtitle reveal">YMCA of the Philippines Organizational Chart</p>
-
+          <div className="org-chart-card__name" style={{ textAlign: 'center', marginBottom: '1.5rem' }}>NATIONAL BOARD OF TRUSTEES</div>
           {loadingStaff ? (
             <div className="loading">Loading staff members...</div>
           ) : staffError || !orgStructure ? (
@@ -566,8 +558,8 @@ function AboutUs() {
                               {child.members.map((m, j) => (
                                 <OrgChartCard
                                   key={j}
-                                  name={m.name || 'Vacant'}
-                                  position={m.position || 'Vacant'}
+                                  name={m.name || ''}
+                                  position={m.position || ''}
                                   imageUrl={m.imageUrl || ymcaLogo}
                                 />
                               ))}
@@ -578,8 +570,8 @@ function AboutUs() {
                         return (
                           <OrgChartCard
                             key={idx}
-                            name={(child as OrgMember).name || 'Vacant'}
-                            position={(child as OrgMember).position || 'Vacant'}
+                            name={(child as OrgMember).name || ''}
+                            position={(child as OrgMember).position || ''}
                             imageUrl={(child as OrgMember).imageUrl || ymcaLogo}
                           />
                         );

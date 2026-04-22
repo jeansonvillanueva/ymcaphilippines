@@ -8,8 +8,8 @@ import vision from '../assets/images/partners/vision_2030.png';
 import VideoShowcase, { type VideoItem } from '../components/VideoShowcase';
 import ImpactStats from '../components/ImpactStats';
 import EventVenueRental from '../components/EventVenueRental';
-import eventVenueImage1 from '../assets/images/rent/event1.jpg';
-import eventVenueImage2 from '../assets/images/rent/event2.jpg';
+import eventVenueImage1 from '../assets/images/rent/event1.png';
+import eventVenueImage2 from '../assets/images/rent/event2.png';
 import { useVideos, useNews } from '../hooks/useApi';
 
 const normalizeImageUrl = (url?: string | null) => {
@@ -49,9 +49,9 @@ const FALLBACK_VIDEOS: VideoItem[] = [
     embedUrl: 'https://youtu.be/g7D2GX2XfGw?si=73IjH_Yj_iSOP_pJ',
   },
   {
-    id: 'YWCA_Motion',
-    title: 'YWCA Motion',
-    description: 'YWCA Greeting from the President of YWCA of the Philippines.',
+    id: 'YMCA_Motion',
+    title: 'YMCA Motion',
+    description: 'YMCA Greeting from the President of YMCA of the Philippines.',
     embedUrl: 'https://youtu.be/-KO_7ahfJaY?si=8s7ZeQqIiSdsEvSM',
   }
 ];

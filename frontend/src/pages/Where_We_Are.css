@@ -415,6 +415,10 @@
   box-shadow: 0 0 0 2px rgba(196, 30, 58, 0.45);
 }
 
+.contact-textarea--invalid {
+  box-shadow: 0 0 0 2px rgba(196, 30, 58, 0.45);
+}
+
 .contact-field-error {
   color: var(--ymca-red);
   font-size: 0.85rem;

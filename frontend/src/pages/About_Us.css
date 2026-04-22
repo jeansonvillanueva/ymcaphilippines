@@ -798,6 +798,14 @@
     width: 100%;
   }
 
+  .org-tree__board-label {
+    text-align: center;
+    font-weight: 700;
+    color: var(--ymca-navy);
+    font-size: 0.98rem;
+    margin: 1rem 0 1.5rem;
+  }
+
   .org-tree__branches {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -1366,7 +1374,7 @@
   }
 
   .org-chart-card:hover .org-chart-card__image {
-    filter: brightness(0.75) contrast(1.1);
+    filter: none;
   }
 
   .org-chart-card__image-wrap {
