@@ -207,7 +207,9 @@ function Where_We_Are() {
   const [contactPhone, setContactPhone] = useState('');
   const [contactTouched, setContactTouched] = useState(false);
 
-  const emailInvalid = contactTouched && contactEmail.length > 0 && !STRICT_EMAIL.test(contactEmail.trim());
+  const nameEmpty = contactTouched && contactName.trim().length === 0;
+  const surnameEmpty = contactTouched && contactSurname.trim().length === 0;
+  const emailInvalid = contactTouched && (contactEmail.length === 0 || !STRICT_EMAIL.test(contactEmail.trim()));
   const phoneInvalid =
     contactTouched && contactPhone.trim().length > 0 && !isValidPhPhone(contactPhone.trim());
   const messageInvalid = contactTouched && contactMessage.trim().length === 0;
@@ -430,8 +432,11 @@ function Where_We_Are() {
                 e.preventDefault();
                 setContactTouched(true);
 
+                if (contactName.trim().length === 0) return;
+                if (contactSurname.trim().length === 0) return;
                 if (!STRICT_EMAIL.test(contactEmail.trim())) return;
                 if (contactPhone.trim() && !isValidPhPhone(contactPhone.trim())) return;
+                if (contactMessage.trim().length === 0) return;
 
                 axios.post(`${PUBLIC_API_URL}/feedback`, {
                   name: contactName,
@@ -463,21 +468,28 @@ function Where_We_Are() {
               </p>
 
               <input 
-                className="contact-input" 
+                className={`contact-input ${nameEmpty ? 'contact-input--invalid' : ''}`}
                 type="text" 
                 placeholder="Name" 
                 value={contactName}
                 onChange={(e) => setContactName(e.target.value)}
+                onBlur={() => setContactTouched(true)}
                 required 
+                aria-invalid={nameEmpty}
               />
+              {nameEmpty ? <p className="contact-field-error">Please enter your name.</p> : null}
+              
               <input 
-                className="contact-input" 
+                className={`contact-input ${surnameEmpty ? 'contact-input--invalid' : ''}`}
                 type="text" 
                 placeholder="Surname" 
                 value={contactSurname}
                 onChange={(e) => setContactSurname(e.target.value)}
+                onBlur={() => setContactTouched(true)}
                 required 
+                aria-invalid={surnameEmpty}
               />
+              {surnameEmpty ? <p className="contact-field-error">Please enter your surname.</p> : null}
               <input
                 className={`contact-input ${emailInvalid ? 'contact-input--invalid' : ''}`}
                 type="email"
@@ -488,7 +500,11 @@ function Where_We_Are() {
                 onBlur={() => setContactTouched(true)}
                 aria-invalid={emailInvalid}
               />
-              {emailInvalid ? <p className="contact-field-error">Enter a valid email address.</p> : null}
+              {emailInvalid && contactTouched ? (
+                <p className="contact-field-error">
+                  {contactEmail.length === 0 ? 'Please enter your email address.' : 'Enter a valid email address.'}
+                </p>
+              ) : null}
 
               <input
                 className={`contact-input ${phoneInvalid ? 'contact-input--invalid' : ''}`}

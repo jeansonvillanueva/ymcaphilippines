@@ -49,16 +49,24 @@ function Article() {
   const [subtitle, setSubtitle] = useState('');
   const [message, setMessage] = useState('');
 
-  const emailInvalid = touched && email.length > 0 && !EMAIL_RE.test(email.trim());
-  const urlInvalid = touched && articleUrl.length > 0 && !/^https?:\/\/.+\..+/.test(articleUrl.trim());
+  const nameEmpty = touched && name.trim().length === 0;
+  const titleEmpty = touched && title.trim().length === 0;
+  const subtitleEmpty = touched && subtitle.trim().length === 0;
+  const messageEmpty = touched && message.trim().length === 0;
+  const emailInvalid = touched && (email.length === 0 || !EMAIL_RE.test(email.trim()));
+  const urlInvalid = touched && (articleUrl.length === 0 || !/^https?:\/\/.+\..+/.test(articleUrl.trim()));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setTouched(true);
 
-    if (!selectedYMCA || 
+    if (name.trim().length === 0 || 
+        !selectedYMCA || 
+        title.trim().length === 0 ||
+        subtitle.trim().length === 0 ||
         !EMAIL_RE.test(email.trim()) ||
-        !/^https?:\/\/.+\..+/.test(articleUrl.trim())
+        !/^https?:\/\/.+\..+/.test(articleUrl.trim()) ||
+        message.trim().length === 0
       ) {
       return;
     }
@@ -124,13 +132,16 @@ function Article() {
               </label>
               <input 
                 id="ymca-update-name" 
-                className="article-form__field" 
+                className={`article-form__field ${nameEmpty ? 'article-form__field--invalid' : ''}`}
                 type="text" 
                 placeholder="Your name" 
                 required 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                onBlur={() => setTouched(true)}
+                aria-invalid={nameEmpty}
               />
+              {nameEmpty ? <p className="article-form__error">Please enter your name.</p> : null}
             </div>
 
             <div>
@@ -158,13 +169,16 @@ function Article() {
               </label>
               <input 
                 id="ymca-update-title" 
-                className="article-form__field" 
+                className={`article-form__field ${titleEmpty ? 'article-form__field--invalid' : ''}`}
                 type="text" 
                 placeholder="Headline" 
                 required 
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                onBlur={() => setTouched(true)}
+                aria-invalid={titleEmpty}
               />
+              {titleEmpty ? <p className="article-form__error">Please enter a title.</p> : null}
             </div>
 
             <div>
@@ -173,13 +187,16 @@ function Article() {
               </label>
               <input 
                 id="ymca-update-subtitle" 
-                className="article-form__field" 
+                className={`article-form__field ${subtitleEmpty ? 'article-form__field--invalid' : ''}`}
                 type="text" 
                 placeholder="Short summary" 
                 required 
                 value={subtitle}
                 onChange={(e) => setSubtitle(e.target.value)}
+                onBlur={() => setTouched(true)}
+                aria-invalid={subtitleEmpty}
               />
+              {subtitleEmpty ? <p className="article-form__error">Please enter a subtitle.</p> : null}
             </div>
 
             <div>
@@ -217,7 +234,11 @@ function Article() {
                 required
                 aria-invalid={emailInvalid}
               />
-              {emailInvalid ? <p className="article-form__error">Enter a valid email address.</p> : null}
+              {emailInvalid ? (
+                <p className="article-form__error">
+                  {email.length === 0 ? 'Please enter your email address.' : 'Enter a valid email address.'}
+                </p>
+              ) : null}
             </div>
 
             <div>
@@ -226,11 +247,15 @@ function Article() {
               </label>
               <textarea
                 id="ymca-update-message"
-                className="article-form__field article-form__textarea"
+                className={`article-form__field article-form__textarea ${messageEmpty ? 'article-form__field--invalid' : ''}`}
                 placeholder="Additional context for the web team"
+                required
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
+                onBlur={() => setTouched(true)}
+                aria-invalid={messageEmpty}
               />
+              {messageEmpty ? <p className="article-form__error">Please enter a message.</p> : null}
             </div>
           </div>
 
