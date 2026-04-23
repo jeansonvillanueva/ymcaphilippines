@@ -61,6 +61,8 @@
   height: 150px;
   resize: none;
   padding-top: 0.9rem;
+  overflow: hidden;
+  line-height: 1.5;
 }
 
 .contact-input:focus,

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useNews, useCalendarEvents } from '../hooks/useApi';
 import ActivityCalendar, { type CalendarEvent } from '../components/ActivityCalendar';
-import Card from './Card-Media/Card';
+import Card from '../components/Card';
 import SubjectHeader from '../components/SubjectHeader';
 import { NEWS_FEATURED_IMAGE, type NewsCategory } from '../data/news';
 import '../styles/design-system.css';

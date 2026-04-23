@@ -22,6 +22,8 @@
 .news-article-sidebar {
   position: sticky;
   top: 120px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
   background: var(--ymca-white);
   border-radius: 12px;
   border: 1px solid rgba(0, 0, 0, 0.06);
@@ -211,6 +213,8 @@
   margin-top: 1rem;
   padding-top: 1rem;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
+  display: block;
+  visibility: visible;
 }
 
 .news-article-more__title {
@@ -218,6 +222,8 @@
   color: var(--ymca-navy);
   font-size: 1rem;
   margin-bottom: 0.75rem;
+  display: block;
+  visibility: visible;
 }
 
 .news-article-more__list {
@@ -227,6 +233,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
+  visibility: visible;
 }
 
 .news-article-more__list--horizontal {
@@ -238,12 +245,15 @@
 .news-article-more__link {
   display: flex;
   gap: 0.65rem;
-  align-items: flex-start;
+  align-items: stretch;
   text-decoration: none;
   color: inherit;
   border-radius: 10px;
   padding: 0.35rem;
   margin: -0.35rem;
+  min-width: 0;
+  visibility: visible;
+  overflow: visible;
   transition: background var(--duration-normal) var(--ease-out);
 }
 
@@ -258,6 +268,7 @@
   background: var(--ymca-gray-bg);
   flex-shrink: 0;
   overflow: hidden;
+  display: block;
 }
 
 .news-article-more__thumb img {
@@ -267,17 +278,35 @@
   display: block;
 }
 
+.news-article-more__meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 0.5rem;
+  visibility: visible;
+  overflow: visible;
+}
+
 .news-article-more__itemTitle {
   font-weight: 800;
   font-size: 0.88rem;
   color: var(--ymca-navy);
   line-height: 1.25;
+  display: block;
+  visibility: visible;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .news-article-more__itemDate {
   font-size: 0.8rem;
   color: var(--ymca-text-muted);
   margin-top: 0.15rem;
+  display: block;
+  visibility: visible;
 }
 
 .news-article-main {
@@ -288,6 +317,12 @@
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.news-article-more--inline {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid rgba(0, 0, 0, 0.12);
 }
 
 .news-article-page--article .news-article__title {

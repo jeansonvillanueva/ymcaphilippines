@@ -510,7 +510,7 @@ function AboutUs() {
           <div className="histoy-grid reveal reveal-delay-1">
             <figure className="histoy-card histoy-card--right">
               <img src={yangPresident} alt="YMCA President Yang" />
-              <figcaption>Teodoro R.Yang</figcaption>
+              <figcaption>Teodoro R. Yangco</figcaption>
             </figure>
 
             <div className="histoy-video-wrap">
@@ -534,7 +534,11 @@ function AboutUs() {
         <div className="page-section__inner">
           <SubjectHeader text="Meet Our Family" className="reveal" />
           <p className="meet-family__subtitle reveal">YMCA of the Philippines Organizational Chart</p>
-          <div className="org-chart-card__name" style={{ textAlign: 'center', marginBottom: '1.5rem' }}>NATIONAL BOARD OF TRUSTEES</div>
+          <div className="org-chart-card__name" style={{ textAlign: 'center', marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+            <div>NATIONAL BOARD OF TRUSTEES</div>
+            <div style={{ fontSize: '4rem', lineHeight: '1' }}>↓</div>
+            <div>FEDERATIONAL OFFICE</div>
+          </div>
           {loadingStaff ? (
             <div className="loading">Loading staff members...</div>
           ) : staffError || !orgStructure ? (

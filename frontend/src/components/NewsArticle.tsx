@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { FaFacebookF, FaInstagram, FaTwitter } from 'react-icons/fa';
-import { getRelatedNews } from '../data/news';
+import { useNews } from '../hooks/useApi';
 import '../styles/design-system.css';
 import './NewsArticle.css';
 
@@ -59,6 +59,8 @@ export default function NewsArticle({
   children,
 }: NewsArticleProps) {
   const ref = useScrollReveal<HTMLDivElement>();
+  const { news } = useNews();
+  
   const slides = useMemo(() => {
     const fromProp = heroImageUrls?.filter(Boolean) as string[] | undefined;
     if (fromProp && fromProp.length) return fromProp;
@@ -78,9 +80,10 @@ export default function NewsArticle({
   }, [slides.length]);
 
   const related = useMemo(() => {
-    if (!articlePath) return [];
-    return getRelatedNews(articlePath, 3);
-  }, [articlePath]);
+    if (!articlePath || !news || news.length === 0) return [];
+    // Filter out current article and return first 3 items
+    return news.filter((n) => n.path !== articlePath).slice(0, 3);
+  }, [articlePath, news]);
 
   const rootClass =
     layoutVariant === 'article'
@@ -234,7 +237,7 @@ export default function NewsArticle({
             <div className="news-article-main news-article-main--solo" aria-label="Article content">
               {articleInner}
               {related.length > 0 ? (
-                <div className="news-article-more news-article-more--inline reveal reveal-delay-3">
+                <div className="news-article-more news-article-more--inline">
                   <div className="news-article-more__title">More Like This</div>
                   <ul className="news-article-more__list news-article-more__list--horizontal">
                     {related.map((item) => (
