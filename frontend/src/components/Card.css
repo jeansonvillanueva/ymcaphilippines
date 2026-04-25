@@ -28,6 +28,10 @@
   height: 200px;
 }
 
+.card-container--article .card-image--placeholder {
+  height: 200px;
+}
+
 .card-media {
   position: relative;
 }
@@ -56,16 +60,22 @@
 }
 
   .card-image--placeholder {
-    aspect-ratio: 16 / 9;
-    min-height: 150px;
-    background: var(--ymca-gray-bg, #f0f0f0);
+    height: 180px;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--ymca-text-muted, #666);
-    font-size: 1rem;
+    color: var(--ymca-navy, #1e2a7a);
+    font-size: 1.25rem;
+    font-weight: 700;
     text-align: center;
-    padding: 1rem;
+    padding: 1.5rem;
+    width: 100%;
+  }
+
+  .card-image--placeholder-content {
+    line-height: 1.4;
+    max-width: 90%;
   }
   
 .card-content {
