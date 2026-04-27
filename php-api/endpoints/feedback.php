@@ -2,10 +2,10 @@
 // POST /api/feedback
 $data = getPostData();
 
-validateRequired($data, ['name', 'surname', 'email']);
+validateRequired($data, ['name', 'email']);
 
 $name = $conn->real_escape_string($data['name']);
-$surname = $conn->real_escape_string($data['surname']);
+$surname = isset($data['surname']) ? $conn->real_escape_string($data['surname']) : '';
 $email = $conn->real_escape_string($data['email']);
 $message = isset($data['message']) ? $conn->real_escape_string($data['message']) : '';
 
