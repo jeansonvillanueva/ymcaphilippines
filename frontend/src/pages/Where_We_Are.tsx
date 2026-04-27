@@ -201,14 +201,12 @@ function Where_We_Are() {
   const localsById = useMemo(() => new Map(localsData.map((local) => [local.id, local])), [localsData]);
 
   const [contactName, setContactName] = useState('');
-  const [contactSurname, setContactSurname] = useState('');
   const [contactMessage, setContactMessage] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [contactPhone, setContactPhone] = useState('');
   const [contactTouched, setContactTouched] = useState(false);
 
   const nameEmpty = contactTouched && contactName.trim().length === 0;
-  const surnameEmpty = contactTouched && contactSurname.trim().length === 0;
   const emailInvalid = contactTouched && (contactEmail.length === 0 || !STRICT_EMAIL.test(contactEmail.trim()));
   const phoneInvalid =
     contactTouched && contactPhone.trim().length > 0 && !isValidPhPhone(contactPhone.trim());
@@ -433,14 +431,12 @@ function Where_We_Are() {
                 setContactTouched(true);
 
                 if (contactName.trim().length === 0) return;
-                if (contactSurname.trim().length === 0) return;
                 if (!STRICT_EMAIL.test(contactEmail.trim())) return;
                 if (contactPhone.trim() && !isValidPhPhone(contactPhone.trim())) return;
                 if (contactMessage.trim().length === 0) return;
 
                 axios.post(`${PUBLIC_API_URL}/feedback`, {
                   name: contactName,
-                  surname: contactSurname,
                   email: contactEmail,
                   phone_num: contactPhone,
                   message: contactMessage,
@@ -451,7 +447,6 @@ function Where_We_Are() {
 
                   // reset form
                   setContactName('');
-                  setContactSurname('');
                   setContactEmail('');
                   setContactPhone('');
                   setContactMessage('');
@@ -478,18 +473,6 @@ function Where_We_Are() {
                 aria-invalid={nameEmpty}
               />
               {nameEmpty ? <p className="contact-field-error">Please enter your name.</p> : null}
-              
-              <input 
-                className={`contact-input ${surnameEmpty ? 'contact-input--invalid' : ''}`}
-                type="text" 
-                placeholder="Surname" 
-                value={contactSurname}
-                onChange={(e) => setContactSurname(e.target.value)}
-                onBlur={() => setContactTouched(true)}
-                required 
-                aria-invalid={surnameEmpty}
-              />
-              {surnameEmpty ? <p className="contact-field-error">Please enter your surname.</p> : null}
               <input
                 className={`contact-input ${emailInvalid ? 'contact-input--invalid' : ''}`}
                 type="email"

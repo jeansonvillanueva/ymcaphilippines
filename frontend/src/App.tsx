@@ -18,6 +18,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Footer from './components/Footer';
 import Article from './pages/Article_Form';
 import NewsDetail from './pages/NewsDetail';
+import AboutUsHighlights from './pages/Card-Media/articles/about_us';
 
 function ScrollToHash() {
   const { hash, pathname } = useLocation();
@@ -73,6 +74,7 @@ function AppContent() {
           <Route path="/donate" element={<Donate />} />
           <Route path="/get-involved" element={<Get_Involved />} />
           <Route path="/about-us" element={<About_Us />} />
+          <Route path="/about-us/highlights" element={<AboutUsHighlights />} />
           <Route path="/developer" element={<Developer />} />
 
           <Route path="/article" element={<Article />} />

@@ -97,6 +97,12 @@ switch ($path) {
         }
         break;
 
+    case '/api/videos':
+        if ($requestMethod === 'GET') {
+            require_once 'endpoints/videos.php';
+        }
+        break;
+
     case '/api/users':
         if ($requestMethod === 'GET') {
             require_once 'endpoints/users.php';
@@ -175,15 +181,36 @@ switch ($path) {
         }
         break;
 
+    case (preg_match('/^\/admin\/feedback\/(\d+)$/', $path, $matches) ? true : false):
+        $_GET['id'] = $matches[1];
+        if ($requestMethod === 'DELETE') {
+            require_once 'endpoints/admin_feedback_delete.php';
+        }
+        break;
+
     case '/admin/submit-updates':
         if ($requestMethod === 'GET') {
             require_once 'endpoints/admin_submit_updates.php';
         }
         break;
 
+    case (preg_match('/^\/admin\/submit-updates\/(\d+)$/', $path, $matches) ? true : false):
+        $_GET['id'] = $matches[1];
+        if ($requestMethod === 'DELETE') {
+            require_once 'endpoints/admin_submit_updates_delete.php';
+        }
+        break;
+
     case '/admin/donations':
         if ($requestMethod === 'GET') {
             require_once 'endpoints/admin_donations.php';
+        }
+        break;
+
+    case (preg_match('/^\/admin\/donations\/(\d+)$/', $path, $matches) ? true : false):
+        $_GET['id'] = $matches[1];
+        if ($requestMethod === 'DELETE') {
+            require_once 'endpoints/admin_donations_delete.php';
         }
         break;
 

@@ -17,12 +17,18 @@ export function useVideos() {
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const response = await axios.get(`${ADMIN_API_URL}/videos`);
-        setVideos(response.data);
+        const response = await axios.get(`${PUBLIC_API_URL}/videos`);
+        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+          setVideos(response.data);
+        } else {
+          setVideos([]);
+        }
         setError(null);
       } catch (err) {
         console.error('Error fetching videos:', err);
-        setError('Failed to load videos');
+        // On error, continue without videos - component will handle empty array
+        setVideos([]);
+        setError(null);
       } finally {
         setLoading(false);
       }

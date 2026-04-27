@@ -23,8 +23,10 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = ({ title, subtitle, imageUrl, tag, description, variant = 'news', children }) => {
+  const containerClass = `card-container ${variant === 'article' ? 'card-container--article' : ''} ${!imageUrl ? 'card-container--no-image' : ''}`.trim();
+  
   return (
-    <div className={variant === 'article' ? 'card-container card-container--article' : 'card-container'}>
+    <div className={containerClass}>
       {imageUrl ? (
         <div className="card-media">
           {tag ? <div className="card-tag">{tag}</div> : null}

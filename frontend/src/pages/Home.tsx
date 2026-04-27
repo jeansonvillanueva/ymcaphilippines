@@ -176,7 +176,17 @@ function Home() {
               </p>
             </div>
             <div className="vision-2030__video-wrap">
-              <iframe src="https://www.youtube.com/embed/KfGMl7ov2x8" title="YMCA Vision 2030" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+              <iframe
+              width="560"
+              height="315"
+              src="https://www.youtube.com/embed/KfGMl7ov2x8?rel=0"
+              title="YMCA Vision 2030"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+              ></iframe>
+              {/* <iframe src="https://www.youtube.com/embed/KfGMl7ov2x8?rel=0" title="YMCA Vision 2030" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe> */}
             </div>
           </div>
         </div>

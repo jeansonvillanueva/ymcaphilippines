@@ -64,6 +64,7 @@ export default function AdminSubmissions() {
   const [donations, setDonations] = useState<DonationEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     const fetchSubmissions = async () => {
@@ -88,6 +89,51 @@ export default function AdminSubmissions() {
     fetchSubmissions();
   }, []);
 
+  const handleDeleteFeedback = async (feedbackId: number | undefined) => {
+    if (!feedbackId) return;
+    if (!window.confirm('Are you sure you want to delete this feedback submission?')) return;
+
+    try {
+      await axios.delete(`${ADMIN_API_URL}/feedback/${feedbackId}`);
+      setFeedback(feedback.filter((item) => item.feedback_id !== feedbackId));
+      setMessage({ type: 'success', text: 'Feedback deleted successfully' });
+      setTimeout(() => setMessage(null), 3000);
+    } catch (err) {
+      console.error('Error deleting feedback:', err);
+      setMessage({ type: 'error', text: 'Failed to delete feedback' });
+    }
+  };
+
+  const handleDeleteUpdate = async (updateId: number | undefined) => {
+    if (!updateId) return;
+    if (!window.confirm('Are you sure you want to delete this YMCA update submission?')) return;
+
+    try {
+      await axios.delete(`${ADMIN_API_URL}/submit-updates/${updateId}`);
+      setUpdates(updates.filter((item) => item.id !== updateId));
+      setMessage({ type: 'success', text: 'Update submission deleted successfully' });
+      setTimeout(() => setMessage(null), 3000);
+    } catch (err) {
+      console.error('Error deleting update:', err);
+      setMessage({ type: 'error', text: 'Failed to delete update submission' });
+    }
+  };
+
+  const handleDeleteDonation = async (donationId: number | undefined) => {
+    if (!donationId) return;
+    if (!window.confirm('Are you sure you want to delete this donation submission?')) return;
+
+    try {
+      await axios.delete(`${ADMIN_API_URL}/donations/${donationId}`);
+      setDonations(donations.filter((item) => item.donation_id !== donationId));
+      setMessage({ type: 'success', text: 'Donation deleted successfully' });
+      setTimeout(() => setMessage(null), 3000);
+    } catch (err) {
+      console.error('Error deleting donation:', err);
+      setMessage({ type: 'error', text: 'Failed to delete donation' });
+    }
+  };
+
   if (loading) {
     return <div className="loading">Loading admin dashboard submissions...</div>;
   }
@@ -103,6 +149,13 @@ export default function AdminSubmissions() {
         <div className="error-message">
           {error}
           <button onClick={() => setError(null)}>×</button>
+        </div>
+      ) : null}
+
+      {message ? (
+        <div className={`${message.type}-message`}>
+          {message.text}
+          <button onClick={() => setMessage(null)}>×</button>
         </div>
       ) : null}
 
@@ -126,6 +179,7 @@ export default function AdminSubmissions() {
                 <th>Phone</th>
                 <th>Message</th>
                 <th>Submitted</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -137,6 +191,15 @@ export default function AdminSubmissions() {
                   <td>{item.phone_number || '-'}</td>
                   <td>{item.message || '-'}</td>
                   <td>{formatDate(item.created_at)}</td>
+                  <td>
+                    <button
+                      onClick={() => handleDeleteFeedback(item.feedback_id)}
+                      className="btn btn-danger btn-small"
+                      style={{ backgroundColor: '#dc2626', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }}
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -159,6 +222,7 @@ export default function AdminSubmissions() {
                 <th>Article URL</th>
                 <th>Email</th>
                 <th>Submitted</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -175,6 +239,15 @@ export default function AdminSubmissions() {
                   </td>
                   <td>{item.email}</td>
                   <td>{formatDate(item.created_at)}</td>
+                  <td>
+                    <button
+                      onClick={() => handleDeleteUpdate(item.id)}
+                      className="btn btn-danger btn-small"
+                      style={{ backgroundColor: '#dc2626', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }}
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -197,6 +270,7 @@ export default function AdminSubmissions() {
                 <th>Payment</th>
                 <th>Phone</th>
                 <th>Submitted</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -209,6 +283,15 @@ export default function AdminSubmissions() {
                   <td>{item.payment_method || '-'}</td>
                   <td>{item.phone || '-'}</td>
                   <td>{formatDate(item.created_at)}</td>
+                  <td>
+                    <button
+                      onClick={() => handleDeleteDonation(item.donation_id)}
+                      className="btn btn-danger btn-small"
+                      style={{ backgroundColor: '#dc2626', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }}
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
