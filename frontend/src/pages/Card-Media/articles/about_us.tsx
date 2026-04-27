@@ -25,7 +25,7 @@ const ABOUT_CARDS: AboutCard[] = [
     id: 'employment',
     title: 'Employment',
     imageUrl: employment,
-    details: 'Young people are valuable economic participants and have a right to contribute to the worldΓÇÖs development and wellbeing. Through YMCA programmes, young people address issues relating to youth employment and economic empowerment.',
+    details: 'Young people are valuable economic participants and have a right to contribute to the world development and wellbeing. Through YMCA programmes, young people address issues relating to youth employment and economic empowerment.',
   },
   {
     id: 'environment',

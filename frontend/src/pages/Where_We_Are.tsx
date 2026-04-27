@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import InteractivePhilippinesMap, { type BranchMarker } from '../components/InteractivePhilippinesMap';
 import SubjectHeader from '../components/SubjectHeader';
@@ -307,7 +307,6 @@ function Where_We_Are() {
                     const backendLocal = localsById.get(b.markerId);
                     const local = backendLocal || getLocalById(b.markerId);
                     const logoSrc = local?.logoImageUrl ?? defaultBranchLogo;
-                    const fb = b.link && b.link !== '#';
                     const rowActive = activeMarkerId === b.markerId;
 
                     return (
@@ -319,31 +318,18 @@ function Where_We_Are() {
                           onMouseLeave={() => setActiveMarkerId(null)}
                         >
                           <div className="find-ymca__branch-content">
-                            {fb ? (
-                              <a
-                                className="find-ymca__branch-cta"
-                                href={b.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                aria-label={`${b.name} on Facebook`}
-                              >
-                                <img src={logoSrc} alt="" className="find-ymca__branch-logo" />
-                                <span className="find-ymca__branch-name">{b.name}</span>
-                              </a>
-                            ) : (
-                              <button
-                                type="button"
-                                className="find-ymca__branch-cta find-ymca__branch-cta--fallback"
-                                onClick={() => {
-                                  if (local) navigate(`/find-ymca/${local.id}`);
-                                }}
-                                disabled={!local}
-                                aria-label={local ? `Open ${b.name} local page` : b.name}
-                              >
-                                <img src={logoSrc} alt="" className="find-ymca__branch-logo" />
-                                <span className="find-ymca__branch-name">{b.name}</span>
-                              </button>
-                            )}
+                            <button
+                              type="button"
+                              className="find-ymca__branch-cta find-ymca__branch-cta--fallback"
+                              onClick={() => {
+                                if (local) navigate(`/find-ymca/${local.id}`);
+                              }}
+                              disabled={!local}
+                              aria-label={local ? `Open ${b.name} local page` : b.name}
+                            >
+                              <img src={logoSrc} alt="" className="find-ymca__branch-logo" />
+                              <span className="find-ymca__branch-name">{b.name}</span>
+                            </button>
                           </div>
 
                           {/* Social Media Icons */}
@@ -388,11 +374,6 @@ function Where_We_Are() {
                             </div>
                           )}
 
-                          {local && fb ? (
-                            <Link className="find-ymca__profile-pill" to={`/find-ymca/${local.id}`}>
-                              Local page
-                            </Link>
-                          ) : null}
                         </div>
                       </li>
                     );

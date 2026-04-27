@@ -214,6 +214,8 @@ const davaoHero = new URL(
 
 const davaoLogo = new URL('../assets/images/local_Y/Davao/Davao_Logo.jpg', import.meta.url).href;
 
+const philippinesLogo = new URL('../assets/images/logo.webp', import.meta.url).href;
+
 const DEFAULT_PILLARS: LocalPillar[] = [
   {
     key: 'community',
@@ -1474,6 +1476,16 @@ davao : {
       ],
     },
   ],
+},
+
+philippines: {
+  id: 'philippines',
+  name: 'YMCA of the Philippines',
+  established: '1911',
+  facebookUrl: 'https://www.facebook.com/ymcaphilippines1911',
+  instagramUrl: 'https://www.instagram.com/ymcaphilippines/',
+  logoImageUrl: philippinesLogo,
+  pillars: DEFAULT_PILLARS,
 },
 
 
