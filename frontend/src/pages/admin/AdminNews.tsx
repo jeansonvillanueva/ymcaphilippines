@@ -26,6 +26,16 @@ type NewsForm = Omit<News, 'contentBlocks'> & {
 const categories = ['News', 'Articles', 'Features'];
 const topics = ['Education', 'Training', 'Youth Leadership', 'Environment', 'Youth Summit', 'Leadership', 'National Youth Assembly', 'Careers'];
 
+// Parse date string for chronological sorting (latest first)
+const parseNewsDate = (date?: string) => {
+  if (!date) return Number.MIN_SAFE_INTEGER;
+  const parsed = Date.parse(date);
+  if (!Number.isNaN(parsed)) return parsed;
+  const year = date.match(/\b(19|20)\d{2}\b/)?.[0];
+  if (year) return new Date(`${year}-01-01`).getTime();
+  return Number.MIN_SAFE_INTEGER;
+};
+
 // Image compression utility
 const compressImage = (file: File, quality: number = 0.8, maxWidth: number = 1200, maxHeight: number = 1200): Promise<File> => {
   return new Promise((resolve, reject) => {
@@ -102,7 +112,9 @@ export default function AdminNews() {
       const timestamp = Date.now();
       const response = await axios.get(`${API_URL}&t=${timestamp}`);
       if (Array.isArray(response.data)) {
-        setNewsList(response.data);
+        // Sort news by date field chronologically (latest first), not by created_at
+        const sortedNews = response.data.sort((a, b) => parseNewsDate(b.date) - parseNewsDate(a.date));
+        setNewsList(sortedNews);
       } else {
         console.error('Unexpected API response format:', response.data);
         setMessage({ type: 'error', text: 'Unexpected data format from server' });

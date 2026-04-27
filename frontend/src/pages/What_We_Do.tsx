@@ -26,6 +26,16 @@ function extractYear(date?: string) {
   return match?.[0] ?? null;
 }
 
+// Parse date string for chronological sorting (latest first)
+function parseNewsDate(date?: string) {
+  if (!date) return Number.MIN_SAFE_INTEGER;
+  const parsed = Date.parse(date);
+  if (!Number.isNaN(parsed)) return parsed;
+  const year = date.match(/\b(19|20)\d{2}\b/)?.[0];
+  if (year) return new Date(`${year}-01-01`).getTime();
+  return Number.MIN_SAFE_INTEGER;
+}
+
 function ymdToday() {
   const d = new Date();
   const y = d.getFullYear();
@@ -40,7 +50,11 @@ const WhatWeDo: React.FC = () => {
   const today = ymdToday();
   const { news, loading, error } = useNews();
   const { events: calendarEvents } = useCalendarEvents();
-  const newsItems = news;
+  
+  // Sort news by date field chronologically (latest first), not by creation order
+  const newsItems = useMemo(() => {
+    return [...news].sort((a, b) => parseNewsDate(b.date) - parseNewsDate(a.date));
+  }, [news]);
 
   const initialEvent = calendarEvents.find((e) => e.date === today)
     ? {

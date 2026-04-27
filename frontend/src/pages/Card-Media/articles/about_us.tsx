@@ -49,7 +49,7 @@ const ABOUT_CARDS: AboutCard[] = [
     id: 'global',
     title: 'Global Initiatives',
     imageUrl: global,
-    details: 'The YMCA of the Philippines is only part of the YMCA story. In fact, the YMCA is a global network with YMCAs in 119 countries all over the world! While the YMCA looks a bit different from country to country, weΓÇÖre all united by our passion to improve the lives of the people, particularly young people, in our communities.',
+    details: 'The YMCA of the Philippines is only part of the YMCA story. In fact, the YMCA is a global network with YMCAs in 119 countries all over the world! While the YMCA looks a bit different from country to country, were all united by our passion to improve the lives of the people, particularly young people, in our communities.',
   },
 ];
 
