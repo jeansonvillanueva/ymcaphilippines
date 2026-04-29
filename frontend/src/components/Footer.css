@@ -126,27 +126,178 @@ body {
 
   @media (max-width: 900px) {
     .footer{
-      padding:28px 20px;
+      padding: clamp(1.5rem, 3vw, 2rem);
     }
 
     .footer-container{
       flex-direction:column;
       align-items:flex-start;
-      gap:24px;
+      gap: clamp(1.2rem, 3vw, 1.8rem);
     }
 
     .footer-left{
       flex-direction:column;
       align-items:flex-start;
-      gap:16px;
+      gap: clamp(1rem, 2vw, 1.5rem);
+    }
+
+    .footer-logo {
+      width: clamp(80px, 12vw, 120px);
+    }
+
+    .footer-center {
+      max-width: 100%;
+    }
+
+    .footer-item {
+      gap: clamp(10px, 2vw, 15px);
+      margin-top: clamp(10px, 1.5vw, 15px);
+    }
+
+    .footer-icon {
+      font-size: clamp(18px, 3vw, 26px);
     }
 
     .footer-right{
-      font-size:34px;
+      font-size: clamp(28px, 5vw, 34px);
+      gap: clamp(15px, 2vw, 25px);
     }
 
     .footer-bottom{
-      font-size:14px;
-      margin-top:28px;
+      font-size: 14px;
+      margin-top: clamp(1.5rem, 2.5vw, 2rem);
+    }
+  }
+
+  /* Tablet: 768px and below */
+  @media (max-width: 768px) {
+    .footer {
+      padding: clamp(1.2rem, 2.5vw, 1.5rem);
+    }
+
+    .footer-container {
+      gap: clamp(1rem, 2vw, 1.5rem);
+    }
+
+    .footer-left {
+      gap: clamp(0.8rem, 1.5vw, 1.2rem);
+      width: 100%;
+    }
+
+    .footer-logo {
+      width: clamp(70px, 15vw, 100px);
+    }
+
+    .footer-item {
+      gap: clamp(8px, 1.5vw, 12px);
+      margin-top: clamp(8px, 1vw, 12px);
+      font-size: 0.95rem;
+    }
+
+    .footer-icon {
+      font-size: clamp(16px, 2.5vw, 22px);
+      margin-top: 3px;
+    }
+
+    .footer-right {
+      font-size: clamp(24px, 4vw, 30px);
+      gap: clamp(12px, 1.5vw, 18px);
+    }
+
+    .footer-bottom {
+      font-size: 12px;
+      margin-top: clamp(1rem, 2vw, 1.5rem);
+    }
+  }
+
+  /* Small phones: 480px and below */
+  @media (max-width: 480px) {
+    .footer {
+      padding: 1rem 0.75rem;
+    }
+
+    .footer-container {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .footer-left {
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+    }
+
+    .footer-logo {
+      width: 70px;
+    }
+
+    .footer-center {
+      max-width: 100%;
+      font-size: 0.9rem;
+    }
+
+    .footer-item {
+      gap: 10px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+
+    .footer-icon {
+      font-size: 20px;
+      margin-top: 4px;
+    }
+
+    .footer-email-stack a {
+      font-size: 0.9rem;
+    }
+
+    .footer-right {
+      font-size: 24px;
+      gap: 16px;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .footer-bottom {
+      font-size: 11px;
+      margin-top: 1rem;
+    }
+  }
+
+  /* Extra small phones: 360px and below */
+  @media (max-width: 360px) {
+    .footer {
+      padding: 0.8rem 0.5rem;
+    }
+
+    .footer-container {
+      gap: 0.8rem;
+    }
+
+    .footer-logo {
+      width: 60px;
+    }
+
+    .footer-center {
+      font-size: 0.85rem;
+    }
+
+    .footer-item {
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 0.85rem;
+    }
+
+    .footer-icon {
+      font-size: 18px;
+    }
+
+    .footer-right {
+      font-size: 20px;
+      gap: 12px;
+    }
+
+    .footer-bottom {
+      font-size: 10px;
     }
   }

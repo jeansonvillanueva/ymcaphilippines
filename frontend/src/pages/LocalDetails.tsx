@@ -4,6 +4,7 @@ import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useLocalById } from '../hooks/useApi';
 import { getDefaultPillars, getLocalById, resolveLocalHeroImage, type LocalPillarKey, type LocalConfig } from '../data/locals';
 import SubjectHeader from '../components/SubjectHeader';
+import FacilitiesSlideshow from '../components/FacilitiesSlideshow';
 import pillarCommunityWellbeing from '../assets/images/pillars/community_wellbeing.png';
 import pillarMeaningWork from '../assets/images/pillars/meaning_work.png';
 import pillarSustainablePlanet from '../assets/images/pillars/sustainable_planet.png';
@@ -194,6 +195,9 @@ export default function LocalDetails() {
                 Stats will be added here soon.
               </div>
             )}
+
+            {/* Facilities Slideshow */}
+            <FacilitiesSlideshow localId={localId || ''} />
 
             <div className="local-details-pillars">
               {pillars.map((p) => (

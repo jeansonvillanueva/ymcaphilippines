@@ -700,8 +700,14 @@
 }
 
 @media (max-width: 768px) {
+  .who-is-y-page .page-section {
+    min-height: auto;
+    padding: var(--section-padding-y) var(--section-padding-x);
+  }
+
   .about-hero {
     grid-template-columns: 1fr;
+    gap: var(--gap-lg);
   }
 
   .about-hero__image-wrap {
@@ -709,7 +715,7 @@
   }
 
   .about-banner {
-    min-height: 420px;
+    min-height: 320px;
     border-radius: 10px;
   }
 
@@ -724,15 +730,22 @@
 
   .about-banner__inner {
     max-width: none;
+    padding: clamp(1rem, 2vw, 1.5rem);
+  }
+
+  .about-banner__title {
+    font-size: var(--text-2xl);
   }
 
   .vmv-wrap {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 
   .vmv-block {
     clip-path: none;
     border-radius: 8px;
+    padding: 1.5rem;
   }
 
   .vmv-block--values {
@@ -742,24 +755,23 @@
 
   .pillars-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .pillar-card {
+    padding: 0.8rem 0.8rem 0.9rem;
+  }
+
+  .pillar-card__label {
+    font-size: 1rem;
   }
 
   .org-profile {
     grid-template-columns: 1fr;
   }
 
-  .history-hero__panel {
-    min-height: 520px;
-  }
-
-  .history-hero__president {
-    width: min(220px, 44%);
-    opacity: 0.95;
-  }
-
-  .history-hero__videoFrame {
-    width: min(640px, 92%);
-    top: 58%;
+  .section-header__title {
+    font-size: var(--text-2xl);
   }
 }
 
@@ -1465,8 +1477,8 @@
 
 @media (max-width: 900px) {
   .home-hero {
-    height: 60vh;
-    min-height: 360px;
+    height: 50vh;
+    min-height: 300px;
   }
 
   .news-grid {
@@ -1481,5 +1493,130 @@
   .vision-2030__layout,
   .impact__layout {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Small phones: 480px and below */
+@media (max-width: 480px) {
+  .who-is-y-page .page-section {
+    padding: clamp(1.5rem, 4vw, 2rem) clamp(0.75rem, 3vw, 1rem);
+  }
+
+  .about-banner {
+    min-height: 240px;
+  }
+
+  .about-banner__title {
+    font-size: var(--text-xl);
+    margin-bottom: 0.5rem;
+  }
+
+  .about-banner__body {
+    font-size: 0.95rem;
+  }
+
+  .pillars-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .pillar-card {
+    padding: 0.75rem;
+    gap: 0.6rem;
+  }
+
+  .pillar-card__icon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .pillar-card__label {
+    font-size: 0.95rem;
+  }
+
+  .pillars-detail {
+    min-height: 180px;
+  }
+
+  .pillars-detail__front,
+  .pillars-detail__back {
+    padding: 1rem 1rem;
+  }
+
+  .pillars-detail__frontTitle {
+    font-size: var(--text-lg);
+  }
+
+  .pillars-detail__title {
+    font-size: var(--text-base);
+  }
+
+  .vmv-block {
+    padding: 1rem;
+  }
+
+  .vmv-block__title {
+    font-size: var(--text-lg);
+  }
+
+  .vmv-block__text {
+    font-size: 0.95rem;
+  }
+
+  .vmv-caption {
+    font-size: 0.9rem;
+  }
+
+  .history-hero__panel {
+    min-height: clamp(300px, 45vh, 420px);
+  }
+
+  .history-hero__videoFrame {
+    width: min(100%, 95%);
+    padding: 10px;
+  }
+
+  .org-chart-card__name {
+    font-size: var(--text-base);
+  }
+
+  .org-chart-card__position {
+    font-size: 0.85rem;
+  }
+
+  .section-header__title {
+    font-size: var(--text-xl);
+  }
+}
+
+/* Extra small phones: 360px and below */
+@media (max-width: 360px) {
+  .who-is-y-page .page-section {
+    padding: 1rem 0.6rem;
+  }
+
+  .about-banner {
+    min-height: 200px;
+  }
+
+  .about-banner__title {
+    font-size: var(--text-lg);
+  }
+
+  .pillars-grid {
+    gap: 0.5rem;
+  }
+
+  .pillar-card {
+    padding: 0.6rem;
+  }
+
+  .pillar-card__icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .section-header__title {
+    font-size: var(--text-lg);
   }
 }

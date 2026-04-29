@@ -136,6 +136,13 @@ switch ($path) {
         }
         break;
 
+    // Public calendar endpoint
+    case '/api/calendar':
+        if ($requestMethod === 'GET') {
+            require_once 'endpoints/calendar.php';
+        }
+        break;
+
     // Form submission routes
     case '/api/submit-update':
         if ($requestMethod === 'POST') {
@@ -333,6 +340,39 @@ switch ($path) {
             require_once 'endpoints/admin_staff_update.php';
         } elseif ($requestMethod === 'DELETE') {
             require_once 'endpoints/admin_staff_delete.php';
+        }
+        break;
+
+    // Admin facilities routes
+    case (preg_match('/^\/admin\/facilities\/([^\/]+)$/', $path, $matches) ? true : false):
+        $_GET['localId'] = $matches[1];
+        if ($requestMethod === 'GET') {
+            require_once 'endpoints/admin_facilities.php';
+        } elseif ($requestMethod === 'POST') {
+            require_once 'endpoints/admin_facilities_create.php';
+        }
+        break;
+
+    case (preg_match('/^\/admin\/facilities\/([^\/]+)\/upload$/', $path, $matches) ? true : false):
+        $_GET['localId'] = $matches[1];
+        if ($requestMethod === 'POST') {
+            require_once 'endpoints/admin_facilities_upload.php';
+        }
+        break;
+
+    case (preg_match('/^\/admin\/facilities\/([^\/]+)\/images\/(\d+)$/', $path, $matches) ? true : false):
+        $_GET['localId'] = $matches[1];
+        $_GET['imageId'] = $matches[2];
+        if ($requestMethod === 'DELETE') {
+            require_once 'endpoints/admin_facilities_delete_image.php';
+        }
+        break;
+
+    // Public facilities endpoint
+    case (preg_match('/^\/api\/facilities\/([^\/]+)$/', $path, $matches) ? true : false):
+        $_GET['localId'] = $matches[1];
+        if ($requestMethod === 'GET') {
+            require_once 'endpoints/facilities.php';
         }
         break;
 

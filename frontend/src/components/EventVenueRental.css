@@ -149,6 +149,156 @@
   border-color: var(--ymca-white);
 }
 
+/* Tablet: 900px and below */
+@media (max-width: 900px) {
+  .event-venue-rental {
+    padding: var(--section-padding-y) var(--section-padding-x);
+  }
+
+  .event-venue-rental__layout {
+    grid-template-columns: 1fr;
+    gap: var(--gap-lg);
+  }
+
+  .event-venue-rental__title {
+    font-size: var(--text-2xl);
+  }
+
+  .event-venue-rental__subtitle {
+    font-size: var(--text-lg);
+  }
+
+  .event-venue-rental__image-wrap {
+    height: clamp(280px, 40vw, 320px);
+  }
+}
+
+/* Tablet: 768px and below */
+@media (max-width: 768px) {
+  .event-venue-rental {
+    padding: clamp(2rem, 4vw, 2.5rem) var(--section-padding-x);
+  }
+
+  .event-venue-rental__title {
+    font-size: var(--text-xl);
+  }
+
+  .event-venue-rental__subtitle {
+    font-size: var(--text-base);
+  }
+
+  .event-venue-rental__description {
+    font-size: 0.95rem;
+  }
+
+  .event-venue-rental__contact-label {
+    font-size: 0.95rem;
+  }
+
+  .event-venue-rental__contact-item {
+    font-size: 1rem;
+  }
+
+  .event-venue-rental__image-wrap {
+    height: clamp(240px, 35vw, 300px);
+  }
+}
+
+/* Small phones: 480px and below */
+@media (max-width: 480px) {
+  .event-venue-rental {
+    padding: clamp(1.5rem, 3vw, 2rem) clamp(0.75rem, 2vw, 1rem);
+  }
+
+  .event-venue-rental__inner {
+    padding: 0;
+  }
+
+  .event-venue-rental__layout {
+    gap: var(--gap-md);
+  }
+
+  .event-venue-rental__content {
+    gap: var(--gap-sm, 0.75rem);
+  }
+
+  .event-venue-rental__title {
+    font-size: var(--text-lg);
+    margin-bottom: 0.5rem;
+  }
+
+  .event-venue-rental__subtitle {
+    font-size: 1rem;
+  }
+
+  .event-venue-rental__description {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 0.5rem 0;
+  }
+
+  .event-venue-rental__contact {
+    margin-top: var(--gap-md);
+    gap: 0.5rem;
+  }
+
+  .event-venue-rental__contact-label {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .event-venue-rental__contact-item {
+    font-size: 0.95rem;
+  }
+
+  .event-venue-rental__image-wrap {
+    height: clamp(200px, 40vw, 280px);
+    padding: 0.6rem;
+    border-radius: 10px;
+  }
+
+  .event-venue-rental__dots {
+    bottom: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .event-venue-rental__dot {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+/* Extra small phones: 360px and below */
+@media (max-width: 360px) {
+  .event-venue-rental {
+    padding: 1rem 0.6rem;
+  }
+
+  .event-venue-rental__title {
+    font-size: var(--text-base);
+  }
+
+  .event-venue-rental__subtitle {
+    font-size: 0.95rem;
+  }
+
+  .event-venue-rental__description {
+    font-size: 0.85rem;
+  }
+
+  .event-venue-rental__contact-label {
+    font-size: 0.8rem;
+  }
+
+  .event-venue-rental__contact-item {
+    font-size: 0.9rem;
+  }
+
+  .event-venue-rental__image-wrap {
+    height: clamp(180px, 45vw, 240px);
+  }
+}
+
 .event-venue-rental__nav-button {
   position: absolute;
   top: 50%;

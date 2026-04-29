@@ -1,0 +1,426 @@
+.facilities-slideshow {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  margin: 2rem 0;
+}
+
+.facilities-slideshow-container {
+  max-width: 100%;
+}
+
+.facilities-slideshow-image-wrapper {
+  position: relative;
+  width: 100%;
+  background: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  overflow: hidden;
+}
+
+.facilities-slideshow-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Navigation buttons */
+.facilities-slideshow-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.facilities-slideshow-nav:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.facilities-slideshow-nav-prev {
+  left: 15px;
+}
+
+.facilities-slideshow-nav-next {
+  right: 15px;
+}
+
+/* Image indicators */
+.facilities-slideshow-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #f9f9f9;
+  flex-wrap: wrap;
+}
+
+.facilities-slideshow-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ddd;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  padding: 0;
+}
+
+.facilities-slideshow-indicator:hover {
+  background: #0066cc;
+  transform: scale(1.2);
+}
+
+.facilities-slideshow-indicator.active {
+  background: #0066cc;
+  width: 16px;
+  height: 16px;
+}
+
+/* Facilities list */
+.facilities-list {
+  padding: 2rem;
+  background: white;
+}
+
+.facilities-list h3 {
+  color: #333;
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #0066cc;
+  padding-bottom: 0.5rem;
+}
+
+.facilities-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.facilities-list li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #eee;
+  align-items: baseline;
+}
+
+.facilities-list li:last-child {
+  border-bottom: none;
+}
+
+.facilities-label {
+  font-weight: 600;
+  color: #333;
+  min-width: 180px;
+}
+
+.facilities-value {
+  color: #555;
+  flex: 1;
+  min-width: 150px;
+}
+
+/* Only list view */
+.facilities-slideshow-list-only .facilities-list {
+  background: #f9f9f9;
+  border-top: 3px solid #0066cc;
+}
+
+.facilities-slideshow-list-only .facilities-list h3 {
+  border-bottom: 2px solid #0066cc;
+}
+
+/* Loading state */
+.facilities-slideshow-loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+/* Slideshow image section */
+.facilities-slideshow-image-section {
+  width: 100%;
+}
+
+/* Facilities by Pillar */
+.facilities-by-pillar {
+  padding: 2rem;
+  background: white;
+}
+
+.facilities-by-pillar h3 {
+  color: #333;
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #0066cc;
+  padding-bottom: 0.5rem;
+}
+
+.facilities-pillar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.facilities-pillar-section {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: white;
+  border: 1px solid #eee;
+}
+
+.facilities-pillar-header {
+  padding: 1rem;
+  color: white;
+  font-weight: 600;
+}
+
+.facilities-pillar-header h4 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.facilities-pillar-list {
+  padding: 1rem;
+}
+
+.facilities-bullet-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.facilities-item-bullet {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 0;
+  padding-left: 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+  position: relative;
+}
+
+.facilities-item-bullet:before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  font-size: 1.2rem;
+  color: #0066cc;
+  font-weight: bold;
+}
+
+.facilities-item-bullet:last-child {
+  border-bottom: none;
+}
+
+.facilities-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.facilities-item:last-child {
+  border-bottom: none;
+}
+
+.facilities-checkbox {
+  margin-top: 0.25rem;
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  accent-color: #0066cc;
+  flex-shrink: 0;
+}
+
+.facilities-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.facilities-item-label {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.facilities-item-details {
+  color: #666;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+/* All facilities list fallback */
+.facilities-list-all {
+  padding: 2rem;
+  background: white;
+}
+
+.facilities-list-all h3 {
+  color: #333;
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #0066cc;
+  padding-bottom: 0.5rem;
+}
+
+.facilities-list {
+  padding: 2rem;
+  background: white;
+}
+
+.facilities-list h3 {
+  color: #333;
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #0066cc;
+  padding-bottom: 0.5rem;
+}
+
+.facilities-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.facilities-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.facilities-list-item:last-child {
+  border-bottom: none;
+}
+
+.facilities-label {
+  font-weight: 600;
+  color: #333;
+  min-width: 180px;
+}
+
+.facilities-value {
+  color: #555;
+  flex: 1;
+  min-width: 150px;
+}
+
+/* Only list view */
+.facilities-slideshow-list-only .facilities-list {
+  background: #f9f9f9;
+  border-top: 3px solid #0066cc;
+}
+
+.facilities-slideshow-list-only .facilities-list h3 {
+  border-bottom: 2px solid #0066cc;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .facilities-slideshow-image-wrapper {
+    min-height: 250px;
+    max-height: 400px;
+  }
+
+  .facilities-slideshow-nav {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .facilities-slideshow-nav-prev {
+    left: 10px;
+  }
+
+  .facilities-slideshow-nav-next {
+    right: 10px;
+  }
+
+  .facilities-list {
+    padding: 1.5rem;
+  }
+
+  .facilities-list h3 {
+    font-size: 1.1rem;
+  }
+
+  .facilities-label {
+    min-width: 120px;
+  }
+
+  .facilities-value {
+    min-width: 100px;
+  }
+
+  .facilities-pillar-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .facilities-by-pillar {
+    padding: 1.5rem;
+  }
+
+  .facilities-by-pillar h3 {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .facilities-slideshow-image-wrapper {
+    min-height: 200px;
+  }
+
+  .facilities-slideshow-nav {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+  }
+
+  .facilities-slideshow-indicators {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .facilities-list {
+    padding: 1rem;
+  }
+
+  .facilities-list li {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .facilities-label {
+    min-width: auto;
+    font-size: 0.9rem;
+  }
+
+  .facilities-value {
+    min-width: auto;
+    font-size: 0.9rem;
+  }
+}

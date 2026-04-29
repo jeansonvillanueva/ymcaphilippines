@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { ADMIN_API_URL } from '../../hooks/useApi';
 import { LOCALS_BY_ID, getLocalById, mergeLocalRecords } from '../../data/locals';
+import AdminFacilities from './AdminFacilities';
 
 interface LocalProgram {
   id?: number | string;
@@ -695,6 +696,11 @@ export default function AdminLocals() {
                 Save Pillar Programs
               </button>
             </div>
+          </div>
+
+          {/* Facilities Management Section */}
+          <div style={{ gridColumn: '1 / -1', marginTop: '2rem' }}>
+            <AdminFacilities localId={selectedLocal} />
           </div>
         </form>
       )}

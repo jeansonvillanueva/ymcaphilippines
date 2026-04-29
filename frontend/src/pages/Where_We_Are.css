@@ -323,16 +323,179 @@
 }
 
 @media (max-width: 900px) {
+  .find-ymca-page .page-section {
+    min-height: auto;
+  }
+
+  .find-ymca-page #about {
+    min-height: auto;
+    padding-top: clamp(1.5rem, 3vw, 2rem);
+  }
+
   .find-ymca__layout {
     grid-template-columns: 1fr;
+    gap: var(--gap-lg);
   }
 
   .find-ymca__stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
   }
 
   .find-ymca__stat--total {
     grid-column: 1 / -1;
+  }
+
+  .find-ymca__stat {
+    padding: 0.75rem 0.6rem;
+  }
+
+  .find-ymca__stat-label {
+    font-size: 0.7rem;
+  }
+
+  .find-ymca__stat-value {
+    font-size: 1.1rem;
+  }
+
+  .where-banner {
+    min-height: clamp(280px, 35vh, 380px);
+  }
+}
+
+/* Tablet: 768px and below */
+@media (max-width: 768px) {
+  .find-ymca-page #about {
+    padding-top: clamp(1.2rem, 2.5vw, 1.8rem);
+  }
+
+  .find-ymca__layout {
+    gap: var(--gap-md);
+  }
+
+  .find-ymca__map-wrap {
+    padding: 0.8rem;
+  }
+
+  .find-ymca__active-label {
+    font-size: 0.95rem;
+  }
+
+  .find-ymca__region-title {
+    font-size: var(--text-base);
+  }
+
+  .find-ymca__branch-btn {
+    font-size: 0.9rem;
+  }
+}
+
+/* Small phones: 480px and below */
+@media (max-width: 480px) {
+  .find-ymca-page .page-section {
+    padding: clamp(1.5rem, 4vw, 2rem) clamp(0.75rem, 3vw, 1rem);
+  }
+
+  .find-ymca-page #about {
+    padding-top: clamp(0.8rem, 2vw, 1.2rem);
+  }
+
+  .find-ymca__layout {
+    gap: var(--gap-md);
+  }
+
+  .find-ymca__map-wrap {
+    padding: 0.6rem;
+    min-height: auto;
+  }
+
+  .find-ymca__active-label {
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+  }
+
+  .find-ymca__stats {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .find-ymca__stat {
+    padding: 0.6rem 0.5rem;
+    border-radius: 8px;
+  }
+
+  .find-ymca__stat-label {
+    font-size: 0.65rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .find-ymca__stat-value {
+    font-size: 1rem;
+  }
+
+  .where-banner {
+    min-height: clamp(240px, 40vh, 340px);
+    border-radius: 10px;
+  }
+
+  .find-ymca__regions {
+    padding: 0;
+  }
+
+  .find-ymca__region {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 0.6rem 0;
+  }
+
+  .find-ymca__region-title {
+    font-size: 0.95rem;
+    gap: 0.3rem;
+  }
+
+  .find-ymca__branches {
+    padding: 0.3rem 0 0 0.5rem;
+    margin: 0;
+  }
+
+  .find-ymca__branch {
+    margin: 0.15rem 0;
+  }
+
+  .find-ymca__branch-btn {
+    padding: 0.3rem 0.2rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Extra small phones: 360px and below */
+@media (max-width: 360px) {
+  .find-ymca-page .page-section {
+    padding: 1rem 0.6rem;
+  }
+
+  .where-banner {
+    min-height: clamp(200px, 45vh, 300px);
+  }
+
+  .find-ymca__map-wrap {
+    padding: 0.5rem;
+  }
+
+  .find-ymca__stats {
+    gap: 0.4rem;
+  }
+
+  .find-ymca__stat {
+    padding: 0.5rem 0.4rem;
+  }
+
+  .find-ymca__region-title {
+    font-size: 0.9rem;
+  }
+
+  .find-ymca__branch-btn {
+    padding: 0.25rem 0.15rem;
+    font-size: 0.8rem;
   }
 }
 

@@ -248,6 +248,201 @@
   max-height: 84px;
 }
 
+/* Tablet: 900px and below */
+@media (max-width: 900px) {
+  .navbar-bar {
+    min-height: 80px;
+  }
+
+  .navbar-logo {
+    height: 80px;
+    width: 80px;
+  }
+
+  .navbar-title {
+    font-size: 32px;
+  }
+
+  .nav-link {
+    font-size: 18px;
+    gap: 12px;
+  }
+
+  .blue-section {
+    gap: 24px;
+    width: 70%;
+  }
+
+  .right-section {
+    width: 30%;
+  }
+
+  .btn-get-involved,
+  .btn-involved,
+  .btn-donate {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+}
+
+/* Tablet: 768px and below */
+@media (max-width: 768px) {
+  .navbar-bar {
+    min-height: 70px;
+  }
+
+  .navbar-logo {
+    height: 65px;
+    width: 65px;
+  }
+
+  .navbar-title {
+    font-size: 24px;
+  }
+
+  .nav-link {
+    font-size: 14px;
+  }
+
+  .navbar-menu {
+    gap: 10px;
+  }
+
+  .blue-section {
+    gap: 16px;
+    padding: 10px 12px 8px;
+  }
+
+  .right-section {
+    gap: 8px;
+  }
+
+  .btn-menu {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .btn-search {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .btn-get-involved,
+  .btn-involved,
+  .btn-donate {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+}
+
+/* Small phones: 480px and below */
+@media (max-width: 480px) {
+  .navbar-bar {
+    min-height: 60px;
+  }
+
+  .navbar-logo {
+    height: 55px;
+    width: 55px;
+  }
+
+  .navbar-title {
+    font-size: clamp(16px, 4vw, 22px);
+    max-width: 180px;
+  }
+
+  .blue-section {
+    width: 65%;
+    gap: 8px;
+    padding: 8px 10px 6px;
+  }
+
+  .right-section {
+    width: 35%;
+    border-radius: 0 0 20px 20px;
+  }
+
+  .navbar-menu {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+
+  .nav-link {
+    font-size: 11px;
+    padding: 4px 2px;
+    white-space: nowrap;
+  }
+
+  .nav-dropdown-menu li a {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .btn-menu {
+    display: flex;
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .btn-search {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .btn-get-involved,
+  .btn-involved,
+  .btn-donate {
+    padding: 5px 8px;
+    font-size: 9px;
+    border-radius: 3px;
+  }
+}
+
+/* Extra small phones: 360px and below */
+@media (max-width: 360px) {
+  .navbar-bar {
+    min-height: 56px;
+  }
+
+  .navbar-logo {
+    height: 50px;
+    width: 50px;
+  }
+
+  .navbar-title {
+    font-size: 16px;
+    max-width: 140px;
+  }
+
+  .nav-link {
+    font-size: 10px;
+    padding: 3px 1px;
+  }
+
+  .btn-menu {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .btn-search {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .btn-get-involved,
+  .btn-involved,
+  .btn-donate {
+    padding: 4px 6px;
+    font-size: 8px;
+  }
+}
+
 .navbar-search--open.navbar-search--tall {
   max-height: min(70vh, 520px);
   overflow-y: auto;

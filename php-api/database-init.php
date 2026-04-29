@@ -97,6 +97,48 @@ if ($action === 'create') {
           `sequence_order` int DEFAULT 0,
           INDEX idx_program_id (program_id),
           CONSTRAINT fk_program_id_bullets FOREIGN KEY (program_id) REFERENCES `local_programs`(program_id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+
+        "CREATE TABLE IF NOT EXISTS `facilities` (
+          `id` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+          `local_id` varchar(100) NOT NULL,
+          `buildings` varchar(255) DEFAULT NULL,
+          `buildings_enabled` BOOLEAN DEFAULT FALSE,
+          `room_accommodations` varchar(255) DEFAULT NULL,
+          `room_accommodations_enabled` BOOLEAN DEFAULT FALSE,
+          `basketball_court` varchar(255) DEFAULT NULL,
+          `basketball_court_enabled` BOOLEAN DEFAULT FALSE,
+          `swimming_pool` varchar(255) DEFAULT NULL,
+          `swimming_pool_enabled` BOOLEAN DEFAULT FALSE,
+          `fitness_gym` varchar(255) DEFAULT NULL,
+          `fitness_gym_enabled` BOOLEAN DEFAULT FALSE,
+          `function_hall` varchar(255) DEFAULT NULL,
+          `function_hall_enabled` BOOLEAN DEFAULT FALSE,
+          `badminton_court` varchar(255) DEFAULT NULL,
+          `badminton_court_enabled` BOOLEAN DEFAULT FALSE,
+          `tennis_court` varchar(255) DEFAULT NULL,
+          `tennis_court_enabled` BOOLEAN DEFAULT FALSE,
+          `martial_arts` varchar(255) DEFAULT NULL,
+          `martial_arts_enabled` BOOLEAN DEFAULT FALSE,
+          `spaces` varchar(255) DEFAULT NULL,
+          `spaces_enabled` BOOLEAN DEFAULT FALSE,
+          `other_facilities` varchar(255) DEFAULT NULL,
+          `other_facilities_enabled` BOOLEAN DEFAULT FALSE,
+          `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+          `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          UNIQUE KEY unique_local_facilities (local_id),
+          INDEX idx_local_id (local_id),
+          CONSTRAINT fk_facilities_local FOREIGN KEY (local_id) REFERENCES `local`(local_id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+
+        "CREATE TABLE IF NOT EXISTS `facilities_images` (
+          `id` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+          `local_id` varchar(100) NOT NULL,
+          `image_url` varchar(500) NOT NULL,
+          `image_order` int DEFAULT 0,
+          `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+          INDEX idx_local_id (local_id),
+          CONSTRAINT fk_facilities_images_local FOREIGN KEY (local_id) REFERENCES `local`(local_id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
     ];
 
@@ -128,6 +170,8 @@ if ($action === 'create') {
         'local_pillars' => in_array('local_pillars', $tables),
         'local_programs' => in_array('local_programs', $tables),
         'local_programs_bullets' => in_array('local_programs_bullets', $tables),
+        'facilities' => in_array('facilities', $tables),
+        'facilities_images' => in_array('facilities_images', $tables),
     ];
 
     $allCreated = array_reduce($response['all_tables_created'], function($carry, $item) {

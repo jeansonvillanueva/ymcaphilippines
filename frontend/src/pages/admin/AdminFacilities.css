@@ -1,0 +1,48 @@
+/* AdminFacilities - Uses standard admin form styling from AdminDashboard.css */
+
+.admin-facilities {
+  /* Inherits standard admin container styling */
+}
+
+.admin-facilities h2 {
+  color: #1f2937;
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #3b5bf2;
+  padding-bottom: 0.75rem;
+}
+
+.admin-facilities h3 {
+  color: #374151;
+  font-size: 1.3rem;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.admin-facilities-message {
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.admin-facilities-message.success {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.admin-facilities-message.error {
+  background: #fee2e2;
+  color: #7f1d1d;
+  border: 1px solid #fecaca;
+}
+
+/* Image grid styling */
+.admin-facilities-images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+

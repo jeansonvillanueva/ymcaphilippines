@@ -96,4 +96,125 @@
   .contact-layout {
     grid-template-columns: 1fr;
   }
+
+  .contact-title {
+    font-size: var(--text-2xl);
+  }
+}
+
+/* Tablet: 768px and below */
+@media (max-width: 768px) {
+  .contact-page {
+    padding: var(--section-padding-y) var(--section-padding-x);
+  }
+
+  .contact-title {
+    font-size: var(--text-xl);
+    margin-bottom: 1.5rem;
+  }
+
+  .contact-map {
+    border-width: 3px;
+    min-height: 400px;
+  }
+
+  .contact-form__lead {
+    font-size: var(--text-base);
+  }
+
+  .contact-input,
+  .contact-textarea {
+    padding: 0.65rem 0.9rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+  }
+
+  .contact-textarea {
+    height: 120px;
+  }
+}
+
+/* Small phones: 480px and below */
+@media (max-width: 480px) {
+  .contact-page {
+    padding: clamp(1.5rem, 4vw, 2rem) clamp(0.75rem, 3vw, 1rem);
+  }
+
+  .contact-title {
+    font-size: var(--text-lg);
+    margin-bottom: 1.2rem;
+  }
+
+  .contact-layout {
+    gap: var(--gap-md);
+  }
+
+  .contact-map {
+    border-width: 2px;
+    min-height: 300px;
+    border-radius: 8px;
+  }
+
+  .contact-form {
+    text-align: left;
+  }
+
+  .contact-form__lead {
+    font-size: 0.95rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .contact-input,
+  .contact-textarea {
+    padding: 0.6rem 0.8rem;
+    margin-bottom: 0.65rem;
+    font-size: 0.9rem;
+    border-radius: 8px;
+  }
+
+  .contact-textarea {
+    height: 100px;
+    border-radius: 12px;
+    padding-top: 0.7rem;
+  }
+
+  .contact-submit {
+    padding: 0.5rem 1.5rem;
+    font-size: 0.95rem;
+    border-radius: 20px;
+  }
+
+  .contact-actions {
+    margin-top: 0.3rem;
+  }
+}
+
+/* Extra small phones: 360px and below */
+@media (max-width: 360px) {
+  .contact-page {
+    padding: 1rem 0.6rem;
+  }
+
+  .contact-title {
+    font-size: var(--text-base);
+  }
+
+  .contact-map {
+    min-height: 250px;
+  }
+
+  .contact-form__lead {
+    font-size: 0.9rem;
+  }
+
+  .contact-input,
+  .contact-textarea {
+    padding: 0.55rem 0.7rem;
+    font-size: 0.85rem;
+  }
+
+  .contact-submit {
+    padding: 0.45rem 1.2rem;
+    font-size: 0.9rem;
+  }
 }

@@ -83,7 +83,7 @@ export function useNewsItem(path: NewsArticleMeta['path']) {
   return { item, loading, error };
 }
 
-// Hook for fetching calendar events
+// Hook for fetching calendar events (public endpoint - no auth required)
 export function useCalendarEvents() {
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -92,12 +92,15 @@ export function useCalendarEvents() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get(`${ADMIN_API_URL}/calendar`);
-        setEvents(response.data);
+        // Use PUBLIC_API_URL to allow users to see calendar without admin login
+        const response = await axios.get(`${PUBLIC_API_URL}/calendar`);
+        setEvents(response.data || []);
         setError(null);
       } catch (err) {
         console.error('Error fetching calendar events:', err);
-        setError('Failed to load calendar events');
+        // Don't show error - just display empty calendar if unavailable
+        setEvents([]);
+        setError(null);
       } finally {
         setLoading(false);
       }
