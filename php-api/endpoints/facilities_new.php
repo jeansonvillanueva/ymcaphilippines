@@ -39,4 +39,3 @@ sendResponse([
     'images' => $images
 ]);
 ?>
-

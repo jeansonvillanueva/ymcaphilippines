@@ -4,9 +4,8 @@ import { PUBLIC_API_URL } from '../hooks/useApi';
 import './FacilitiesSlideshow.css';
 
 interface Facility {
-  key: string;
-  label: string;
-  value: string;
+  name: string;
+  details?: string;
   isEnabled: boolean;
 }
 
@@ -154,11 +153,11 @@ export default function FacilitiesSlideshow({ localId }: FacilitiesSlideshowProp
             <ul className="facilities-bullet-list">
               {allFacilities
                 .filter((f) => f.isEnabled)
-                .map((facility) => (
-                  <li key={facility.key} className="facilities-item-bullet">
-                    <span className="facilities-item-label">{facility.label}</span>
-                    {facility.value && (
-                      <span className="facilities-item-details">{facility.value}</span>
+                .map((facility, index) => (
+                  <li key={index} className="facilities-item-bullet">
+                    <span className="facilities-item-label">{facility.name}</span>
+                    {facility.details && (
+                      <span className="facilities-item-details">{facility.details}</span>
                     )}
                   </li>
                 ))}

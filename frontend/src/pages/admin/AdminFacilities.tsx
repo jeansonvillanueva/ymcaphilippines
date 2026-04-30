@@ -3,30 +3,10 @@ import axios from 'axios';
 import { ADMIN_API_URL } from '../../hooks/useApi';
 import './AdminFacilities.css';
 
-interface Facility {
-  [key: string]: string | number | null | undefined | boolean;
-  buildings?: string;
-  buildings_enabled?: boolean;
-  room_accommodations?: string;
-  room_accommodations_enabled?: boolean;
-  basketball_court?: string;
-  basketball_court_enabled?: boolean;
-  swimming_pool?: string;
-  swimming_pool_enabled?: boolean;
-  fitness_gym?: string;
-  fitness_gym_enabled?: boolean;
-  function_hall?: string;
-  function_hall_enabled?: boolean;
-  badminton_court?: string;
-  badminton_court_enabled?: boolean;
-  tennis_court?: string;
-  tennis_court_enabled?: boolean;
-  martial_arts?: string;
-  martial_arts_enabled?: boolean;
-  spaces?: string;
-  spaces_enabled?: boolean;
-  other_facilities?: string;
-  other_facilities_enabled?: boolean;
+interface FacilityItem {
+  id?: number | string;
+  name?: string;
+  details?: string;
 }
 
 interface FacilityImage {
@@ -40,32 +20,12 @@ interface AdminFacilitiesProps {
   localId: string;
 }
 
-interface FacilityField {
-  key: string;
-  label: string;
-  enabledKey: string;
-}
-
 export default function AdminFacilities({ localId }: AdminFacilitiesProps) {
-  const [facilities, setFacilities] = useState<Facility>({});
+  const [facilities, setFacilities] = useState<FacilityItem[]>([]);
   const [images, setImages] = useState<FacilityImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-
-  const facilityFields: FacilityField[] = [
-    { key: 'buildings', label: 'Buildings', enabledKey: 'buildings_enabled' },
-    { key: 'room_accommodations', label: 'Room Accommodations', enabledKey: 'room_accommodations_enabled' },
-    { key: 'basketball_court', label: 'Basketball Court', enabledKey: 'basketball_court_enabled' },
-    { key: 'swimming_pool', label: 'Swimming Pool', enabledKey: 'swimming_pool_enabled' },
-    { key: 'fitness_gym', label: 'Fitness Gym', enabledKey: 'fitness_gym_enabled' },
-    { key: 'function_hall', label: 'Function Hall', enabledKey: 'function_hall_enabled' },
-    { key: 'badminton_court', label: 'Badminton Court', enabledKey: 'badminton_court_enabled' },
-    { key: 'tennis_court', label: 'Tennis Court', enabledKey: 'tennis_court_enabled' },
-    { key: 'martial_arts', label: 'Martial Arts', enabledKey: 'martial_arts_enabled' },
-    { key: 'spaces', label: 'Spaces', enabledKey: 'spaces_enabled' },
-    { key: 'other_facilities', label: 'Other Facilities', enabledKey: 'other_facilities_enabled' },
-  ];
 
   useEffect(() => {
     fetchFacilities();
@@ -76,18 +36,19 @@ export default function AdminFacilities({ localId }: AdminFacilitiesProps) {
       setLoading(true);
       const response = await axios.get(`${ADMIN_API_URL}/facilities/${localId}`);
       
-      // Initialize facilities with all fields properly set
+      // Convert old format to new array format if needed
       const facilitiesData = response.data.facilities || {};
-      const processedFacilities: Facility = {};
-      
-      // Process each facility field to convert database values (0/1) to boolean
-      facilityFields.forEach((field) => {
-        processedFacilities[field.key] = facilitiesData[field.key] || '';
-        // Convert database 0/1 values to boolean
-        processedFacilities[field.enabledKey] = facilitiesData[field.enabledKey] ? true : false;
-      });
-      
-      setFacilities(processedFacilities);
+
+
+      // Check if facilitiesData is already an array (new format)
+      if (Array.isArray(facilitiesData)) {
+        setFacilities(facilitiesData);
+      } else {
+        // Convert old object format with facility types to new array format
+        // For now, we'll just initialize as empty since this is a UI restructuring
+        setFacilities([]);
+      }
+
       setImages(response.data.images || []);
     } catch (error) {
       console.error('Error fetching facilities:', error);
@@ -97,24 +58,40 @@ export default function AdminFacilities({ localId }: AdminFacilitiesProps) {
     }
   };
 
-  const handleFacilityChange = (key: string, value: string | boolean) => {
-    setFacilities((prev) => ({
+  const handleFacilityChange = (index: number, field: 'name' | 'details', value: string) => {
+    setFacilities((prev) =>
+      prev.map((facility, i) =>
+        i === index
+          ? { ...facility, [field]: value }
+          : facility
+      )
+    );
+  };
+
+  const addFacility = () => {
+    setFacilities((prev) => [
       ...prev,
-      [key]: value,
-    }));
+      {
+        id: `new-${Date.now()}-${Math.round(Math.random() * 1e6)}`,
+        name: '',
+        details: '',
+      },
+    ]);
+  };
+
+  const removeFacility = (index: number) => {
+    setFacilities((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSave = async () => {
     try {
       setLoading(true);
-      
-      // Prepare data with only the relevant facility fields
-      const dataToSave: Record<string, any> = {};
-      facilityFields.forEach((field) => {
-        dataToSave[field.key] = facilities[field.key as keyof Facility] || '';
-        dataToSave[field.enabledKey] = facilities[field.enabledKey as keyof Facility] ? true : false;
-      });
-      
+
+      // Convert new array format to backend format for saving
+      const dataToSave: Record<string, any> = {
+        facilities: facilities,
+      };
+
       await axios.post(`${ADMIN_API_URL}/facilities/${localId}`, dataToSave);
       setMessage({ type: 'success', text: 'Facilities saved successfully' });
       await fetchFacilities();
@@ -173,7 +150,7 @@ export default function AdminFacilities({ localId }: AdminFacilitiesProps) {
     }
   };
 
-  if (loading && Object.keys(facilities).length === 0) {
+  if (loading && facilities.length === 0) {
     return <div className="admin-facilities-loading">Loading facilities...</div>;
   }
 
@@ -197,50 +174,61 @@ export default function AdminFacilities({ localId }: AdminFacilitiesProps) {
 
       {message && <div className={`admin-facilities-message ${message.type}`}>{message.text}</div>}
 
-      <form className="admin-form expanded" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
-        <div style={{ gridColumn: '1 / -1' }}>
-          <h3>Manage Facilities</h3>
-          <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-            Check the facilities you want to display to users. You can add details for each facility (optional).
-          </p>
-        </div>
+      <div className="facilities-editor" style={{ gridColumn: '1 / -1', marginTop: '2rem', padding: '1rem', background: '#f5f9ff', borderRadius: '6px' }}>
+        <h4 style={{ marginBottom: '1rem' }}>Manage Facilities</h4>
+        <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+          Add facilities by entering a name and optional details. This is similar to how you manage Pillar Programs.
+        </p>
 
-        {facilityFields.map((field) => {
-          const isEnabled = facilities[field.enabledKey as keyof Facility] as boolean || false;
-          const value = (facilities[field.key as keyof Facility] as string) || '';
-
-          return (
-            <div key={field.key} style={{ gridColumn: '1 / -1', marginBottom: '1rem' }}>
-              <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+        {facilities.length > 0 ? (
+          facilities.map((facility, index) => (
+            <div key={facility.id} style={{ marginBottom: '1rem', padding: '0.75rem', background: '#ffffff', borderRadius: '6px', border: '1px solid #dce3eb' }}>
+              <div className="form-group">
+                <label>Facility Name</label>
                 <input
-                  type="checkbox"
-                  id={field.enabledKey}
-                  checked={isEnabled}
-                  onChange={(e) => handleFacilityChange(field.enabledKey, e.target.checked)}
-                  style={{ marginTop: '0.5rem', width: '20px', height: '20px', cursor: 'pointer', flexShrink: 0 }}
+                  type="text"
+                  placeholder="e.g., Building A, Swimming Pool, Gymnasium"
+                  value={facility.name || ''}
+                  onChange={(e) => handleFacilityChange(index, 'name', e.target.value)}
+                  style={{ width: '100%' }}
                 />
-                <div style={{ flex: 1 }}>
-                  <label htmlFor={field.enabledKey} style={{ fontWeight: '600', cursor: 'pointer', display: 'block', marginBottom: '0.5rem' }}>
-                    {field.label}
-                  </label>
-                  {isEnabled && (
-                    <input
-                      type="text"
-                      placeholder={`Enter ${field.label} details (optional)`}
-                      value={value}
-                      onChange={(e) => handleFacilityChange(field.key, e.target.value)}
-                      style={{ width: '100%' }}
-                    />
-                  )}
-                </div>
               </div>
+              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                <label>Enter Details (optional)</label>
+                <textarea
+                  placeholder="e.g., Modern facility with 3 floors, air-conditioned"
+                  rows={3}
+                  value={facility.details || ''}
+                  onChange={(e) => handleFacilityChange(index, 'details', e.target.value)}
+                  style={{ width: '100%', minHeight: '72px' }}
+                />
+              </div>
+              <button
+                type="button"
+                className="btn btn-tertiary"
+                style={{ marginTop: '0.5rem' }}
+                onClick={() => removeFacility(index)}
+              >
+                Remove Facility
+              </button>
             </div>
-          );
-        })}
+          ))
+        ) : (
+          <p>No facilities configured yet. Click "Add Facility" to add one.</p>
+        )}
 
-        <div style={{ gridColumn: '1 / -1', marginTop: '1.5rem' }}>
-          <button 
-            type="button" 
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={addFacility}
+          style={{ marginBottom: '1rem' }}
+        >
+          + Add Facility
+        </button>
+
+        <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: '1rem' }}>
+          <button
+            type="button"
             onClick={handleSave}
             className="btn btn-primary"
             disabled={loading}
@@ -248,7 +236,7 @@ export default function AdminFacilities({ localId }: AdminFacilitiesProps) {
             {loading ? 'Saving...' : 'Save Facilities'}
           </button>
         </div>
-      </form>
+      </div>
 
       <div style={{ marginTop: '3rem' }}>
         <h3>Facility Images (Optional - Max 5 images)</h3>
@@ -256,7 +244,7 @@ export default function AdminFacilities({ localId }: AdminFacilitiesProps) {
           Upload up to 5 images to display in the slideshow
         </p>
 
-        <div style={{ 
+        <div style={{
           background: '#f9fafb',
           padding: '2rem',
           borderRadius: '20px',
@@ -297,8 +285,8 @@ export default function AdminFacilities({ localId }: AdminFacilitiesProps) {
                   border: '1px solid #e0e0e0'
                 }}
               >
-                <img 
-                  src={normalizeImageUrl(image.image_url)} 
+                <img
+                  src={normalizeImageUrl(image.image_url)}
                   alt={`Facility ${image.image_order + 1}`}
                   style={{
                     width: '100%',

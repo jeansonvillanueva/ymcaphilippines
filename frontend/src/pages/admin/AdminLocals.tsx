@@ -73,8 +73,6 @@ export default function AdminLocals() {
     others: 0,
     totalMembersAsOf: '',
   });
-  const [localPillars, setLocalPillars] = useState<LocalPillar[]>([]);
-  const [deletedProgramIds, setDeletedProgramIds] = useState<number[]>([]);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [isNewLocal, setIsNewLocal] = useState(false);
@@ -127,7 +125,6 @@ export default function AdminLocals() {
         youth: Number(merged.youth) || 0,
         others: Number(merged.others) || 0,
       });
-      setLocalPillars(merged.pillars || []);
       setIsNewLocal(false);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 404) {
@@ -140,7 +137,6 @@ export default function AdminLocals() {
             youth: Number(merged.youth) || 0,
             others: Number(merged.others) || 0,
           });
-          setLocalPillars(merged.pillars || []);
           setMessage({ type: 'success', text: 'Loaded default values from local data. Save to create this local record.' });
           setIsNewLocal(true);
           return;
@@ -157,10 +153,7 @@ export default function AdminLocals() {
           youth: Number(merged.youth) || 0,
           others: Number(merged.others) || 0,
         });
-        setLocalPillars(merged.pillars || []);
         setIsNewLocal(true);
-      } else {
-        setLocalPillars([]);
       }
     }
   };
@@ -201,174 +194,6 @@ export default function AdminLocals() {
     const file = e.target.files?.[0];
     if (file) {
       await uploadLocalImage(file, 'logoImageUrl');
-    }
-  };
-
-  const handlePillarChange = (pillarId: number | string, field: keyof LocalPillar, value: string) => {
-    setLocalPillars((prev) =>
-      prev.map((pillar) =>
-        pillar.id === pillarId ? { ...pillar, [field]: value } : pillar,
-      ),
-    );
-  };
-
-  const handleProgramChange = (
-    pillarId: number | string,
-    programId: number | string,
-    field: 'title' | 'bullets',
-    value: string,
-  ) => {
-    setLocalPillars((prev) =>
-      prev.map((pillar) => {
-        if (pillar.id !== pillarId) return pillar;
-        return {
-          ...pillar,
-          programs: (pillar.programs || []).map((program) =>
-            program.id === programId
-              ? {
-                  ...program,
-                  [field]:
-                    field === 'bullets'
-                      ? value
-                          .split('\n')
-                          .map((line) => line.trim())
-                          .filter(Boolean)
-                      : value,
-                }
-              : program,
-          ),
-        };
-      }),
-    );
-  };
-
-  const addProgram = (pillarId: number | string) => {
-    setLocalPillars((prev) =>
-      prev.map((pillar) =>
-        pillar.id === pillarId
-          ? {
-              ...pillar,
-              programs: [
-                ...(pillar.programs || []),
-                {
-                  id: `new-${Date.now()}-${Math.round(Math.random() * 1e6)}`,
-                  title: '',
-                  bullets: [],
-                  sequenceOrder: pillar.programs?.length || 0,
-                },
-              ],
-            }
-          : pillar,
-      ),
-    );
-  };
-
-  const removeProgram = (pillarId: number | string, programId: number | string) => {
-    setLocalPillars((prev) =>
-      prev.map((pillar) =>
-        pillar.id === pillarId
-          ? {
-              ...pillar,
-              programs: (pillar.programs || []).filter((program) => program.id !== programId),
-            }
-          : pillar,
-      ),
-    );
-
-    if (typeof programId === 'number') {
-      setDeletedProgramIds((prev) => [...prev, programId]);
-    }
-  };
-
-  const handleSavePrograms = async () => {
-    if (!selectedLocal) {
-      setMessage({ type: 'error', text: 'Please select a local first' });
-      return;
-    }
-
-    try {
-      for (const programId of deletedProgramIds) {
-        await axios.delete(`${ADMIN_API_URL}/pillar-programs/${programId}`);
-      }
-
-      let updatedPillars = [...localPillars];
-
-      for (const pillar of updatedPillars) {
-        let pillarId = pillar.id;
-
-        if (typeof pillarId !== 'number') {
-          const createPillarResponse = await axios.post(`${ADMIN_API_URL}/pillars`, {
-            localId: pillar.localId,
-            key: pillar.key,
-            label: pillar.label,
-            color: pillar.color,
-          });
-          pillarId = createPillarResponse.data.id;
-          pillar.id = pillarId;
-          await axios.put(`${ADMIN_API_URL}/pillars/${pillarId}`, {
-            key: pillar.key,
-            label: pillar.label,
-            color: pillar.color,
-          });
-        }
-
-        for (const [index, program] of (pillar.programs || []).entries()) {
-          const payload = {
-            title: program.title || '',
-            bullets: program.bullets || [],
-            sequenceOrder: index,
-          };
-
-          if (typeof program.id === 'number') {
-            await axios.put(`${ADMIN_API_URL}/pillar-programs/${program.id}`, payload);
-          } else {
-            await axios.post(`${ADMIN_API_URL}/pillar-programs`, {
-              pillarId,
-              ...payload,
-            });
-          }
-        }
-      }
-
-      setDeletedProgramIds([]);
-      setLocalPillars(updatedPillars);
-      setMessage({ type: 'success', text: 'Pillar programs saved successfully' });
-      handleSelectLocal(selectedLocal);
-    } catch (error) {
-      console.error('Error saving pillar programs:', error);
-      setMessage({ type: 'error', text: 'Failed to save pillar programs' });
-    }
-  };
-
-  const handleSavePillars = async () => {
-    if (!selectedLocal) {
-      setMessage({ type: 'error', text: 'Please select a local first' });
-      return;
-    }
-
-    try {
-      await Promise.all(
-        localPillars.map((pillar) => {
-          if (typeof pillar.id === 'number') {
-            return axios.put(`${ADMIN_API_URL}/pillars/${pillar.id}`, {
-              key: pillar.key,
-              label: pillar.label,
-              color: pillar.color,
-            });
-          }
-          return axios.post(`${ADMIN_API_URL}/pillars`, {
-            localId: pillar.localId,
-            key: pillar.key,
-            label: pillar.label,
-            color: pillar.color,
-          });
-        }),
-      );
-      setMessage({ type: 'success', text: 'Pillars saved successfully' });
-      if (selectedLocal) handleSelectLocal(selectedLocal);
-    } catch (error) {
-      console.error('Error saving pillars:', error);
-      setMessage({ type: 'error', text: 'Failed to save pillars' });
     }
   };
 
@@ -601,101 +426,6 @@ export default function AdminLocals() {
             <p><strong>Youth:</strong> {Number(form.youth) || 0}</p>
             <p><strong>Others:</strong> {Number(form.others) || 0}</p>
             <p><strong>Total:</strong> {(Number(form.corporate) || 0) + (Number(form.nonCorporate) || 0) + (Number(form.youth) || 0) + (Number(form.others) || 0)}</p>
-          </div>
-
-          <div className="pillars-editor" style={{ gridColumn: '1 / -1', marginTop: '2rem', padding: '1rem', background: '#fff6f0', borderRadius: '6px' }}>
-            <h4 style={{ marginBottom: '1rem' }}>Local Pillars</h4>
-            {localPillars.length > 0 ? (
-              localPillars.map((pillar) => (
-                <div key={pillar.id} className="pillar-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                  <div className="form-group">
-                    <label>Pillar Key</label>
-                    <input type="text" value={pillar.key} disabled />
-                  </div>
-                  <div className="form-group">
-                    <label>Pillar Label</label>
-                    <input
-                      type="text"
-                      value={pillar.label}
-                      onChange={(e) => handlePillarChange(pillar.id, 'label', e.target.value)}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Pillar Color</label>
-                    <input
-                      type="color"
-                      value={pillar.color || '#000000'}
-                      onChange={(e) => handlePillarChange(pillar.id, 'color', e.target.value)}
-                    />
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p>No pillar configuration available for this local.</p>
-            )}
-            <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: '1rem' }}>
-              <button type="button" onClick={handleSavePillars} className="btn btn-secondary">
-                Save Pillars
-              </button>
-            </div>
-          </div>
-
-          <div className="pillar-programs-editor" style={{ gridColumn: '1 / -1', marginTop: '2rem', padding: '1rem', background: '#f0fbff', borderRadius: '6px' }}>
-            <h4 style={{ marginBottom: '1rem' }}>Pillar Programs</h4>
-            {localPillars.length > 0 ? (
-              localPillars.map((pillar) => (
-                <div key={pillar.id} style={{ marginBottom: '1.75rem', padding: '1rem', border: '1px solid #dfe6ef', borderRadius: '6px' }}>
-                  <h5 style={{ marginBottom: '0.75rem' }}>{pillar.label || pillar.key}</h5>
-                  {(pillar.programs && pillar.programs.length > 0) ? (
-                    pillar.programs.map((program) => (
-                      <div key={program.id} style={{ marginBottom: '1rem', padding: '0.75rem', background: '#ffffff', borderRadius: '6px', border: '1px solid #dce3eb' }}>
-                        <div className="form-group">
-                          <label>Program Title</label>
-                          <input
-                            type="text"
-                            value={program.title || ''}
-                            onChange={(e) => handleProgramChange(pillar.id, program.id ?? '', 'title', e.target.value)}
-                          />
-                        </div>
-                        <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                          <label>Program Bullets (one per line)</label>
-                          <textarea
-                            rows={4}
-                            value={(program.bullets || []).join('\n')}
-                            onChange={(e) => handleProgramChange(pillar.id, program.id ?? '', 'bullets', e.target.value)}
-                            style={{ width: '100%', minHeight: '96px' }}
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          className="btn btn-tertiary"
-                          style={{ marginTop: '0.5rem' }}
-                          onClick={() => removeProgram(pillar.id, program.id ?? '')}
-                        >
-                          Remove Program
-                        </button>
-                      </div>
-                    ))
-                  ) : (
-                    <p>No programs configured for this pillar yet.</p>
-                  )}
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => addProgram(pillar.id)}
-                  >
-                    Add Program
-                  </button>
-                </div>
-              ))
-            ) : (
-              <p>No pillar configuration available for this local.</p>
-            )}
-            <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: '1rem' }}>
-              <button type="button" onClick={handleSavePrograms} className="btn btn-secondary">
-                Save Pillar Programs
-              </button>
-            </div>
           </div>
 
           {/* Facilities Management Section */}
