@@ -70,8 +70,15 @@ if ($path === '') {
 }
 
 // Protect admin routes unless they are public auth endpoints.
-$publicAdminRoutes = ['/admin/login', '/admin/status', '/admin/logout'];
-if (strpos($path, '/admin') === 0 && !in_array($path, $publicAdminRoutes, true)) {
+$publicAdminRoutes = [
+    '/n2r8k5j9m1/login', '/n2r8k5j9m1/status', '/n2r8k5j9m1/logout',
+    '/secure-management/v3/k7n4m9p2q8c1x5j3/portal/login', 
+    '/secure-management/v3/k7n4m9p2q8c1x5j3/portal/status', 
+    '/secure-management/v3/k7n4m9p2q8c1x5j3/portal/logout',
+    '/admin/login', '/admin/status', '/admin/logout'
+];
+if ((strpos($path, '/n2r8k5j9m1') === 0 || strpos($path, '/secure-management') === 0 || strpos($path, '/admin') === 0) && 
+    !in_array($path, $publicAdminRoutes, true)) {
     requireAdminAuth();
 }
 
@@ -156,6 +163,18 @@ switch ($path) {
         }
         break;
 
+    case '/api/stripe/create-payment-intent':
+        if ($requestMethod === 'POST') {
+            require_once 'endpoints/stripe_create_intent.php';
+        }
+        break;
+
+    case '/api/stripe/confirm-payment':
+        if ($requestMethod === 'POST') {
+            require_once 'endpoints/stripe_confirm_payment.php';
+        }
+        break;
+
     case '/api/feedback':
         if ($requestMethod === 'POST') {
             require_once 'endpoints/feedback.php';
@@ -163,65 +182,65 @@ switch ($path) {
         break;
 
     // Admin auth routes
-    case '/admin/login':
+    case '/n2r8k5j9m1/login':
         if ($requestMethod === 'POST') {
             require_once 'endpoints/admin_login.php';
         }
         break;
 
-    case '/admin/logout':
+    case '/n2r8k5j9m1/logout':
         if ($requestMethod === 'POST') {
             require_once 'endpoints/admin_logout.php';
         }
         break;
 
-    case '/admin/status':
+    case '/n2r8k5j9m1/status':
         if ($requestMethod === 'GET') {
             require_once 'endpoints/admin_status.php';
         }
         break;
 
     // Admin routes
-    case '/admin/feedback':
+    case '/n2r8k5j9m1/feedback':
         if ($requestMethod === 'GET') {
             require_once 'endpoints/admin_feedback.php';
         }
         break;
 
-    case (preg_match('/^\/admin\/feedback\/(\d+)$/', $path, $matches) ? true : false):
+    case (preg_match('/^\/n2r8k5j9m1\/feedback\/(\d+)$/', $path, $matches) ? true : false):
         $_GET['id'] = $matches[1];
         if ($requestMethod === 'DELETE') {
             require_once 'endpoints/admin_feedback_delete.php';
         }
         break;
 
-    case '/admin/submit-updates':
+    case '/n2r8k5j9m1/submit-updates':
         if ($requestMethod === 'GET') {
             require_once 'endpoints/admin_submit_updates.php';
         }
         break;
 
-    case (preg_match('/^\/admin\/submit-updates\/(\d+)$/', $path, $matches) ? true : false):
+    case (preg_match('/^\/n2r8k5j9m1\/submit-updates\/(\d+)$/', $path, $matches) ? true : false):
         $_GET['id'] = $matches[1];
         if ($requestMethod === 'DELETE') {
             require_once 'endpoints/admin_submit_updates_delete.php';
         }
         break;
 
-    case '/admin/donations':
+    case '/n2r8k5j9m1/donations':
         if ($requestMethod === 'GET') {
             require_once 'endpoints/admin_donations.php';
         }
         break;
 
-    case (preg_match('/^\/admin\/donations\/(\d+)$/', $path, $matches) ? true : false):
+    case (preg_match('/^\/n2r8k5j9m1\/donations\/(\d+)$/', $path, $matches) ? true : false):
         $_GET['id'] = $matches[1];
         if ($requestMethod === 'DELETE') {
             require_once 'endpoints/admin_donations_delete.php';
         }
         break;
 
-    case '/admin/videos':
+    case '/n2r8k5j9m1/videos':
         if ($requestMethod === 'GET') {
             require_once 'endpoints/admin_videos.php';
         } elseif ($requestMethod === 'POST') {
@@ -229,7 +248,7 @@ switch ($path) {
         }
         break;
 
-    case (preg_match('/^\/admin\/videos\/(\d+)$/', $path, $matches) ? true : false):
+    case (preg_match('/^\/n2r8k5j9m1\/videos\/(\d+)$/', $path, $matches) ? true : false):
         $_GET['id'] = $matches[1];
         if ($requestMethod === 'PUT') {
             require_once 'endpoints/admin_videos_update.php';
@@ -238,7 +257,7 @@ switch ($path) {
         }
         break;
 
-    case '/admin/news':
+    case '/n2r8k5j9m1/news':
         if ($requestMethod === 'GET') {
             require_once 'endpoints/admin_news.php';
         } elseif ($requestMethod === 'POST') {
@@ -246,7 +265,7 @@ switch ($path) {
         }
         break;
 
-    case (preg_match('/^\/admin\/news\/(\d+)$/', $path, $matches) ? true : false):
+    case (preg_match('/^\/n2r8k5j9m1\/news\/(\d+)$/', $path, $matches) ? true : false):
         $_GET['id'] = $matches[1];
         if ($requestMethod === 'PUT') {
             require_once 'endpoints/admin_news_update.php';
@@ -255,6 +274,8 @@ switch ($path) {
         }
         break;
 
+    case '/n2r8k5j9m1/calendar':
+    case '/secure-management/v3/k7n4m9p2q8c1x5j3/portal/calendar':
     case '/admin/calendar':
         if ($requestMethod === 'GET') {
             require_once 'endpoints/admin_calendar.php';
@@ -263,8 +284,8 @@ switch ($path) {
         }
         break;
 
-    case (preg_match('/^\/admin\/calendar\/(\d+)$/', $path, $matches) ? true : false):
-        $_GET['id'] = $matches[1];
+    case (preg_match('/^(\/n2r8k5j9m1\/calendar\/(\d+)|\/secure-management\/v3\/k7n4m9p2q8c1x5j3\/portal\/calendar\/(\d+)|\/admin\/calendar\/(\d+))$/', $path, $matches) ? true : false):
+        $_GET['id'] = $matches[2] ?? $matches[3] ?? $matches[4];
         if ($requestMethod === 'PUT') {
             require_once 'endpoints/admin_calendar_update.php';
         } elseif ($requestMethod === 'DELETE') {
@@ -272,7 +293,7 @@ switch ($path) {
         }
         break;
 
-    case '/admin/locals':
+    case '/n2r8k5j9m1/locals':
         if ($requestMethod === 'GET') {
             require_once 'endpoints/admin_locals.php';
         } elseif ($requestMethod === 'POST') {
@@ -280,7 +301,7 @@ switch ($path) {
         }
         break;
 
-    case (preg_match('/^\/admin\/locals\/([^\/]+)$/', $path, $matches) ? true : false):
+    case (preg_match('/^\/n2r8k5j9m1\/locals\/([^\/]+)$/', $path, $matches) ? true : false):
         $_GET['id'] = $matches[1];
         if ($requestMethod === 'GET') {
             require_once 'endpoints/admin_locals_detail.php';
@@ -289,21 +310,21 @@ switch ($path) {
         }
         break;
 
-    case (preg_match('/^\/admin\/locals\/([^\/]+)\/upload$/', $path, $matches) ? true : false):
+    case (preg_match('/^\/n2r8k5j9m1\/locals\/([^\/]+)\/upload$/', $path, $matches) ? true : false):
         $_GET['id'] = $matches[1];
         if ($requestMethod === 'POST') {
             require_once 'endpoints/admin_locals_upload.php';
         }
         break;
 
-    case (preg_match('/^\/admin\/pillars\/(.+)$/', $path, $matches) ? true : false):
+    case (preg_match('/^\/n2r8k5j9m1\/pillars\/(.+)$/', $path, $matches) ? true : false):
         $_GET['localId'] = $matches[1];
         if ($requestMethod === 'GET') {
             require_once 'endpoints/admin_pillars.php';
         }
         break;
 
-    case '/admin/pillars':
+    case '/n2r8k5j9m1/pillars':
         if ($requestMethod === 'PUT') {
             require_once 'endpoints/admin_pillars_update.php';
         } elseif ($requestMethod === 'POST') {
@@ -311,13 +332,13 @@ switch ($path) {
         }
         break;
 
-    case '/admin/pillar-programs':
+    case '/n2r8k5j9m1/pillar-programs':
         if ($requestMethod === 'POST') {
             require_once 'endpoints/admin_pillar_programs_create.php';
         }
         break;
 
-    case (preg_match('/^\/admin\/pillar-programs\/(\d+)$/', $path, $matches) ? true : false):
+    case (preg_match('/^\/n2r8k5j9m1\/pillar-programs\/(\d+)$/', $path, $matches) ? true : false):
         $_GET['id'] = $matches[1];
         if ($requestMethod === 'PUT') {
             require_once 'endpoints/admin_pillar_programs_update.php';
@@ -326,7 +347,7 @@ switch ($path) {
         }
         break;
 
-    case '/admin/staff':
+    case '/n2r8k5j9m1/staff':
         if ($requestMethod === 'GET') {
             require_once 'endpoints/admin_staff.php';
         } elseif ($requestMethod === 'POST') {
@@ -334,7 +355,7 @@ switch ($path) {
         }
         break;
 
-    case (preg_match('/^\/admin\/staff\/(\d+)$/', $path, $matches) ? true : false):
+    case (preg_match('/^\/n2r8k5j9m1\/staff\/(\d+)$/', $path, $matches) ? true : false):
         $_GET['id'] = $matches[1];
         if ($requestMethod === 'PUT') {
             require_once 'endpoints/admin_staff_update.php';
@@ -344,7 +365,7 @@ switch ($path) {
         break;
 
     // Admin facilities routes
-    case (preg_match('/^\/admin\/facilities\/([^\/]+)$/', $path, $matches) ? true : false):
+    case (preg_match('/^\/n2r8k5j9m1\/facilities\/([^\/]+)$/', $path, $matches) ? true : false):
         $_GET['localId'] = $matches[1];
         if ($requestMethod === 'GET') {
             require_once 'endpoints/admin_facilities.php';
@@ -353,14 +374,14 @@ switch ($path) {
         }
         break;
 
-    case (preg_match('/^\/admin\/facilities\/([^\/]+)\/upload$/', $path, $matches) ? true : false):
+    case (preg_match('/^\/n2r8k5j9m1\/facilities\/([^\/]+)\/upload$/', $path, $matches) ? true : false):
         $_GET['localId'] = $matches[1];
         if ($requestMethod === 'POST') {
             require_once 'endpoints/admin_facilities_upload.php';
         }
         break;
 
-    case (preg_match('/^\/admin\/facilities\/([^\/]+)\/images\/(\d+)$/', $path, $matches) ? true : false):
+    case (preg_match('/^\/n2r8k5j9m1\/facilities\/([^\/]+)\/images\/(\d+)$/', $path, $matches) ? true : false):
         $_GET['localId'] = $matches[1];
         $_GET['imageId'] = $matches[2];
         if ($requestMethod === 'DELETE') {

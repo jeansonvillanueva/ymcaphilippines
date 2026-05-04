@@ -47,7 +47,7 @@ function ScrollToHash() {
 
 function App() {
   return (
-    <Router basename="/testsite">
+    <Router basename="/">
       <AppContent />
     </Router>
   );
@@ -55,7 +55,7 @@ function App() {
 
 function AppContent() {
   const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith('/admin');
+  const isAdminRoute = location.pathname.startsWith('/secure-management/v3/k7n4m9p2q8c1x5j3');
 
   return (
     <>
@@ -65,9 +65,9 @@ function AppContent() {
       <main style={{ paddingTop: isAdminRoute ? 0 : undefined }}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-          <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+          <Route path="/secure-management/v3/k7n4m9p2q8c1x5j3/portal/login" element={<AdminLogin />} />
+          <Route path="/secure-management/v3/k7n4m9p2q8c1x5j3/portal/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/secure-management/v3/k7n4m9p2q8c1x5j3/*" element={<Navigate to="/secure-management/v3/k7n4m9p2q8c1x5j3/portal/login" replace />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/find-ymca" element={<Find_Your_YMCA />} />
           <Route path="/find-ymca/:localId" element={<LocalDetails />} />
@@ -75,7 +75,7 @@ function AppContent() {
           <Route path="/get-involved" element={<Get_Involved />} />
           <Route path="/about-us" element={<About_Us />} />
           <Route path="/about-us/highlights" element={<AboutUsHighlights />} />
-          <Route path="/developer" element={<Developer />} />
+          <Route path="/x7f4t9w2k8" element={<Developer />} />
 
           <Route path="/article" element={<Article />} />
           <Route path="/news/:slug" element={<NewsDetail />} />

@@ -437,9 +437,17 @@ app.delete("/admin/news/:id", (req, res) => {
   });
 });
 
+// CALENDAR EVENTS - Public endpoint
+app.get("/api/calendar", (req, res) => {
+  db.query("SELECT * FROM calendar_events ORDER BY start_date DESC, date DESC", (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(result);
+  });
+});
+
 // CALENDAR EVENTS - Admin Management
 app.get("/admin/calendar", (req, res) => {
-  db.query("SELECT * FROM calendar_events ORDER BY date DESC", (err, result) => {
+  db.query("SELECT * FROM calendar_events ORDER BY start_date DESC", (err, result) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(result);
   });
@@ -454,21 +462,26 @@ app.post("/admin/calendar", upload.single('image'), (req, res) => {
     
     // Safely extract fields
     const title = req.body?.title;
-    const date = req.body?.date;
+    const startDate = req.body?.startDate;
+    const endDate = req.body?.endDate;
     const description = req.body?.description;
     const imageUrl = req.body?.imageUrl;
     
-    console.log('[POST /admin/calendar] Extracted fields:', { title, date, description, imageUrl, hasFile: !!req.file });
+    console.log('[POST /admin/calendar] Extracted fields:', { title, startDate, endDate, description, hasFile: !!req.file });
     
-    if (!title || !date) {
-      return res.status(400).json({ error: "Title and date are required" });
+    if (!title || !startDate || !endDate) {
+      return res.status(400).json({ error: "Title, start date, and end date are required" });
+    }
+
+    if (startDate > endDate) {
+      return res.status(400).json({ error: "Start date cannot be after end date" });
     }
     
     const imagePath = req.file ? `/uploads/${req.file.filename}` : (imageUrl || null);
     
     db.query(
-      "INSERT INTO calendar_events (title, date, description, imageUrl) VALUES (?, ?, ?, ?)",
-      [title, date, description, imagePath],
+      "INSERT INTO calendar_events (title, start_date, end_date, description, imageUrl) VALUES (?, ?, ?, ?, ?)",
+      [title, startDate, endDate, description, imagePath],
       (err, result) => {
         if (err) {
           console.error('Database error:', err);
@@ -493,21 +506,26 @@ app.put("/admin/calendar/:id", upload.single('image'), (req, res) => {
     
     // Safely extract fields
     const title = req.body?.title;
-    const date = req.body?.date;
+    const startDate = req.body?.startDate;
+    const endDate = req.body?.endDate;
     const description = req.body?.description;
     const imageUrl = req.body?.imageUrl;
     
-    console.log('[PUT /admin/calendar/:id] Extracted fields:', { id: req.params.id, title, date, description, imageUrl, hasFile: !!req.file });
+    console.log('[PUT /admin/calendar/:id] Extracted fields:', { id: req.params.id, title, startDate, endDate, description, hasFile: !!req.file });
     
-    if (!title || !date) {
-      return res.status(400).json({ error: "Title and date are required" });
+    if (!title || !startDate || !endDate) {
+      return res.status(400).json({ error: "Title, start date, and end date are required" });
+    }
+
+    if (startDate > endDate) {
+      return res.status(400).json({ error: "Start date cannot be after end date" });
     }
     
     const imagePath = req.file ? `/uploads/${req.file.filename}` : (imageUrl || null);
     
     db.query(
-      "UPDATE calendar_events SET title=?, date=?, description=?, imageUrl=? WHERE id=?",
-      [title, date, description, imagePath, req.params.id],
+      "UPDATE calendar_events SET title=?, start_date=?, end_date=?, description=?, imageUrl=? WHERE id=?",
+      [title, startDate, endDate, description, imagePath, req.params.id],
       (err) => {
         if (err) {
           console.error('Database error:', err);

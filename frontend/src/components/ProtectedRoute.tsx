@@ -17,7 +17,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
     const checkAuth = async () => {
       try {
-        const response = await axios.get(AUTH_STATUS_URL);
+        const response = await axios.get(AUTH_STATUS_URL, { withCredentials: true });
 
         if (!mounted) return;
         if (response.data?.authenticated) {
@@ -42,7 +42,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   if (authState === 'unauthorized') {
-    return <Navigate to="/admin/login" replace />;
+    return <Navigate to="/secure-management/v3/k7n4m9p2q8c1x5j3/portal/login" replace />;
   }
 
   return <>{children}</>;

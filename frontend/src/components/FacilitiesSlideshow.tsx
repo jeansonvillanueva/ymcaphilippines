@@ -77,9 +77,9 @@ export default function FacilitiesSlideshow({ localId }: FacilitiesSlideshowProp
     if (!url) return '';
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
     if (url.startsWith('/backend/uploads/')) return url;
-    if (url.startsWith('/uploads/')) return `/testsite/backend${url}`;
+    if (url.startsWith('/uploads/')) return `/backend${url}`;
     if (url.startsWith('/php-api/uploads/')) {
-      return `/testsite/backend/${url.substring('/php-api/uploads/'.length)}`;
+      return `/backend/${url.substring('/php-api/uploads/'.length)}`;
     }
     return url;
   };

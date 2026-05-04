@@ -102,6 +102,21 @@
   --fc-event-text-color: #fff;
 }
 
+/* Multi-day event styling (like Google Calendar) */
+.calendar-board .fc .fc-daygrid-block .fc-event-container .fc-event {
+  position: relative;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Make multi-day events span across cells */
+.calendar-board .fc .fc-daygrid-day .fc-event[data-start]:not([data-start=""])[data-end]:not([data-end=""]) {
+  background: linear-gradient(90deg, var(--ymca-navy) 0%, rgba(12, 34, 63, 0.85) 100%);
+  border-left: 4px solid var(--ymca-red);
+  padding: 2px 4px;
+}
+
 .calendar-board .fc .fc-daygrid-day.ymca-calendar-today-ring {
   box-shadow: inset 0 0 0 2px var(--ymca-red);
 }

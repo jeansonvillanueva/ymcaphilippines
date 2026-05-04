@@ -5,7 +5,9 @@ import { ADMIN_API_URL } from '../../hooks/useApi';
 interface CalendarEvent {
   id?: number;
   title: string;
-  date: string;
+  date?: string;
+  startDate?: string;
+  endDate?: string;
   description?: string;
   imageUrl?: string;
 }
@@ -14,7 +16,8 @@ export default function AdminCalendar() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [form, setForm] = useState<CalendarEvent>({
     title: '',
-    date: '',
+    startDate: '',
+    endDate: '',
     description: '',
     imageUrl: '',
   });
@@ -68,8 +71,22 @@ export default function AdminCalendar() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.title.trim() || !form.date.trim()) {
-      setMessage({ type: 'error', text: 'Title and date are required' });
+    if (!form.title.trim()) {
+      setMessage({ type: 'error', text: 'Title is required' });
+      return;
+    }
+
+    // Validate date range
+    const startDate = form.startDate?.trim();
+    const endDate = form.endDate?.trim();
+    
+    if (!startDate || !endDate) {
+      setMessage({ type: 'error', text: 'Start date and end date are required' });
+      return;
+    }
+
+    if (startDate > endDate) {
+      setMessage({ type: 'error', text: 'Start date cannot be after end date' });
       return;
     }
 
@@ -77,18 +94,31 @@ export default function AdminCalendar() {
       // Auto-generate description if not provided
       let description = (form.description || '').trim();
       if (!description) {
-        const dateObj = new Date(form.date);
-        const formattedDate = dateObj.toLocaleDateString('en-US', { 
-          month: 'long', 
+        const startDateObj = new Date(startDate);
+        const endDateObj = new Date(endDate);
+        
+        const formattedStart = startDateObj.toLocaleDateString('en-US', { 
+          month: 'short', 
           day: 'numeric', 
           year: 'numeric' 
         });
-        description = `${form.title} to be held on ${formattedDate}. Details to follow.`;
+        const formattedEnd = endDateObj.toLocaleDateString('en-US', { 
+          month: 'short', 
+          day: 'numeric', 
+          year: 'numeric' 
+        });
+        
+        if (startDate === endDate) {
+          description = `${form.title} on ${formattedStart}. Details to follow.`;
+        } else {
+          description = `${form.title} from ${formattedStart} to ${formattedEnd}. Details to follow.`;
+        }
       }
 
       const formData = new FormData();
       formData.append('title', form.title.trim());
-      formData.append('date', form.date);
+      formData.append('startDate', startDate);
+      formData.append('endDate', endDate);
       formData.append('description', description);
       if (imageFile) {
         formData.append('image', imageFile);
@@ -96,30 +126,71 @@ export default function AdminCalendar() {
         formData.append('imageUrl', form.imageUrl);
       }
 
-      console.log('Submitting event data:', {
-        title: form.title.trim(),
-        date: form.date,
-        description: description,
-        hasImage: !!imageFile,
-        imageUrl: form.imageUrl,
-        isEditing: !!editingId
-      });
+      // Extensive logging for debugging
+      console.log('=== CALENDAR EVENT SUBMISSION ===');
+      console.log('API_URL:', API_URL);
+      console.log('Editing ID:', editingId);
+      console.log('FormData entries:');
+      for (const [key, value] of formData.entries()) {
+        if (value instanceof File) {
+          console.log(`  ✓ ${key}: [File] ${value.name} (${value.size} bytes)`);
+        } else {
+          console.log(`  ✓ ${key}: "${value}"`);
+        }
+      }
       
-      console.log('FormData entries:', Array.from(formData.entries()));
+      console.log('Validation passed:', {
+        title: form.title.trim().length > 0,
+        startDate: !!startDate,
+        endDate: !!endDate,
+        datesValid: startDate <= endDate,
+      });
 
       if (editingId) {
-        console.log('Sending PUT request to:', `${API_URL}/${editingId}`);
-        await axios.put(`${API_URL}/${editingId}`, formData);
-        setMessage({ type: 'success', text: 'Event updated successfully' });
+        console.log(`[UPDATE] Sending PUT request to: ${API_URL}/${editingId}`);
+        console.log('[UPDATE] Waiting for response...');
+        const response = await axios.put(`${API_URL}/${editingId}`, formData);
+        console.log('[UPDATE] Response received:', {
+          status: response.status,
+          data: response.data,
+        });
+        
+        // Check for error in response
+        if (response.data?.error) {
+          setMessage({ type: 'error', text: `Update failed: ${response.data.error}` });
+        } else {
+          setMessage({ type: 'success', text: 'Event updated successfully' });
+        }
       } else {
-        console.log('Sending POST request to:', API_URL);
-        await axios.post(API_URL, formData);
-        setMessage({ type: 'success', text: 'Event added successfully' });
+        console.log(`[CREATE] Sending POST request to: ${API_URL}`);
+        console.log('[CREATE] Waiting for response...');
+        const response = await axios.post(API_URL, formData);
+        console.log('[CREATE] Response received:', {
+          status: response.status,
+          statusText: response.statusText,
+          data: response.data,
+        });
+        
+        // Check for error in response
+        if (response.data?.error) {
+          setMessage({ type: 'error', text: `Create failed: ${response.data.error}` });
+        } else if (response.data?.id) {
+          console.log('[CREATE] SUCCESS: Event created with ID', response.data.id);
+          setMessage({ type: 'success', text: 'Event added successfully' });
+        } else {
+          console.log('[CREATE] Unexpected response structure:', response.data);
+          setMessage({ type: 'success', text: 'Event added successfully' });
+        }
       }
-      setForm({ title: '', date: '', description: '', imageUrl: '' });
+      setForm({ title: '', startDate: '', endDate: '', description: '', imageUrl: '' });
       setImageFile(null);
       setEditingId(null);
-      fetchEvents();
+      
+      // Refetch events with a small delay to ensure database write completes
+      console.log('Fetching events after submission...');
+      setTimeout(() => {
+        fetchEvents();
+      }, 500);
     } catch (error: any) {
       console.error('Error saving event:', error);
       const errorMessage = error.response?.data?.error || error.message || 'Failed to save event';
@@ -140,7 +211,7 @@ export default function AdminCalendar() {
         setMessage({ type: 'success', text: 'Event deleted successfully' });
         fetchEvents();
         if (editingId === id) {
-          setForm({ title: '', date: '', description: '', imageUrl: '' });
+          setForm({ title: '', startDate: '', endDate: '', description: '', imageUrl: '' });
           setImageFile(null);
           setEditingId(null);
         }
@@ -153,14 +224,12 @@ export default function AdminCalendar() {
 
   if (loading) return <div className="loading">Loading events...</div>;
 
-  // Group events by date
-  const eventsByDate = events.reduce((acc, event) => {
-    if (!acc[event.date]) acc[event.date] = [];
-    acc[event.date].push(event);
-    return acc;
-  }, {} as Record<string, CalendarEvent[]>);
-
-  const sortedDates = Object.keys(eventsByDate).sort().reverse();
+  // Sort events by start date (most recent first)
+  const sortedEvents = [...events].sort((a, b) => {
+    const dateA = new Date(a.startDate || a.date || 0).getTime();
+    const dateB = new Date(b.startDate || b.date || 0).getTime();
+    return dateB - dateA;
+  });
 
   return (
     <div className="admin-section">
@@ -189,11 +258,21 @@ export default function AdminCalendar() {
         </div>
 
         <div className="form-group">
-          <label>Date * (YYYY-MM-DD)</label>
+          <label>Start Date * (YYYY-MM-DD)</label>
           <input
             type="date"
-            name="date"
-            value={form.date}
+            name="startDate"
+            value={form.startDate || ''}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>End Date * (YYYY-MM-DD)</label>
+          <input
+            type="date"
+            name="endDate"
+            value={form.endDate || ''}
             onChange={handleChange}
           />
         </div>
@@ -226,7 +305,7 @@ export default function AdminCalendar() {
             <button
               type="button"
               onClick={() => {
-                setForm({ title: '', date: '', description: '', imageUrl: '' });
+                setForm({ title: '', startDate: '', endDate: '', description: '', imageUrl: '' });
                 setImageFile(null);
                 setEditingId(null);
               }}
@@ -239,38 +318,51 @@ export default function AdminCalendar() {
       </form>
 
       <h3>Upcoming & Recent Events</h3>
-      {sortedDates.length === 0 ? (
+      {sortedEvents.length === 0 ? (
         <p>No events yet. Add one to get started!</p>
       ) : (
         <div className="events-timeline">
-          {sortedDates.map((date) => (
-            <div key={date} className="event-date-group">
-              <h4 className="event-date-header">{new Date(date).toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              })}</h4>
-              <div className="events-for-date">
-                {eventsByDate[date].map((event) => (
-                  <div key={event.id} className="admin-item">
-                    <h5 className="admin-item-title">{event.title}</h5>
-                    {event.description && <p className="admin-item-subtitle">{event.description}</p>}
-                    {event.imageUrl && (
-                      <p className="admin-item-content"><strong>Image:</strong> {event.imageUrl.substring(0, 50)}...</p>
-                    )}
-                    <div className="admin-item-actions">
-                      <button onClick={() => handleEdit(event)} className="btn btn-secondary btn-small">
-                        Edit
-                      </button>
-                      <button onClick={() => handleDelete(event.id!)} className="btn btn-danger btn-small">
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))}
+          {sortedEvents.map((event) => {
+            const startDate = new Date(event.startDate || event.date || '');
+            const endDate = new Date(event.endDate || event.date || '');
+            
+            const formattedStart = startDate.toLocaleDateString('en-US', { 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            });
+            
+            const formattedEnd = endDate.toLocaleDateString('en-US', { 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            });
+            
+            const dateRangeText = event.startDate === event.endDate || !event.endDate 
+              ? formattedStart 
+              : `${formattedStart} - ${formattedEnd}`;
+            
+            return (
+              <div key={event.id} className="admin-item" style={{ marginBottom: '1.5rem' }}>
+                <h5 className="admin-item-title">{event.title}</h5>
+                <p style={{ fontSize: '0.95rem', color: '#666', marginBottom: '0.5rem' }}>
+                  <strong>Date Range:</strong> {dateRangeText}
+                </p>
+                {event.description && <p className="admin-item-subtitle">{event.description}</p>}
+                {event.imageUrl && (
+                  <p className="admin-item-content"><strong>Image:</strong> {event.imageUrl.substring(0, 50)}...</p>
+                )}
+                <div className="admin-item-actions">
+                  <button onClick={() => handleEdit(event)} className="btn btn-secondary btn-small">
+                    Edit
+                  </button>
+                  <button onClick={() => handleDelete(event.id!)} className="btn btn-danger btn-small">
+                    Delete
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

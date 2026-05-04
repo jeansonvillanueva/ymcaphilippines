@@ -257,3 +257,39 @@
     position: static;
   }
 }
+
+/* Stripe Card Element Styles */
+.donate-stripe-element {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 1rem;
+  background: white;
+  font-size: 16px;
+  font-family: var(--font-sans);
+}
+
+.donate-stripe-element.StripeElement--focus {
+  border-color: var(--ymca-red);
+  outline: 2px solid rgba(220, 53, 69, 0.2);
+}
+
+.donate-stripe-element.StripeElement--complete {
+  border-color: #10b981;
+}
+
+.donate-error {
+  background-color: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 14px;
+}
+
+.donate-loading {
+  color: #666;
+  font-size: 14px;
+  padding: 12px;
+}

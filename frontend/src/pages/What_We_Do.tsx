@@ -12,10 +12,9 @@ import { Link } from 'react-router-dom';
 const normalizeImageUrl = (url?: string | null) => {
   if (!url) return '';
   if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  if (url.startsWith('/testsite/') || url.startsWith('/testsite/backend/uploads/')) return url;
   if (url.startsWith('/backend/uploads/')) return url;
-  if (url.startsWith('/uploads/')) return `/testsite/backend${url}`;
-  if (url.startsWith('/php-api/uploads/')) return `/testsite/backend/${url.substring('/php-api/uploads/'.length)}`;
+  if (url.startsWith('/uploads/')) return `/backend${url}`;
+  if (url.startsWith('/php-api/uploads/')) return `/backend/${url.substring('/php-api/uploads/'.length)}`;
   return url;
 };
 const CARDS_PER_PAGE = 3;
@@ -56,14 +55,27 @@ const WhatWeDo: React.FC = () => {
     return [...news].sort((a, b) => parseNewsDate(b.date) - parseNewsDate(a.date));
   }, [news]);
 
-  const initialEvent = calendarEvents.find((e) => e.date === today)
-    ? {
-        title: calendarEvents.find((e) => e.date === today)?.title || '',
-        date: today,
-        description: calendarEvents.find((e) => e.date === today)?.description,
-        image: calendarEvents.find((e) => e.date === today)?.imageUrl,
+  const initialEvent = useMemo(() => {
+    // Find event for today - either single date or within date range
+    const todayEvent = calendarEvents.find((e) => {
+      if (e.date === today) return true; // Old format: exact date match
+      if (e.startDate && e.endDate) {
+        return today >= e.startDate && today <= e.endDate; // New format: date in range
       }
-    : null;
+      return false;
+    });
+    
+    if (!todayEvent) return null;
+    
+    return {
+      title: todayEvent.title || '',
+      date: todayEvent.date || todayEvent.startDate || today,
+      startDate: todayEvent.startDate,
+      endDate: todayEvent.endDate,
+      description: todayEvent.description,
+      image: todayEvent.imageUrl || todayEvent.image,
+    };
+  }, [calendarEvents]);
 
   const [selected, setSelected] = useState<CalendarEvent | null>(initialEvent);
   const [currentPage, setCurrentPage] = useState(0);
@@ -112,17 +124,45 @@ const WhatWeDo: React.FC = () => {
 
   const selectedDate = selected?.date ?? null;
   const formattedDate = useMemo(() => {
-    if (!selectedDate) return null;
     try {
+      // Handle date range (new format)
+      if (selected?.startDate && selected?.endDate) {
+        const startDate = new Date(selected.startDate);
+        const endDate = new Date(selected.endDate);
+        
+        const startFormatted = startDate.toLocaleDateString(undefined, {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+        
+        // If same day, show only once
+        if (selected.startDate === selected.endDate) {
+          return startFormatted;
+        }
+        
+        const endFormatted = endDate.toLocaleDateString(undefined, {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+        
+        return `${startFormatted} - ${endFormatted}`;
+      }
+      
+      // Handle single date (old format)
+      if (!selectedDate) return null;
       return new Date(selectedDate).toLocaleDateString(undefined, {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
       });
     } catch {
-      return selectedDate;
+      return selected?.startDate && selected?.endDate 
+        ? `${selected.startDate} - ${selected.endDate}`
+        : selectedDate;
     }
-  }, [selectedDate]);
+  }, [selected, selectedDate]);
 
   return (
     <div className="what-we-do-page" ref={ref}>
@@ -305,7 +345,7 @@ const WhatWeDo: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    {selected.date === ymdToday() ? (
+                    {(selected.date === ymdToday() || (selected.startDate && selected.endDate && ymdToday() >= selected.startDate && ymdToday() <= selected.endDate)) ? (
                       <div className="calendar-details__todayBadge">Today&apos;s event</div>
                     ) : null}
                     <h2 className="calendar-details__title">{selected.title}</h2>

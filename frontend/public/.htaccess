@@ -1,12 +1,12 @@
 # Enable URL rewriting for the single-page app
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteBase /testsite/
+  RewriteBase /
 
   # If the request is not a file or directory, rewrite to index.html
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^.*$ /testsite/index.html [L,QSA]
+  RewriteRule ^.*$ /index.html [L,QSA]
 </IfModule>
 
 # Optional: serve compressed assets if available

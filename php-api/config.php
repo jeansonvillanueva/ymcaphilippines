@@ -1,8 +1,19 @@
 <?php
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+
+// CORS configuration with credentials support
+// When using withCredentials: true in frontend, we need to specify exact origin, not '*'
+$allowed_origins = ['https://ymca.ph', 'https://www.ymca.ph', 'http://localhost:5173', 'http://localhost:3000'];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+if (in_array($origin, $allowed_origins)) {
+    header("Access-Control-Allow-Origin: $origin");
+    header('Access-Control-Allow-Credentials: true');
+}
+
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Access-Control-Max-Age: 86400');
 
 // Enable error reporting for debugging on cPanel
 ini_set('display_errors', '1');

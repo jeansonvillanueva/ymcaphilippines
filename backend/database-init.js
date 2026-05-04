@@ -57,7 +57,9 @@ export function initializeTables() {
     CREATE TABLE IF NOT EXISTS calendar_events (
       id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
       title VARCHAR(255) NOT NULL,
-      date DATE NOT NULL,
+      date DATE,
+      start_date DATE NOT NULL,
+      end_date DATE NOT NULL,
       description TEXT,
       imageUrl VARCHAR(500),
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -76,6 +76,7 @@ export default function AdminLocals() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [isNewLocal, setIsNewLocal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const API_URL = `${ADMIN_API_URL}/locals`;
 
@@ -246,8 +247,6 @@ export default function AdminLocals() {
 
   if (loading) return <div className="loading">Loading locals...</div>;
 
-  const localOptions = locals.map((local) => ({ id: local.id, name: local.name }));
-
   return (
     <div className="admin-section">
       <h2>Manage Find Your YMCA (Local Pages)</h2>
@@ -263,19 +262,14 @@ export default function AdminLocals() {
       )}
 
       <div className="form-group" style={{ marginBottom: '2rem' }}>
-        <label>Select Local YMCA:</label>
-        <select
-          value={selectedLocal || ''}
-          onChange={(e) => handleSelectLocal(e.target.value)}
-          style={{ gridColumn: '1 / -1' }}
-        >
-          <option value="">-- Choose a Local --</option>
-          {localOptions.map((local) => (
-            <option key={local.id} value={local.id}>
-              {local.name}
-            </option>
-          ))}
-        </select>
+        <label>Search Local YMCA:</label>
+        <input
+          type="text"
+          placeholder="Search by local name..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ gridColumn: '1 / -1', padding: '0.75rem', borderRadius: '4px', border: '1px solid #ccc', fontSize: '1rem' }}
+        />
       </div>
 
       {selectedLocal && (
@@ -449,23 +443,25 @@ export default function AdminLocals() {
             </tr>
           </thead>
           <tbody>
-            {locals.map((local) => {
-              const corp = Number(local.corporate) || 0;
-              const nonCorp = Number(local.nonCorporate) || 0;
-              const youth = Number(local.youth) || 0;
-              const others = Number(local.others) || 0;
-              const total = corp + nonCorp + youth + others;
-              return (
-                <tr key={local.id} onClick={() => handleSelectLocal(local.id)} style={{ cursor: 'pointer' }}>
-                  <td>{local.name}</td>
-                  <td>{corp}</td>
-                  <td>{nonCorp}</td>
-                  <td>{youth}</td>
-                  <td>{others}</td>
-                  <td><strong>{total}</strong></td>
-                </tr>
-              );
-            })}
+            {locals
+              .filter((local) => local.name.toLowerCase().includes(searchTerm.toLowerCase()))
+              .map((local) => {
+                const corp = Number(local.corporate) || 0;
+                const nonCorp = Number(local.nonCorporate) || 0;
+                const youth = Number(local.youth) || 0;
+                const others = Number(local.others) || 0;
+                const total = corp + nonCorp + youth + others;
+                return (
+                  <tr key={local.id} onClick={() => handleSelectLocal(local.id)} style={{ cursor: 'pointer' }}>
+                    <td>{local.name}</td>
+                    <td>{corp}</td>
+                    <td>{nonCorp}</td>
+                    <td>{youth}</td>
+                    <td>{others}</td>
+                    <td><strong>{total}</strong></td>
+                  </tr>
+                );
+              })}
           </tbody>
         </table>
       </div>

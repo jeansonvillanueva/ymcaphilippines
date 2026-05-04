@@ -29,11 +29,11 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
     try {
-      await axios.post(LOGOUT_URL);
+      await axios.post(LOGOUT_URL, {}, { withCredentials: true });
     } catch (error) {
       console.error('Logout error:', error);
     }
-    navigate('/admin/login');
+    navigate('/secure-management/v3/k7n4m9p2q8c1x5j3/portal/login');
   };
 
   return (

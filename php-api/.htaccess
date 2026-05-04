@@ -1,5 +1,5 @@
 RewriteEngine On
-RewriteBase /testsite/php-api/
+RewriteBase /php-api/
 
 # Don't rewrite if the request is for an actual file
 RewriteCond %{REQUEST_FILENAME} -f

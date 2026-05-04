@@ -21,11 +21,11 @@ export default function AdminLogin() {
 
     const checkAuth = async () => {
       try {
-        const response = await axios.get(STATUS_URL);
+        const response = await axios.get(STATUS_URL, { withCredentials: true });
         if (!mounted) return;
 
         if (response.data?.authenticated) {
-          navigate('/admin/dashboard', { replace: true });
+          navigate('/secure-management/v3/k7n4m9p2q8c1x5j3/portal/dashboard', { replace: true });
         }
       } catch (err) {
         // No action; user stays on login form
@@ -55,11 +55,12 @@ export default function AdminLogin() {
           headers: {
             'Content-Type': 'application/json',
           },
+          withCredentials: true,
         }
       );
 
       if (response.data?.authenticated) {
-        navigate('/admin/dashboard');
+        navigate('/secure-management/v3/k7n4m9p2q8c1x5j3/portal/dashboard');
       } else {
         setError(response.data?.error || 'Invalid username or password');
         setPassword('');

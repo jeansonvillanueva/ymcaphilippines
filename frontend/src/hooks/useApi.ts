@@ -4,9 +4,13 @@ import { LATEST_NEWS, type NewsArticleMeta } from '../data/news';
 
 // Use query parameter routing instead of path-based routing
 // This works on cPanel without needing .htaccess rewrites
-const API_BASE = 'https://ymca.ph/testsite/php-api/index.php';
-export const ADMIN_API_URL = `${API_BASE}?path=/admin`;
+const API_BASE = 'https://ymca.ph/php-api/index.php';
+export const ADMIN_API_URL = `${API_BASE}?path=/n2r8k5j9m1`;
 export const PUBLIC_API_URL = `${API_BASE}?path=/api`;
+
+// Configure axios with credentials for authentication
+// This ensures session cookies are sent/received with every request
+axios.defaults.withCredentials = true;
 
 // Hook for fetching videos
 export function useVideos() {
