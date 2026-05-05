@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useLoadingScreen } from '../hooks/useLoadingScreen';
 import { useNews, useCalendarEvents } from '../hooks/useApi';
 import ActivityCalendar, { type CalendarEvent } from '../components/ActivityCalendar';
 import Card from '../components/Card';
@@ -51,6 +52,9 @@ const WhatWeDo: React.FC = () => {
   const today = ymdToday();
   const { news, loading, error } = useNews();
   const { events: calendarEvents } = useCalendarEvents();
+  
+  // Show loading screen while fetching latest news
+  useLoadingScreen(loading, 'Loading latest news…');
   
   // Sort news by date field chronologically (latest first), not by creation order
   const newsItems = useMemo(() => {
