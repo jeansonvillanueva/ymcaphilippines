@@ -266,6 +266,10 @@ export default function DocumentsSection() {
               font-size: 1.5rem;
             }
           }
+
+          .documents-section .subject-header__accent {
+            color: var(--ymca-navy);
+          }
         `}</style>
       </div>
     </section>
