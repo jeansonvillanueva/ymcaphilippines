@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useLoadingScreen } from '../hooks/useLoadingScreen';
 import axios from 'axios';
 import { PUBLIC_API_URL } from '../hooks/useApi';
 import '../styles/design-system.css';
@@ -59,6 +60,9 @@ function AboutUs() {
   const [orgStructure, setOrgStructure] = useState<{ head: OrgMember; branches: OrgBranch[] } | null>(null);
   const [loadingStaff, setLoadingStaff] = useState(true);
   const [staffError, setStaffError] = useState<string | null>(null);
+
+  // Show loading screen while fetching staff data
+  useLoadingScreen(loadingStaff);
 
   // Fetch staff data on mount
   useEffect(() => {

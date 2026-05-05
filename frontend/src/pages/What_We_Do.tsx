@@ -53,8 +53,8 @@ const WhatWeDo: React.FC = () => {
   const { news, loading, error } = useNews();
   const { events: calendarEvents } = useCalendarEvents();
   
-  // Show loading screen while fetching latest news
-  useLoadingScreen(loading, 'Loading latest news…');
+  // Show loading screen while fetching news
+  useLoadingScreen(loading);
   
   // Sort news by date field chronologically (latest first), not by creation order
   const newsItems = useMemo(() => {
@@ -198,7 +198,6 @@ const WhatWeDo: React.FC = () => {
           {/* All latest news — below the fold */}
           <div className="latest-news-archive">
           <SubjectHeader text="Y Latest News" className="reveal" />
-          {loading && <div className="latest-news-loading">Loading latest news…</div>}
           {error && <div className="latest-news-error">{error}</div>}
 
           <div className="latest-news-layout">

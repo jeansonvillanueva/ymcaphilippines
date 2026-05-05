@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useLoadingScreen } from '../hooks/useLoadingScreen';
 import '../styles/design-system.css';
 import './Home.css';
 import Partners from '../components/Partners';
@@ -67,8 +68,11 @@ function parseNewsDate(date?: string) {
 function Home() {
   const sectionRef = useScrollReveal<HTMLDivElement>();
   const [activeSlide, setActiveSlide] = useState(0);
-  const { videos } = useVideos();
-  const { news } = useNews();
+  const { videos, loading: videosLoading } = useVideos();
+  const { news, loading: newsLoading } = useNews();
+
+  // Show loading screen while fetching videos and news
+  useLoadingScreen(videosLoading || newsLoading);
 
   const heroSlides = useMemo<HeroSlide[]>(() => {
     const latest = [...news]

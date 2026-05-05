@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
+import { useLoadingScreen } from '../hooks/useLoadingScreen';
 import { useNews } from '../hooks/useApi';
 import NewsArticle, { type LocalYMCAConfig } from '../components/NewsArticle';
 import ContentRenderer from '../components/ContentRenderer';
@@ -42,6 +43,9 @@ function resolveLocalYMCA(localYMCA?: string | LocalYMCAConfig | null): LocalYMC
 const NewsDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { news, loading, error } = useNews();
+
+  // Show loading screen while fetching news
+  useLoadingScreen(loading);
 
   type NewsWithContentBlocks = {
     contentBlocks?: any[] | string;

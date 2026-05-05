@@ -4,7 +4,7 @@ import logoImg from '../assets/images/logo.webp';
 import './LoadingScreen.css';
 
 export function LoadingScreen() {
-  const { isLoading, loadingMessage } = useLoading();
+  const { isLoading } = useLoading();
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
@@ -28,8 +28,6 @@ export function LoadingScreen() {
     <div className={`loading-screen ${!isLoading ? 'fade-out' : ''}`}>
       <div className="loading-container">
         <img src={logoImg} alt="YMCA Philippines Logo" className="loading-logo" />
-        <div className="spinner"></div>
-        <p className="loading-text">{loadingMessage}</p>
       </div>
     </div>
   );

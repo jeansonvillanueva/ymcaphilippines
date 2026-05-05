@@ -3,18 +3,15 @@ import React, { createContext, useContext, useState } from 'react';
 interface LoadingContextType {
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
-  loadingMessage: string;
-  setLoadingMessage: (message: string) => void;
 }
 
 const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
 
 export function LoadingProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
-  const [loadingMessage, setLoadingMessage] = useState('Loading...');
 
   return (
-    <LoadingContext.Provider value={{ isLoading, setIsLoading, loadingMessage, setLoadingMessage }}>
+    <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
       {children}
     </LoadingContext.Provider>
   );

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useLoadingScreen } from '../hooks/useLoadingScreen';
 import { useLocalById } from '../hooks/useApi';
 import { getDefaultPillars, getLocalById, resolveLocalHeroImage, type LocalPillarKey, type LocalConfig } from '../data/locals';
 import SubjectHeader from '../components/SubjectHeader';
@@ -35,8 +36,11 @@ const PILLAR_ICONS: Record<LocalPillarKey, string> = {
 export default function LocalDetails() {
   const ref = useScrollReveal<HTMLDivElement>();
   const { localId } = useParams();
-  const { local: apiLocal } = useLocalById(localId ?? '');
+  const { local: apiLocal, loading } = useLocalById(localId ?? '');
   const [activePillar, setActivePillar] = useState<LocalPillarKey | null>(null);
+
+  // Show loading screen while fetching local data
+  useLoadingScreen(loading);
 
   const normalizedLocal = useMemo<LocalConfig | null>(() => {
     if (apiLocal) {

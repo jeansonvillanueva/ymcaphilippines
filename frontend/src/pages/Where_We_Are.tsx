@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useLoadingScreen } from '../hooks/useLoadingScreen';
 import InteractivePhilippinesMap, { type BranchMarker } from '../components/InteractivePhilippinesMap';
 import SubjectHeader from '../components/SubjectHeader';
 import { getLocalById, getLocalsAggregateStats } from '../data/locals';
@@ -161,7 +162,11 @@ function Where_We_Are() {
   const ref = useScrollReveal<HTMLDivElement>();
   const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null);
   const [localsData, setLocalsData] = useState<LocalData[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  // Show loading screen while fetching locals data
+  useLoadingScreen(loading);
 
   useEffect(() => {
     const fetchLocalData = async () => {
@@ -181,6 +186,8 @@ function Where_We_Are() {
       } catch (err) {
         console.error('Error fetching locals from backend:', err);
         setLocalsData([]);
+      } finally {
+        setLoading(false);
       }
     };
 
