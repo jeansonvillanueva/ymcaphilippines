@@ -4,10 +4,11 @@ import { useNews, useCalendarEvents } from '../hooks/useApi';
 import ActivityCalendar, { type CalendarEvent } from '../components/ActivityCalendar';
 import Card from '../components/Card';
 import SubjectHeader from '../components/SubjectHeader';
+import DocumentsSection from '../components/DocumentsSection';
 import { NEWS_FEATURED_IMAGE, type NewsCategory } from '../data/news';
 import '../styles/design-system.css';
 import './What_We_Do.css';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const normalizeImageUrl = (url?: string | null) => {
   if (!url) return '';
@@ -45,6 +46,7 @@ function ymdToday() {
 
 const WhatWeDo: React.FC = () => {
   const ref = useScrollReveal<HTMLDivElement>();
+  const location = useLocation();
 
   const today = ymdToday();
   const { news, loading, error } = useNews();
@@ -373,6 +375,9 @@ const WhatWeDo: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Documents Section */}
+      <DocumentsSection key={`docs-${location.key}`} />
     </div>
   );
 };

@@ -50,6 +50,10 @@ const uploadDir = path.join(__dirname, 'uploads');
 fs.mkdirSync(uploadDir, { recursive: true });
 app.use('/uploads', express.static(uploadDir));
 
+// Serve static files from frontend dist
+const frontendPath = path.join(__dirname, '../frontend/dist');
+app.use(express.static(frontendPath));
+
 const storage = multer.diskStorage({
   destination: uploadDir,
   filename: (req, file, cb) => {
@@ -879,6 +883,11 @@ app.delete("/admin/staff/:id", (req, res) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ message: "Staff deleted successfully" });
   });
+});
+
+// Catch-all route: serve index.html for SPA routing (must be after all API routes)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
 
 app.use((err, req, res, next) => {

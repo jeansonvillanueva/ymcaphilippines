@@ -150,6 +150,13 @@ switch ($path) {
         }
         break;
 
+    // Public documents endpoint
+    case '/api/documents':
+        if ($requestMethod === 'GET') {
+            require_once 'endpoints/documents.php';
+        }
+        break;
+
     // Form submission routes
     case '/api/submit-update':
         if ($requestMethod === 'POST') {
@@ -394,6 +401,25 @@ switch ($path) {
         $_GET['localId'] = $matches[1];
         if ($requestMethod === 'GET') {
             require_once 'endpoints/facilities.php';
+        }
+        break;
+
+    // Admin documents routes
+    case '/n2r8k5j9m1/documents':
+    case '/admin/documents':
+        if ($requestMethod === 'GET') {
+            require_once 'endpoints/admin_documents.php';
+        } elseif ($requestMethod === 'POST') {
+            require_once 'endpoints/admin_documents.php';
+        }
+        break;
+
+    case (preg_match('/^(\/n2r8k5j9m1\/documents\/(\d+)|\/admin\/documents\/(\d+))$/', $path, $matches) ? true : false):
+        $_GET['id'] = $matches[2] ?? $matches[3];
+        if ($requestMethod === 'PUT') {
+            require_once 'endpoints/admin_documents_update.php';
+        } elseif ($requestMethod === 'DELETE') {
+            require_once 'endpoints/admin_documents_delete.php';
         }
         break;
 

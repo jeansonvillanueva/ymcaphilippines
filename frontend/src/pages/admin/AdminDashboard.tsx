@@ -8,11 +8,12 @@ import AdminCalendar from './AdminCalendar';
 import AdminLocals from './AdminLocals';
 import AdminStaff from './AdminStaff';
 import AdminSubmissions from './AdminSubmissions';
+import AdminDocuments from './AdminDocuments';
 import './AdminDashboard.css';
 
 const LOGOUT_URL = `${ADMIN_API_URL}/logout`;
 
-type AdminTab = 'videos' | 'news' | 'calendar' | 'locals' | 'staff' | 'dashboard';
+type AdminTab = 'videos' | 'news' | 'calendar' | 'locals' | 'staff' | 'documents' | 'dashboard';
 
 const tabs: { id: AdminTab; label: string; icon: string }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: '📊' },
@@ -21,6 +22,7 @@ const tabs: { id: AdminTab; label: string; icon: string }[] = [
   { id: 'calendar', label: 'Calendar of Activities', icon: '📅' },
   { id: 'locals', label: 'Find Your YMCA', icon: '📍' },
   { id: 'staff', label: 'Meet Our Family', icon: '👥' },
+  { id: 'documents', label: 'Documents', icon: '📁' },
 ];
 
 export default function AdminDashboard() {
@@ -76,6 +78,7 @@ export default function AdminDashboard() {
             {activeTab === 'calendar' && <AdminCalendar />}
             {activeTab === 'locals' && <AdminLocals />}
             {activeTab === 'staff' && <AdminStaff />}
+            {activeTab === 'documents' && <AdminDocuments />}
             {activeTab === 'dashboard' && <AdminSubmissions />}
           </section>
         </main>
