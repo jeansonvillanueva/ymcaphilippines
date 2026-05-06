@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { PUBLIC_API_URL } from '../hooks/useApi';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useLoadingScreen } from '../hooks/useLoadingScreen';
 import SubjectHeader from '../components/SubjectHeader';
 import '../styles/design-system.css';
 import './Documents.css';
@@ -22,6 +23,9 @@ export default function DocumentsPage() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Show global loading screen while fetching documents
+  useLoadingScreen(loading);
 
   const fetchDocuments = async () => {
     setLoading(true);
@@ -61,15 +65,7 @@ export default function DocumentsPage() {
   };
 
   if (loading) {
-    return (
-      <div className="documents-page" ref={ref}>
-        <section className="page-section page-section--light documents-section">
-          <div className="page-section__inner">
-            <div className="documents-loading">Loading documents...</div>
-          </div>
-        </section>
-      </div>
-    );
+    return null;
   }
 
   return (
