@@ -7,6 +7,7 @@ import { LoadingScreen } from './components/LoadingScreen';
 
 import Home from './pages/Home';
 import Calendar from './pages/What_We_Do';
+import Documents from './pages/Documents';
 import Find_Your_YMCA from './pages/Where_We_Are';
 import Donate from './pages/Donate';
 import Get_Involved from './pages/Get_Involved';
@@ -85,6 +86,7 @@ function AppContent() {
           <Route path="/secure-management/v3/k7n4m9p2q8c1x5j3/portal/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
           <Route path="/secure-management/v3/k7n4m9p2q8c1x5j3/*" element={<Navigate to="/secure-management/v3/k7n4m9p2q8c1x5j3/portal/login" replace />} />
           <Route path="/calendar" element={<Calendar />} />
+          <Route path="/documents" element={<Documents />} />
           <Route path="/find-ymca" element={<Find_Your_YMCA />} />
           <Route path="/find-ymca/:localId" element={<LocalDetails />} />
           <Route path="/donate" element={<Donate />} />

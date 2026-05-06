@@ -134,7 +134,7 @@ function Navbar() {
                 </li>
 
                 <li>
-                  <Link to="/calendar#documents" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
+                  <Link to="/documents" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
                     Documents
                   </Link>
                 </li>

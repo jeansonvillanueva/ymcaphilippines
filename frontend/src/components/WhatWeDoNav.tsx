@@ -1,23 +1,36 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface NavigationLink {
   id: string;
   label: string;
   icon: string;
+  external?: boolean;
 }
 
 const SECTIONS: NavigationLink[] = [
   { id: 'latest-news', label: 'Latest News', icon: '📄' },
   { id: 'calendar', label: 'Calendar of Activities', icon: '📅' },
-  { id: 'documents', label: 'Documents', icon: '📁' },
+  { id: 'documents', label: 'Documents', icon: '📁', external: true },
 ];
 
 export default function WhatWeDoNav() {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const handleNavigate = (sectionId: string) => {
+  const handleNavigate = (section: NavigationLink) => {
     setIsOpen(false);
-    const element = document.getElementById(sectionId);
+    
+    // If it's an external link (separate page), navigate using router
+    if (section.external) {
+      if (section.id === 'documents') {
+        navigate('/documents');
+      }
+      return;
+    }
+    
+    // Otherwise, scroll to the section
+    const element = document.getElementById(section.id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -179,7 +192,7 @@ export default function WhatWeDoNav() {
               <button
                 key={section.id}
                 className="what-we-do-nav__menu-item"
-                onClick={() => handleNavigate(section.id)}
+                onClick={() => handleNavigate(section)}
               >
                 <span className="what-we-do-nav__menu-item-icon">{section.icon}</span>
                 <span className="what-we-do-nav__menu-item-label">{section.label}</span>
