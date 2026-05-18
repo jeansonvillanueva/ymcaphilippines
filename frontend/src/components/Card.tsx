@@ -1,0 +1,49 @@
+import React from 'react';
+import './Card.css';
+
+const normalizeImageUrl = (url?: string | null) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (url.startsWith('/backend/uploads/')) return url;
+  if (url.startsWith('/uploads/')) return `/backend${url}`;
+  if (url.startsWith('/php-api/uploads/')) return `/backend/${url.substring('/php-api/uploads/'.length)}`;
+  return url;
+};
+
+interface CardProps {
+  title: string;
+  subtitle?: string;
+  imageUrl?: string | null;
+  tag?: string;
+  description?: string;
+  /** Articles use a distinct editorial layout */
+  variant?: 'news' | 'article';
+  children?: React.ReactNode;
+}
+
+const Card: React.FC<CardProps> = ({ title, subtitle, imageUrl, tag, description, variant = 'news', children }) => {
+  const containerClass = `card-container ${variant === 'article' ? 'card-container--article' : ''} ${!imageUrl ? 'card-container--no-image' : ''}`.trim();
+  
+  return (
+    <div className={containerClass}>
+      {imageUrl ? (
+        <div className="card-media">
+          {tag ? <div className="card-tag">{tag}</div> : null}
+          <img src={normalizeImageUrl(imageUrl)} alt={title} className="card-image" />
+        </div>
+      ) : tag ? (
+        <div className="card-media">
+          <div className="card-tag">{tag}</div>
+        </div>
+      ) : null}
+      <div className="card-content">
+        <div className="card-title">{title}</div>
+        {subtitle && <div className="card-subtitle">{subtitle}</div>}
+        {description ? <div className="card-description">{description}</div> : null}
+        {children}
+      </div>
+    </div>
+  );
+};
+
+export default Card;

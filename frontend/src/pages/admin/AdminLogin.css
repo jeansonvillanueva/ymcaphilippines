@@ -1,0 +1,154 @@
+.admin-login-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+}
+
+.admin-login-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.admin-login-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 50px 40px;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.admin-login-logo {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.admin-login-logo img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+}
+
+.admin-login-title {
+  font-size: 48px;
+  font-weight: bold;
+  color: #e31937; /* YMCA red color */
+  margin: 20px 0 30px 0;
+  letter-spacing: 2px;
+}
+
+.admin-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.admin-login-error {
+  background-color: #fee;
+  color: #c33;
+  padding: 12px 15px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 10px;
+  border-left: 4px solid #c33;
+}
+
+.admin-login-input {
+  padding: 14px 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+  font-family: inherit;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: #f9f9f9;
+}
+
+.admin-login-input:focus {
+  outline: none;
+  border-color: #e31937;
+  box-shadow: 0 0 0 3px rgba(227, 25, 55, 0.1);
+  background-color: white;
+}
+
+.admin-login-input:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.admin-login-button {
+  padding: 12px 24px;
+  background-color: #4CAF50; /* Green color like in the image */
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+  margin-top: 10px;
+  letter-spacing: 0.5px;
+}
+
+.admin-login-button:hover:not(:disabled) {
+  background-color: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.admin-login-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.admin-login-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Footer styling - make it sticky at bottom */
+footer {
+  margin-top: auto;
+  border-top: 1px solid #ddd;
+}
+
+@media (max-width: 768px) {
+  .admin-login-content {
+    padding: 40px 25px;
+    margin: 20px;
+  }
+
+  .admin-login-title {
+    font-size: 36px;
+  }
+
+  .admin-login-logo img {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-login-content {
+    padding: 30px 20px;
+  }
+
+  .admin-login-title {
+    font-size: 32px;
+  }
+
+  .admin-login-logo img {
+    width: 70px;
+    height: 70px;
+  }
+
+  .admin-login-form {
+    gap: 12px;
+  }
+}

@@ -1,0 +1,54 @@
+.developer-page {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+  display: grid;
+  gap: 2rem;
+}
+
+.developer-banner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 1.75rem;
+  align-items: center;
+}
+
+.developer-banner__content h1 {
+  margin-bottom: 1rem;
+  font-size: clamp(2rem, 2.5vw, 3rem);
+}
+
+.developer-banner__content p {
+  line-height: 1.8;
+  color: #222;
+}
+
+.developer-banner__image img {
+  width: 100%;
+  max-width: 320px;
+  border-radius: 1rem;
+  object-fit: cover;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
+}
+
+.developer-details {
+  display: grid;
+  gap: 1.35rem;
+}
+
+.developer-details p {
+  line-height: 1.85;
+  color: #2d2d2d;
+}
+
+.hidden-dev-link {
+  color: transparent;
+  text-decoration: none;
+  pointer-events: auto;
+}
+
+@media (max-width: 768px) {
+  .developer-banner {
+    grid-template-columns: 1fr;
+  }
+}
