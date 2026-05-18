@@ -161,9 +161,18 @@ function isValidPhPhone(raw: string) {
 function Where_We_Are() {
   const ref = useScrollReveal<HTMLDivElement>();
   const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null);
+  const [openRegionIds, setOpenRegionIds] = useState<string[]>([]);
   const [localsData, setLocalsData] = useState<LocalData[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const toggleRegionOpen = (regionId: string) => {
+    setOpenRegionIds((current) =>
+      current.includes(regionId)
+        ? current.filter((id) => id !== regionId)
+        : [...current, regionId]
+    );
+  };
 
   // Show loading screen while fetching locals data
   useLoadingScreen(loading);
@@ -306,11 +315,23 @@ function Where_We_Are() {
             </div>
 
             <ul className="find-ymca__regions" aria-label="Regions">
-              {REGIONS.map((region) => (
-                <li key={region.id} className="find-ymca__region">
-                  <div className="find-ymca__region-title">{region.name}</div>
-                  <ul className="find-ymca__branches" aria-label={`${region.name} branches`}>
-                  {region.branches.map((b) => {
+              {REGIONS.map((region) => {
+                const regionOpen = openRegionIds.includes(region.id);
+                return (
+                  <li key={region.id} className="find-ymca__region">
+                    <button
+                      type="button"
+                      className="find-ymca__region-toggle"
+                      onClick={() => toggleRegionOpen(region.id)}
+                      aria-expanded={regionOpen}
+                    >
+                      {region.name}
+                    </button>
+                    <ul
+                      className={`find-ymca__branches ${regionOpen ? 'find-ymca__branches--open' : ''}`}
+                      aria-label={`${region.name} branches`}
+                    >
+                    {region.branches.map((b) => {
                     const backendLocal = localsById.get(b.markerId);
                     const local = backendLocal || getLocalById(b.markerId);
                     const logoSrc = local?.logoImageUrl ?? defaultBranchLogo;

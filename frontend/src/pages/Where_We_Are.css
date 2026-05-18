@@ -109,16 +109,35 @@
   font-size: var(--text-xl);
   font-weight: 800;
   color: var(--ymca-navy);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: default;
 }
 
-.find-ymca__region-title::after {
+.find-ymca__region-toggle {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: var(--ymca-navy);
+  font: inherit;
+  text-align: left;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: var(--text-xl);
+  font-weight: 800;
+}
+
+.find-ymca__region-toggle::after {
   content: '▾';
   font-size: 0.9em;
   opacity: 0.65;
+  transition: transform var(--duration-normal) var(--ease-out);
+}
+
+.find-ymca__region-toggle[aria-expanded='true']::after {
+  transform: rotate(-180deg);
 }
 
 .find-ymca__branches {
@@ -128,8 +147,7 @@
   margin: 0;
 }
 
-.find-ymca__region:hover .find-ymca__branches,
-.find-ymca__region:focus-within .find-ymca__branches {
+.find-ymca__branches--open {
   display: block;
 }
 
