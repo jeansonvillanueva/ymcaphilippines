@@ -22,13 +22,8 @@ function Get_Involved() {
           </p>
 
           <div className="get-involved-ctas reveal reveal-delay-2" aria-label="Get involved actions">
-            {/* Volunteer LEFT */}
-            <Link to="/find-ymca" className="get-involved-cta get-involved-cta--left">
+            <Link to="/where-we-are" className="get-involved-cta get-involved-cta--left">
               VOLUNTEER
-            </Link>
-            {/* Donate RIGHT */}
-            <Link to="/donate" className="get-involved-cta get-involved-cta--right">
-              DONATE
             </Link>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import Navbar from './components/Navbar';
 import './App.css';
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate, useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { LoadingProvider, useLoading } from './context/LoadingContext';
 import { LoadingScreen } from './components/LoadingScreen';
@@ -9,7 +9,6 @@ import Home from './pages/Home';
 import Calendar from './pages/What_We_Do';
 import Documents from './pages/Documents';
 import Find_Your_YMCA from './pages/Where_We_Are';
-import Donate from './pages/Donate';
 import Get_Involved from './pages/Get_Involved';
 import LocalDetails from './pages/LocalDetails';
 import About_Us from './pages/About_Us';
@@ -85,11 +84,14 @@ function AppContent() {
           <Route path="/secure-management/v3/k7n4m9p2q8c1x5j3/portal/login" element={<AdminLogin />} />
           <Route path="/secure-management/v3/k7n4m9p2q8c1x5j3/portal/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
           <Route path="/secure-management/v3/k7n4m9p2q8c1x5j3/*" element={<Navigate to="/secure-management/v3/k7n4m9p2q8c1x5j3/portal/login" replace />} />
-          <Route path="/calendar" element={<Calendar />} />
+          <Route path="/calendar" element={<Navigate to="/what-we-do" replace />} />
+          <Route path="/find-ymca" element={<Navigate to="/where-we-are" replace />} />
+          <Route path="/find-ymca/:localId" element={<RedirectFindYMCA />} />
+          <Route path="/what-we-do" element={<Calendar />} />
           <Route path="/documents" element={<Documents />} />
-          <Route path="/find-ymca" element={<Find_Your_YMCA />} />
-          <Route path="/find-ymca/:localId" element={<LocalDetails />} />
-          <Route path="/donate" element={<Donate />} />
+          <Route path="/where-we-are" element={<Find_Your_YMCA />} />
+          <Route path="/where-we-are/:localId" element={<LocalDetails />} />
+          <Route path="/donate" element={<Navigate to="/get-involved" replace />} />
           <Route path="/get-involved" element={<Get_Involved />} />
           <Route path="/about-us" element={<About_Us />} />
           <Route path="/about-us/highlights" element={<AboutUsHighlights />} />
@@ -102,6 +104,11 @@ function AppContent() {
       {!isAdminRoute && <Footer />}
     </>
   );
+}
+
+function RedirectFindYMCA() {
+  const { localId } = useParams();
+  return <Navigate to={`/where-we-are/${localId}`} replace />;
 }
 
 export default App;

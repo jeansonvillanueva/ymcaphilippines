@@ -103,14 +103,14 @@ function Navbar() {
                   <Link to="/#vision_2030" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>Vision 2030</Link>
                 </li>
                 <li>
-                  <Link to="/#made-our-impact" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>Made Our Impact</Link>
+                  <Link to="/#made-our-impact" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>Our Reach & Impact</Link>
                 </li>
               </ul>
             </li>
 
             <li className="nav-dropdown">
               <NavLink
-                to="/calendar"
+                to="/what-we-do"
                 onClick={() => {
                   setIsSearchOpen(false);
                   setIsMenuOpen(false);
@@ -122,13 +122,13 @@ function Navbar() {
 
               <ul className="nav-dropdown-menu" aria-label="What We Do submenu">
                 <li>
-                  <Link to="/calendar#latest-news" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
+                  <Link to="/what-we-do#latest-news" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
                     Latest News
                   </Link>
                 </li>
 
                 <li>
-                  <Link to="/calendar#calendar" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
+                  <Link to="/what-we-do#calendar" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
                     Calendar of Activities
                   </Link>
                 </li>
@@ -143,7 +143,7 @@ function Navbar() {
 
             <li className="nav-dropdown">
               <NavLink
-                to="/find-ymca"
+                to="/where-we-are"
                 onClick={() => {
                   setIsSearchOpen(false);
                   setIsMenuOpen(false);
@@ -155,13 +155,13 @@ function Navbar() {
 
               <ul className="nav-dropdown-menu" aria-label="Where We Are submenu">
                 <li>
-                  <Link to="/find-ymca#find-your-ymca" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
+                  <Link to="/where-we-are#find-your-ymca" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
                     Find Your YMCA
                   </Link>
                 </li>
 
                 <li>
-                  <Link to="/find-ymca#contact-us" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
+                  <Link to="/where-we-are#contact-us" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
                     Contact Us
                   </Link>
                 </li>

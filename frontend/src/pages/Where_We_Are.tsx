@@ -350,7 +350,7 @@ function Where_We_Are() {
                                   type="button"
                                   className="find-ymca__branch-cta find-ymca__branch-cta--fallback"
                                   onClick={() => {
-                                    if (local) navigate(`/find-ymca/${local.id}`);
+                                    if (local) navigate(`/where-we-are/${local.id}`);
                                   }}
                                   disabled={!local}
                                   aria-label={local ? `Open ${b.name} local page` : b.name}

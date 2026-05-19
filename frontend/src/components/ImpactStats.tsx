@@ -55,7 +55,7 @@ function ImpactStats() {
     <section id="made-our-impact" className="page-section page-section--gray">
       <div className="page-section__inner">
         <div className="section-header reveal">
-          <h2 className="section-header__title">Made Our Impact</h2>
+          <h2 className="section-header__title">Our Reach & Impact</h2>
           <div className="section-header__line" aria-hidden />
         </div>
         <div className="impact-stats__grid reveal reveal-delay-1">

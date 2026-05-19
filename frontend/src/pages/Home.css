@@ -5,7 +5,7 @@
   color: var(--ymca-text);
 }
 
-/* Section header with red line (used for YMCA Videos, Event Venue, Made Our Impact) */
+/* Section header with red line (used for YMCA Videos, Event Venue, Our Reach & Impact) */
 .section-header {
   display: flex;
   align-items: flex-end;
@@ -1310,6 +1310,14 @@
   grid-template-columns: 1fr 1fr;
   gap: var(--gap-xl);
   align-items: center;
+}
+
+.vision-2030__title img {
+  max-width: 320px;
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-bottom: 0.75rem;
 }
 
 .vision-2030__title {
