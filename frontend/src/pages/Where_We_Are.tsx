@@ -331,84 +331,84 @@ function Where_We_Are() {
                       className={`find-ymca__branches ${regionOpen ? 'find-ymca__branches--open' : ''}`}
                       aria-label={`${region.name} branches`}
                     >
-                    {region.branches.map((b) => {
-                    const backendLocal = localsById.get(b.markerId);
-                    const local = backendLocal || getLocalById(b.markerId);
-                    const logoSrc = local?.logoImageUrl ?? defaultBranchLogo;
-                    const rowActive = activeMarkerId === b.markerId;
+                      {region.branches.map((b) => {
+                        const backendLocal = localsById.get(b.markerId);
+                        const local = backendLocal || getLocalById(b.markerId);
+                        const logoSrc = local?.logoImageUrl ?? defaultBranchLogo;
+                        const rowActive = activeMarkerId === b.markerId;
 
-                    return (
-                      <li key={b.id} className="find-ymca__branch">
-                        <div
-                          className={rowActive ? 'find-ymca__branch-row find-ymca__branch-row--active' : 'find-ymca__branch-row'}
-                          onMouseEnter={() => setActiveMarkerId(b.markerId)}
-                          onFocus={() => setActiveMarkerId(b.markerId)}
-                          onMouseLeave={() => setActiveMarkerId(null)}
-                        >
-                          <div className="find-ymca__branch-content">
-                            <button
-                              type="button"
-                              className="find-ymca__branch-cta find-ymca__branch-cta--fallback"
-                              onClick={() => {
-                                if (local) navigate(`/find-ymca/${local.id}`);
-                              }}
-                              disabled={!local}
-                              aria-label={local ? `Open ${b.name} local page` : b.name}
+                        return (
+                          <li key={b.id} className="find-ymca__branch">
+                            <div
+                              className={rowActive ? 'find-ymca__branch-row find-ymca__branch-row--active' : 'find-ymca__branch-row'}
+                              onMouseEnter={() => setActiveMarkerId(b.markerId)}
+                              onFocus={() => setActiveMarkerId(b.markerId)}
+                              onMouseLeave={() => setActiveMarkerId(null)}
                             >
-                              <img src={logoSrc} alt="" className="find-ymca__branch-logo" />
-                              <span className="find-ymca__branch-name">{b.name}</span>
-                            </button>
-                          </div>
+                              <div className="find-ymca__branch-content">
+                                <button
+                                  type="button"
+                                  className="find-ymca__branch-cta find-ymca__branch-cta--fallback"
+                                  onClick={() => {
+                                    if (local) navigate(`/find-ymca/${local.id}`);
+                                  }}
+                                  disabled={!local}
+                                  aria-label={local ? `Open ${b.name} local page` : b.name}
+                                >
+                                  <img src={logoSrc} alt="" className="find-ymca__branch-logo" />
+                                  <span className="find-ymca__branch-name">{b.name}</span>
+                                </button>
+                              </div>
 
-                          {/* Social Media Icons */}
-                          {local && (local.facebookUrl || local.instagramUrl || local.twitterUrl) && (
-                            <div className="find-ymca__branch-social">
-                              {local.facebookUrl && (
-                                <a
-                                  href={local.facebookUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="find-ymca__social-icon"
-                                  title="Facebook"
-                                  aria-label={`${b.name} Facebook`}
-                                >
-                                  <FaFacebookF />
-                                </a>
+                              {local && (local.facebookUrl || local.instagramUrl || local.twitterUrl) && (
+                                <div className="find-ymca__branch-social">
+                                  {local.facebookUrl && (
+                                    <a
+                                      href={local.facebookUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="find-ymca__social-icon"
+                                      title="Facebook"
+                                      aria-label={`${b.name} Facebook`}
+                                    >
+                                      <FaFacebookF />
+                                    </a>
+                                  )}
+                                  {local.instagramUrl && (
+                                    <a
+                                      href={local.instagramUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="find-ymca__social-icon"
+                                      title="Instagram"
+                                      aria-label={`${b.name} Instagram`}
+                                    >
+                                      <FaInstagram />
+                                    </a>
+                                  )}
+                                  {local.twitterUrl && (
+                                    <a
+                                      href={local.twitterUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="find-ymca__social-icon"
+                                      title="X (Twitter)"
+                                      aria-label={`${b.name} X/Twitter`}
+                                    >
+                                      <FaTwitter />
+                                    </a>
+                                  )}
+                                </div>
                               )}
-                              {local.instagramUrl && (
-                                <a
-                                  href={local.instagramUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="find-ymca__social-icon"
-                                  title="Instagram"
-                                  aria-label={`${b.name} Instagram`}
-                                >
-                                  <FaInstagram />
-                                </a>
-                              )}
-                              {local.twitterUrl && (
-                                <a
-                                  href={local.twitterUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="find-ymca__social-icon"
-                                  title="X (Twitter)"
-                                  aria-label={`${b.name} X/Twitter`}
-                                >
-                                  <FaTwitter />
-                                </a>
-                              )}
+
                             </div>
-                          )}
-
-                        </div>
-                      </li>
-                    );
-                  })}
-                  </ul>
-                </li>
-              ))}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </div>
