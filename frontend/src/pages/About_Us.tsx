@@ -509,7 +509,7 @@ function AboutUs() {
       <section id="history" className="page-section histoy-section">
         <div className="page-section__inner">
           <SubjectHeader text="HistorY" className="reveal" />
-          <p className="histoy__subtitle reveal">Since arriving in the Philippines in 1899 and formally incorporating in 1911, we have spent over a century at the forefront of community development. From pioneering the country's first Physical Education classes and the first Filipino Boy Scouts troop, we have grown into a nationwide network of local branches. Today, our enduring legacy of nation-building and holistic youth empowerment continues to thrive across the country. </p>
+          <p className="histoy__subtitle reveal">Since arriving in the Philippines in 1899 and formally incorporating in 1911, the YMCA have spent over a century at the forefront of community development. From pioneering the country's first Physical Education classes and the first Filipino Boy Scouts troop, the YMCA have grown into a nationwide network of local branches. Today, our enduring legacy of nation-building and holistic youth empowerment continues to thrive across the country.</p>
 
           <div className="histoy-grid reveal reveal-delay-1">
             <figure className="histoy-card histoy-card--right">
