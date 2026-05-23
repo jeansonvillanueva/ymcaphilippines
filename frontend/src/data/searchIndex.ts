@@ -16,6 +16,7 @@ const PAGE_ENTRIES: SearchResult[] = [
   { type: 'page', title: 'Vision', path: '/#vision' },
   { type: 'page', title: 'History', path: '/#history' },
   { type: 'page', title: 'Meet Our Family', subtitle: 'Organizational staff', path: '/#meet-family' },
+<<<<<<< HEAD
   { type: 'page', title: 'What We Do', subtitle: 'News & calendar', path: '/what-we-do' },
   { type: 'page', title: 'Latest News', path: '/what-we-do#latest-news' },
   { type: 'page', title: 'Calendar of Activities', path: '/what-we-do#calendar' },
@@ -23,6 +24,16 @@ const PAGE_ENTRIES: SearchResult[] = [
   { type: 'page', title: 'Find Your YMCA', path: '/where-we-are#find-your-ymca' },
   { type: 'page', title: 'Contact Us', path: '/where-we-are#contact-us' },
   { type: 'page', title: 'Get Involved', path: '/get-involved' },
+=======
+  { type: 'page', title: 'What We Do', subtitle: 'News & calendar', path: '/calendar' },
+  { type: 'page', title: 'Latest News', path: '/calendar#latest-news' },
+  { type: 'page', title: 'Calendar of Activities', path: '/calendar#calendar' },
+  { type: 'page', title: 'Where We Are', subtitle: 'Find your YMCA', path: '/find-ymca' },
+  { type: 'page', title: 'Find Your YMCA', path: '/find-ymca#find-your-ymca' },
+  { type: 'page', title: 'Contact Us', path: '/find-ymca#contact-us' },
+  { type: 'page', title: 'Get Involved', path: '/get-involved' },
+  { type: 'page', title: 'Support — Donate', path: '/donate' },
+>>>>>>> 0ac1e4a8513bef680c8307afe418cb8b5a90d925
   { type: 'page', title: 'Submit YMCA Update', subtitle: 'Local news submission', path: '/Article' },
 ];
 

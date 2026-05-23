@@ -22,9 +22,20 @@ function Get_Involved() {
           </p>
 
           <div className="get-involved-ctas reveal reveal-delay-2" aria-label="Get involved actions">
+<<<<<<< HEAD
             <Link to="/where-we-are" className="get-involved-cta get-involved-cta--left">
               VOLUNTEER
             </Link>
+=======
+            {/* Volunteer LEFT */}
+            <Link to="/find-ymca" className="get-involved-cta get-involved-cta--left">
+              VOLUNTEER
+            </Link>
+            {/* Donate RIGHT */}
+            <Link to="/donate" className="get-involved-cta get-involved-cta--right">
+              DONATE
+            </Link>
+>>>>>>> 0ac1e4a8513bef680c8307afe418cb8b5a90d925
           </div>
         </div>
       </section>

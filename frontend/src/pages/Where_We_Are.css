@@ -109,6 +109,7 @@
   font-size: var(--text-xl);
   font-weight: 800;
   color: var(--ymca-navy);
+<<<<<<< HEAD
 }
 
 .find-ymca__region-toggle {
@@ -138,6 +139,18 @@
 
 .find-ymca__region-toggle[aria-expanded='true']::after {
   transform: rotate(-180deg);
+=======
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: default;
+}
+
+.find-ymca__region-title::after {
+  content: '▾';
+  font-size: 0.9em;
+  opacity: 0.65;
+>>>>>>> 0ac1e4a8513bef680c8307afe418cb8b5a90d925
 }
 
 .find-ymca__branches {
@@ -147,7 +160,12 @@
   margin: 0;
 }
 
+<<<<<<< HEAD
 .find-ymca__branches--open {
+=======
+.find-ymca__region:hover .find-ymca__branches,
+.find-ymca__region:focus-within .find-ymca__branches {
+>>>>>>> 0ac1e4a8513bef680c8307afe418cb8b5a90d925
   display: block;
 }
 
