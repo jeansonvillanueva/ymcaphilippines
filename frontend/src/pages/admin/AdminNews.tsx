@@ -3,6 +3,7 @@ import axios from 'axios';
 import { ADMIN_API_URL } from '../../hooks/useApi';
 import ContentBuilder from '../../components/ContentBuilder';
 import type { ContentBlock } from '../../components/ContentBuilder';
+import ContentRenderer from '../../components/ContentRenderer';
 import { LOCALS_BY_ID } from '../../data/locals';
 
 interface News {
@@ -24,8 +25,52 @@ type NewsForm = Omit<News, 'contentBlocks'> & {
 };
 
 const categories = ['News', 'Articles', 'Features'];
-const topics = ['Education', 'Training', 'Youth Leadership', 'Environment', 'Youth Summit', 'Leadership', 'National Youth Assembly', 'Careers'];
-
+const topics = [
+  'Education',
+  'Training',
+  'Youth Leadership',
+  'Environment',
+  'Youth Summit',
+  'Leadership',
+  'National Youth Assembly',
+  'Careers',
+  'Community Development',
+  'Volunteerism',
+  'Health and Wellness',
+  'Mental Health',
+  'Sports and Recreation',
+  'Culture and Arts',
+  'Disaster Response',
+  'Climate Action',
+  'Social Responsibility',
+  'Scholarships',
+  'Events and Programs',
+  'Partnerships',
+  'Advocacy',
+  'Technology and Innovation',
+  'Entrepreneurship',
+  'Faith and Values',
+  'International Programs',
+  'Local YMCA Activities',
+  'Success Stories',
+  'Announcements',
+  'Workshops',
+  'Seminars',
+  'Conferences',
+  'Outreach Programs',
+  'Fundraising',
+  'Community Service',
+  'Inclusive Development',
+  'Women Empowerment',
+  'Children and Youth',
+  'Sustainability',
+  'Digital Skills',
+  'Volunteer Opportunities',
+  'Public Service',
+  'Campus Initiatives',
+  'Employment Opportunities',
+  'Press Releases'
+];
 // Parse date string for chronological sorting (latest first)
 const parseNewsDate = (date?: string) => {
   if (!date) return Number.MIN_SAFE_INTEGER;
@@ -100,6 +145,8 @@ export default function AdminNews() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [topicSearch, setTopicSearch] = useState('');
+  const [showTopicSuggestions, setShowTopicSuggestions] = useState(false);
 
   const API_URL = `${ADMIN_API_URL}/news`;
 
@@ -133,6 +180,58 @@ export default function AdminNews() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleTopicSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setTopicSearch(value);
+    setShowTopicSuggestions(true);
+  };
+
+  const handleSelectTopic = (selectedTopic: string) => {
+    setForm((prev) => ({ ...prev, topic: selectedTopic }));
+    setTopicSearch(selectedTopic);
+    setShowTopicSuggestions(false);
+  };
+
+  const filteredTopics = topicSearch.trim() === '' 
+    ? topics 
+    : topics.filter((topic) => topic.toLowerCase().includes(topicSearch.toLowerCase()));
+
+  const extractSlideshowImages = () => {
+    const images: Array<{ url: string; order: number }> = [];
+    (form.contentBlocks || []).forEach((block) => {
+      if (block.type === 'slideshow' && block.slideshow_images) {
+        block.slideshow_images.forEach((img) => {
+          images.push({
+            url: img.url,
+            order: images.length, // Global order across all slideshows
+          });
+        });
+      }
+    });
+    return images;
+  };
+
+  const uploadSlideshowImages = async (newsId: number) => {
+    const images = extractSlideshowImages();
+    if (images.length === 0) return;
+
+    for (const image of images) {
+      try {
+        // Convert base64 to blob
+        const response = await fetch(image.url);
+        const blob = await response.blob();
+        
+        const formData = new FormData();
+        formData.append('image', blob, `slideshow-${image.order}.jpg`);
+
+        await axios.post(`${ADMIN_API_URL}/news/${newsId}/upload`, formData);
+      } catch (error) {
+        console.error(`Error uploading slideshow image ${image.order}:`, error);
+        throw new Error(`Failed to upload slideshow image ${image.order + 1}`);
+      }
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -169,6 +268,16 @@ export default function AdminNews() {
     });
   };
 
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setForm((prev) => ({ ...prev, imageUrl: '' }));
+
+    const fileInput = document.getElementById('news-image') as HTMLInputElement | null;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title.trim()) {
@@ -201,25 +310,34 @@ export default function AdminNews() {
 
       if (editingId) {
         formData.append('_method', 'PUT');
+        formData.append('id', editingId.toString());
         await axios.post(`${API_URL}/${editingId}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
           timeout: 120000, // 2 minutes
           maxContentLength: Infinity,
           maxBodyLength: Infinity,
         });
+        // Delete old slideshow images and upload new ones for editing
+        try {
+          // First, delete all existing slideshow images for this news
+          await axios.delete(`${ADMIN_API_URL}/news/${editingId}/images/all`);
+        } catch (error) {
+          console.log('Note: Could not delete existing slideshow images (may not exist)');
+        }
+        // Upload new slideshow images
+        await uploadSlideshowImages(editingId);
         setMessage({ type: 'success', text: 'News updated successfully' });
       } else {
         const createResponse = await axios.post(API_URL, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
           timeout: 120000, // 2 minutes
           maxContentLength: Infinity,
           maxBodyLength: Infinity,
         });
         console.log('[AdminNews] Create response:', createResponse.data);
+        const newNewsId = createResponse.data.id;
+        // Upload slideshow images for new news
+        if (newNewsId) {
+          await uploadSlideshowImages(newNewsId);
+        }
         setMessage({ type: 'success', text: 'News added successfully' });
       }
       setForm({
@@ -236,6 +354,8 @@ export default function AdminNews() {
       });
       setImageFile(null);
       setEditingId(null);
+      setTopicSearch('');
+      setShowTopicSuggestions(false);
       // Add a small delay to ensure database has processed the insert
       setTimeout(() => {
         fetchNews();
@@ -258,9 +378,14 @@ export default function AdminNews() {
       ...news,
       contentBlocks: parsedContentBlocks,
     });
+    setTopicSearch(news.topic || '');
     setEditingId(news.id || null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+
+
+
 
   const handleDelete = async (id: number) => {
     if (confirm('Are you sure you want to delete this news?')) {
@@ -339,16 +464,39 @@ export default function AdminNews() {
           </select>
         </div>
 
-        <div className="form-group">
+        <div className="form-group topic-search-group">
           <label htmlFor="news-topic">Topic</label>
-          <select id="news-topic" name="topic" value={form.topic} onChange={handleChange}>
-            <option key="topic-placeholder" value="">Select a topic</option>
-            {topics.map((topic) => (
-              <option key={`topic-${topic}`} value={topic}>
-                {topic}
-              </option>
-            ))}
-          </select>
+          <div className="topic-search-wrapper">
+            <input
+              id="news-topic"
+              type="text"
+              placeholder="Search or type a topic..."
+              value={topicSearch || form.topic}
+              onChange={handleTopicSearch}
+              onFocus={() => setShowTopicSuggestions(true)}
+              onBlur={() => setTimeout(() => setShowTopicSuggestions(false), 200)}
+              className="topic-search-input"
+            />
+            {showTopicSuggestions && (topicSearch.trim() !== '' || form.topic === '') && (
+              <div className="topic-suggestions">
+                {filteredTopics.length > 0 ? (
+                  filteredTopics.map((topic) => (
+                    <div
+                      key={`topic-${topic}`}
+                      className={`topic-suggestion-item ${form.topic === topic ? 'selected' : ''}`}
+                      onClick={() => handleSelectTopic(topic)}
+                    >
+                      {topic}
+                    </div>
+                  ))
+                ) : (
+                  <div className="topic-suggestion-item disabled">
+                    No topics found
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="form-group">
@@ -372,6 +520,14 @@ export default function AdminNews() {
           {form.imageUrl ? (
             <div className="image-preview">
               <img src={form.imageUrl} alt="News preview" style={{ maxWidth: '100%', marginTop: '0.75rem' }} />
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                className="btn btn-danger btn-small"
+                style={{ marginTop: '0.75rem' }}
+              >
+                Delete Image
+              </button>
             </div>
           ) : null}
         </div>
@@ -382,6 +538,29 @@ export default function AdminNews() {
             blocks={Array.isArray(form.contentBlocks) ? form.contentBlocks : []}
             onChange={(blocks) => setForm((prev) => ({ ...prev, contentBlocks: blocks }))}
           />
+        </div>
+
+        <div className="admin-news-preview" style={{ gridColumn: '1 / -1' }}>
+          <div className="admin-news-preview__header">
+            <span>Preview</span>
+          </div>
+          <article className="admin-news-preview__article">
+            {form.imageUrl && (
+              <img
+                src={form.imageUrl}
+                alt={form.title || 'News preview'}
+                className="admin-news-preview__image"
+              />
+            )}
+            <div className="admin-news-preview__meta">
+              {form.category && <span>{form.category}</span>}
+              {form.topic && <span>{form.topic}</span>}
+              {form.date && <span>{form.date}</span>}
+            </div>
+            <h2>{form.title || 'Untitled news article'}</h2>
+            {form.subtitle && <p className="admin-news-preview__subtitle">{form.subtitle}</p>}
+            <ContentRenderer contentBlocks={Array.isArray(form.contentBlocks) ? form.contentBlocks : []} />
+          </article>
         </div>
 
         <div className="form-group" style={{ gridColumn: '1 / -1' }}>
@@ -409,6 +588,7 @@ export default function AdminNews() {
                   date: '',
                   subtitle: '',
                   body: '',
+                  contentBlocks: [],
                   localYMCA: '',
                   imageUrl: '',
                   category: 'News',
@@ -461,6 +641,70 @@ export default function AdminNews() {
           </tbody>
         </table>
       )}
+
+      <style>{`
+        .admin-news-preview {
+          border: 1px solid #d9e2ec;
+          border-radius: 8px;
+          overflow: hidden;
+          background: #fff;
+          margin-top: 1rem;
+        }
+
+        .admin-news-preview__header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.75rem 1rem;
+          background: #f5f7fa;
+          border-bottom: 1px solid #d9e2ec;
+          color: #243b53;
+          font-weight: 700;
+        }
+
+        .admin-news-preview__article {
+          max-width: 860px;
+          margin: 0 auto;
+          padding: 1.5rem;
+        }
+
+        .admin-news-preview__image {
+          width: 100%;
+          max-height: 360px;
+          object-fit: cover;
+          border-radius: 8px;
+          margin-bottom: 1rem;
+        }
+
+        .admin-news-preview__meta {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          color: #52606d;
+          font-size: 0.9rem;
+          margin-bottom: 0.75rem;
+        }
+
+        .admin-news-preview__meta span:not(:last-child)::after {
+          content: "•";
+          margin-left: 0.5rem;
+          color: #9fb3c8;
+        }
+
+        .admin-news-preview__article h2 {
+          margin: 0 0 0.75rem;
+          color: #102a43;
+          font-size: 1.8rem;
+          line-height: 1.2;
+        }
+
+        .admin-news-preview__subtitle {
+          color: #334e68;
+          font-size: 1.05rem;
+          line-height: 1.6;
+          margin-bottom: 1.25rem;
+        }
+      `}</style>
     </div>
   );
 }

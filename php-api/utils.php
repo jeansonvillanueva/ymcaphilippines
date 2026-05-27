@@ -89,6 +89,51 @@ function getTableColumn($conn, $table, $column) {
     return $column;
 }
 
+function firstNonEmptyMatch($matches, $indexes) {
+    foreach ($indexes as $index) {
+        if (isset($matches[$index]) && $matches[$index] !== '') {
+            return $matches[$index];
+        }
+    }
+
+    return null;
+}
+
+function getPathRouteParam($segment) {
+    $paths = [];
+
+    if (isset($_GET['path']) && $_GET['path'] !== '') {
+        $paths[] = parse_url($_GET['path'], PHP_URL_PATH) ?: $_GET['path'];
+    }
+
+    if (isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI'] !== '') {
+        $requestUri = $_SERVER['REQUEST_URI'];
+        $paths[] = parse_url($requestUri, PHP_URL_PATH) ?: $requestUri;
+
+        $query = parse_url($requestUri, PHP_URL_QUERY);
+        if ($query) {
+            parse_str($query, $queryParams);
+            if (isset($queryParams['path'])) {
+                $paths[] = parse_url($queryParams['path'], PHP_URL_PATH) ?: $queryParams['path'];
+            }
+        }
+    }
+
+    $segment = preg_quote($segment, '#');
+    foreach ($paths as $path) {
+        if (preg_match('~/' . $segment . '/([^/?#]+)~', $path, $matches)) {
+            return urldecode($matches[1]);
+        }
+    }
+
+    return null;
+}
+
+function getNumericRouteId($segment) {
+    $value = getPathRouteParam($segment);
+    return ($value !== null && ctype_digit((string)$value)) ? (int)$value : 0;
+}
+
 // Function to get POST data - handles both JSON and FormData
 function getPostData() {
     $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
@@ -105,7 +150,12 @@ function getPostData() {
 
     // For PUT/DELETE requests, prioritize JSON parsing
     if (in_array($requestMethod, ['PUT', 'DELETE', 'PATCH'])) {
-        $rawBody = file_get_contents('php://input');
+        // Use cached input if available, otherwise read from stream
+        if (function_exists('getPhpInput')) {
+            $rawBody = getPhpInput();
+        } else {
+            $rawBody = file_get_contents('php://input');
+        }
         error_log('[getPostData] Raw body length: ' . strlen($rawBody));
         error_log('[getPostData] Raw body preview: ' . substr($rawBody, 0, 200));
 
@@ -121,8 +171,20 @@ function getPostData() {
             if (strpos($contentType, 'multipart/form-data') !== false) {
                 $parsed = parseMultipartFormDataFromRaw($rawBody, $contentType);
                 error_log('[getPostData] Using manual FormData parse: ' . json_encode($parsed));
-                return $parsed;
+                if (!empty($parsed)) {
+                    return $parsed;
+                }
+
+                if (!empty($_POST)) {
+                    error_log('[getPostData] Manual parse empty; falling back to _POST: ' . json_encode($_POST));
+                    return $_POST;
+                }
             }
+        }
+
+        if (!empty($_POST)) {
+            error_log('[getPostData] Raw body empty/unparsed; falling back to _POST: ' . json_encode($_POST));
+            return $_POST;
         }
     }
 
@@ -134,7 +196,11 @@ function getPostData() {
     }
 
     // Otherwise try to parse as JSON
-    $rawBody = file_get_contents('php://input');
+    if (function_exists('getPhpInput')) {
+        $rawBody = getPhpInput();
+    } else {
+        $rawBody = file_get_contents('php://input');
+    }
     if (!empty($rawBody)) {
         $data = json_decode($rawBody, true);
         if (json_last_error() === JSON_ERROR_NONE && is_array($data)) {
@@ -194,35 +260,56 @@ function parseMultipartFormDataFromRaw($rawInput, $contentType) {
     $data = [];
 
     if (empty($rawInput)) {
+        error_log('[parseMultipartFormDataFromRaw] Raw input is empty');
         return $data;
     }
 
     $boundary = getBoundaryFromContentType($contentType);
     if (!$boundary) {
+        error_log('[parseMultipartFormDataFromRaw] Could not extract boundary from Content-Type: ' . $contentType);
         return $data;
     }
 
+    error_log('[parseMultipartFormDataFromRaw] Using boundary: ' . $boundary);
     $parts = explode('--' . $boundary, $rawInput);
-    foreach ($parts as $part) {
-        $part = trim($part);
-        if (empty($part) || $part === '--') continue;
+    
+    foreach ($parts as $idx => $part) {
+        $part = trim($part, "\r\n ");
+        if (empty($part) || $part === '--') {
+            continue;
+        }
 
         // Extract field name and value
-        if (preg_match('/name="([^"]+)"/', $part, $nameMatch)) {
+        if (preg_match('/name=["\']?([^"\'\s]+)["\']?/i', $part, $nameMatch)) {
             $fieldName = $nameMatch[1];
-            $value = '';
-
-            // Find the value after the headers
+            
+            // Find the value after the headers (handle both \r\n\r\n and \n\n)
             $headerEnd = strpos($part, "\r\n\r\n");
-            if ($headerEnd !== false) {
+            if ($headerEnd === false) {
+                $headerEnd = strpos($part, "\n\n");
+                if ($headerEnd === false) {
+                    // Try finding after single newline if double newline not found
+                    $lines = preg_split('/\r?\n/', $part, 2);
+                    if (count($lines) === 2) {
+                        $value = trim($lines[1]);
+                    } else {
+                        continue;
+                    }
+                } else {
+                    $value = substr($part, $headerEnd + 2);
+                    $value = trim($value, "\r\n ");
+                }
+            } else {
                 $value = substr($part, $headerEnd + 4);
-                $value = rtrim($value, "\r\n");
+                $value = trim($value, "\r\n ");
             }
 
             $data[$fieldName] = $value;
+            error_log('[parseMultipartFormDataFromRaw] Parsed field: ' . $fieldName . ' = ' . (strlen($value) > 50 ? substr($value, 0, 50) . '...' : $value));
         }
     }
 
+    error_log('[parseMultipartFormDataFromRaw] Total fields parsed: ' . count($data) . ', keys: ' . implode(', ', array_keys($data)));
     return $data;
 }
 

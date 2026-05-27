@@ -119,7 +119,7 @@ export default function AdminFacilities({ localId }: AdminFacilitiesProps) {
       formData.append('image', files[0]);
 
       const response = await axios.post(`${ADMIN_API_URL}/facilities/${localId}/upload`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+
       });
 
       setImages((prev) => [...prev, response.data]);

@@ -1,7 +1,14 @@
 <?php
 // PUT /admin/videos/:id
 $data = getPostData();
-$id = intval($_GET['id']);
+$id = intval($_GET['id'] ?? $_POST['id'] ?? $data['id'] ?? 0);
+if ($id <= 0) {
+    $id = getNumericRouteId('videos');
+}
+
+if ($id <= 0) {
+    sendResponse(['error' => 'Invalid video ID'], 400);
+}
 
 validateRequired($data, ['title', 'embedUrl']);
 

@@ -170,7 +170,7 @@ export default function AdminLocals() {
 
     try {
       const response = await axios.post(`${API_URL}/${selectedLocal}/upload?field=${field}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+
       });
       const normalizedPath = normalizeImageUrl(response.data.path || '');
       setForm((prev) => ({
@@ -227,14 +227,10 @@ export default function AdminLocals() {
       console.log('Sending form data:', form);
 
       if (isNewLocal) {
-        await axios.post(API_URL, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
+        await axios.post(API_URL, formData);
         setMessage({ type: 'success', text: 'Local created successfully' });
       } else {
-        await axios.put(`${API_URL}/${selectedLocal}`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
+        await axios.put(`${API_URL}/${selectedLocal}`, formData);
         setMessage({ type: 'success', text: 'Local updated successfully' });
       }
       setIsNewLocal(false);

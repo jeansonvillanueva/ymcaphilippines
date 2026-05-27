@@ -18,6 +18,8 @@ export type ContentBlock = {
 };
 
 export type NewsArticleMeta = {
+  /** Database ID from API */
+  id?: number;
   /** Route path that must match `App.tsx` routes. */
   path: `/news/${string}`;
   title: string;

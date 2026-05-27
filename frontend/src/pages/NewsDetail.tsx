@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useLoadingScreen } from '../hooks/useLoadingScreen';
 import { useNews } from '../hooks/useApi';
 import NewsArticle, { type LocalYMCAConfig } from '../components/NewsArticle';
+import NewsSlideshow from '../components/NewsSlideshow';
 import ContentRenderer from '../components/ContentRenderer';
 import { LOCALS_BY_ID } from '../data/locals';
 import '../styles/design-system.css';
@@ -47,9 +48,7 @@ const NewsDetail: React.FC = () => {
   // Show loading screen while fetching news
   useLoadingScreen(loading);
 
-  type NewsWithContentBlocks = {
-    contentBlocks?: any[] | string;
-  } & typeof news[number];
+  type NewsWithContentBlocks = typeof news[number];
 
   const currentPath = useMemo(() => {
     if (!slug) return null;
@@ -76,6 +75,9 @@ const NewsDetail: React.FC = () => {
       articlePath={currentPath || undefined}
       layoutVariant="article"
     >
+      {/* Display slideshow if article has images */}
+      {item.id && <NewsSlideshow newsId={item.id} />}
+      
       {item.contentBlocks && item.contentBlocks.length > 0 ? (
         <ContentRenderer contentBlocks={
           typeof item.contentBlocks === 'string'

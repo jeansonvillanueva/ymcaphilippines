@@ -1,7 +1,14 @@
 <?php
 // PUT /admin/staff/:id
 $data = getPostData();
-$id = intval($_GET['id']);
+$id = intval($_GET['id'] ?? $_POST['id'] ?? $data['id'] ?? 0);
+if ($id <= 0) {
+    $id = getNumericRouteId('staff');
+}
+
+if ($id <= 0) {
+    sendResponse(['error' => 'Invalid staff ID'], 400);
+}
 
 if (!isset($data['name']) || empty($data['name'])) {
     sendResponse(['error' => "Field 'name' is required"], 400);

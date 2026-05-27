@@ -6,7 +6,15 @@ if (!$conn) {
 }
 
 $data = getPostData();
-$id = $conn->real_escape_string($_GET['id']);
+$routeId = $_GET['id'] ?? $_POST['id'] ?? $data['id'] ?? '';
+if ($routeId === '') {
+    $routeId = getPathRouteParam('locals') ?? '';
+}
+$id = $conn->real_escape_string($routeId);
+
+if ($id === '') {
+    sendResponse(['error' => 'Invalid local ID'], 400);
+}
 
 // COMPREHENSIVE DIAGNOSTIC LOGGING
 error_log("═════════════════════════════════════════════════════════");

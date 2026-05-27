@@ -374,3 +374,72 @@
     padding: 0.75rem;
   }
 }
+
+/* Topic Search Styles */
+.topic-search-group {
+  position: relative;
+}
+
+.topic-search-wrapper {
+  position: relative;
+}
+
+.topic-search-input {
+  width: 100%;
+  padding: 0.85rem;
+  border: 1px solid #d9e0ee;
+  border-radius: 14px;
+  font-size: 0.96rem;
+  font-family: inherit;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  box-sizing: border-box;
+}
+
+.topic-search-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.12);
+}
+
+.topic-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #d9e0ee;
+  border-top: none;
+  border-radius: 0 0 14px 14px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+.topic-suggestion-item {
+  padding: 0.75rem 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 0.96rem;
+  color: #1f2937;
+}
+
+.topic-suggestion-item:hover {
+  background-color: #f0f4ff;
+}
+
+.topic-suggestion-item.selected {
+  background-color: #e0e7ff;
+  color: #0e1f7d;
+  font-weight: 600;
+}
+
+.topic-suggestion-item.disabled {
+  color: #9ca3af;
+  cursor: default;
+  background-color: #f9fafb;
+}
+
+.topic-suggestion-item.disabled:hover {
+  background-color: #f9fafb;
+}

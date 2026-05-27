@@ -114,7 +114,7 @@ export default function AdminDocuments() {
 
         const response = await axios.post(API_URL, formData, {
           withCredentials: true,
-          headers: { 'Content-Type': 'multipart/form-data' },
+
         });
 
         if (response.data.id) {

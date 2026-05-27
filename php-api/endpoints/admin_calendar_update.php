@@ -6,7 +6,15 @@ error_log('[CALENDAR_UPDATE] Content-Type: ' . ($_SERVER['CONTENT_TYPE'] ?? 'NOT
 $data = getPostData();
 error_log('[CALENDAR_UPDATE] Parsed data: ' . json_encode($data));
 
-$id = intval($_GET['id']);
+$id = intval($_GET['id'] ?? $_POST['id'] ?? $data['id'] ?? 0);
+if ($id <= 0) {
+    $id = getNumericRouteId('calendar');
+}
+
+if ($id <= 0) {
+    error_log('[CALENDAR_UPDATE] Error: invalid event ID');
+    sendResponse(['error' => 'Invalid event ID'], 400);
+}
 
 if (!isset($data['title']) || empty($data['title'])) {
     error_log('[CALENDAR_UPDATE] Error: title is required');

@@ -109,3 +109,34 @@ CREATE TABLE IF NOT EXISTS `facilities_images` (
   INDEX idx_local_id (local_id),
   CONSTRAINT fk_facilities_images_local FOREIGN KEY (local_id) REFERENCES `local`(local_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Create news table
+CREATE TABLE IF NOT EXISTS `news` (
+  `id` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `path` varchar(255) UNIQUE,
+  `title` varchar(255) NOT NULL,
+  `date` varchar(100),
+  `subtitle` text,
+  `body` text,
+  `localYMCA` varchar(100),
+  `imageUrl` varchar(500),
+  `category` varchar(50),
+  `topic` varchar(100),
+  `contentBlocks` longtext,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_path (path),
+  INDEX idx_category (category),
+  INDEX idx_topic (topic)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Create news_images table for news article slideshows
+CREATE TABLE IF NOT EXISTS `news_images` (
+  `id` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `news_id` int NOT NULL,
+  `image_url` varchar(500) NOT NULL,
+  `image_order` int DEFAULT 0,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_news_id (news_id),
+  CONSTRAINT fk_news_images_news FOREIGN KEY (news_id) REFERENCES `news`(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

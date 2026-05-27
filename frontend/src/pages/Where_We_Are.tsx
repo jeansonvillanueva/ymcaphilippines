@@ -161,15 +161,11 @@ function isValidPhPhone(raw: string) {
 function Where_We_Are() {
   const ref = useScrollReveal<HTMLDivElement>();
   const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null);
-<<<<<<< HEAD
   const [openRegionIds, setOpenRegionIds] = useState<string[]>([]);
-=======
->>>>>>> 0ac1e4a8513bef680c8307afe418cb8b5a90d925
   const [localsData, setLocalsData] = useState<LocalData[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-<<<<<<< HEAD
   const toggleRegionOpen = (regionId: string) => {
     setOpenRegionIds((current) =>
       current.includes(regionId)
@@ -178,8 +174,6 @@ function Where_We_Are() {
     );
   };
 
-=======
->>>>>>> 0ac1e4a8513bef680c8307afe418cb8b5a90d925
   // Show loading screen while fetching locals data
   useLoadingScreen(loading);
 
@@ -321,7 +315,6 @@ function Where_We_Are() {
             </div>
 
             <ul className="find-ymca__regions" aria-label="Regions">
-<<<<<<< HEAD
               {REGIONS.map((region) => {
                 const regionOpen = openRegionIds.includes(region.id);
                 return (
@@ -416,90 +409,6 @@ function Where_We_Are() {
                   </li>
                 );
               })}
-=======
-              {REGIONS.map((region) => (
-                <li key={region.id} className="find-ymca__region">
-                  <div className="find-ymca__region-title">{region.name}</div>
-                  <ul className="find-ymca__branches" aria-label={`${region.name} branches`}>
-                  {region.branches.map((b) => {
-                    const backendLocal = localsById.get(b.markerId);
-                    const local = backendLocal || getLocalById(b.markerId);
-                    const logoSrc = local?.logoImageUrl ?? defaultBranchLogo;
-                    const rowActive = activeMarkerId === b.markerId;
-
-                    return (
-                      <li key={b.id} className="find-ymca__branch">
-                        <div
-                          className={rowActive ? 'find-ymca__branch-row find-ymca__branch-row--active' : 'find-ymca__branch-row'}
-                          onMouseEnter={() => setActiveMarkerId(b.markerId)}
-                          onFocus={() => setActiveMarkerId(b.markerId)}
-                          onMouseLeave={() => setActiveMarkerId(null)}
-                        >
-                          <div className="find-ymca__branch-content">
-                            <button
-                              type="button"
-                              className="find-ymca__branch-cta find-ymca__branch-cta--fallback"
-                              onClick={() => {
-                                if (local) navigate(`/find-ymca/${local.id}`);
-                              }}
-                              disabled={!local}
-                              aria-label={local ? `Open ${b.name} local page` : b.name}
-                            >
-                              <img src={logoSrc} alt="" className="find-ymca__branch-logo" />
-                              <span className="find-ymca__branch-name">{b.name}</span>
-                            </button>
-                          </div>
-
-                          {/* Social Media Icons */}
-                          {local && (local.facebookUrl || local.instagramUrl || local.twitterUrl) && (
-                            <div className="find-ymca__branch-social">
-                              {local.facebookUrl && (
-                                <a
-                                  href={local.facebookUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="find-ymca__social-icon"
-                                  title="Facebook"
-                                  aria-label={`${b.name} Facebook`}
-                                >
-                                  <FaFacebookF />
-                                </a>
-                              )}
-                              {local.instagramUrl && (
-                                <a
-                                  href={local.instagramUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="find-ymca__social-icon"
-                                  title="Instagram"
-                                  aria-label={`${b.name} Instagram`}
-                                >
-                                  <FaInstagram />
-                                </a>
-                              )}
-                              {local.twitterUrl && (
-                                <a
-                                  href={local.twitterUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="find-ymca__social-icon"
-                                  title="X (Twitter)"
-                                  aria-label={`${b.name} X/Twitter`}
-                                >
-                                  <FaTwitter />
-                                </a>
-                              )}
-                            </div>
-                          )}
-
-                        </div>
-                      </li>
-                    );
-                  })}
-                  </ul>
-                </li>
-              ))}
->>>>>>> 0ac1e4a8513bef680c8307afe418cb8b5a90d925
             </ul>
           </div>
         </div>

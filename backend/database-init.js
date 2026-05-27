@@ -226,6 +226,18 @@ export function initializeTables() {
     )
   `;
 
+  // News images table for news article slideshows
+  const newsImagesTableSql = `
+    CREATE TABLE IF NOT EXISTS news_images (
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      news_id INT NOT NULL,
+      image_url VARCHAR(500) NOT NULL,
+      image_order INT DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      INDEX idx_news_id (news_id)
+    )
+  `;
+
   // Ensure social media columns exist in local table
   function ensureLocalsColumn(column, definition) {
     db.query(`SHOW COLUMNS FROM \`local\` LIKE '${column}'`, (err, result) => {
@@ -295,6 +307,7 @@ export function initializeTables() {
     donationsTableSql,
     facilitiesTableSql,
     facilitiesImagesTableSql,
+    newsImagesTableSql,
   ];
 
   // Create tables sequentially to handle foreign key dependencies

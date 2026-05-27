@@ -99,11 +99,7 @@ export default function LocalDetails() {
               <p className="local-details__missingBody">
                 This local doesn’t have a details page configured yet.
               </p>
-<<<<<<< HEAD
               <Link to="/where-we-are#find-your-ymca" className="local-details__backLink">
-=======
-              <Link to="/find-ymca#find-ymca" className="local-details__backLink">
->>>>>>> 0ac1e4a8513bef680c8307afe418cb8b5a90d925
                 Back to Find Your YMCA
               </Link>
             </div>
@@ -265,11 +261,7 @@ export default function LocalDetails() {
           </div>
 
           <div className="local-details-footerActions reveal reveal-delay-2">
-<<<<<<< HEAD
             <Link to="/where-we-are#find-your-ymca" className="local-details__backLink">
-=======
-            <Link to="/find-ymca#find-ymca" className="local-details__backLink">
->>>>>>> 0ac1e4a8513bef680c8307afe418cb8b5a90d925
               Back to Find Your YMCA
             </Link>
           </div>

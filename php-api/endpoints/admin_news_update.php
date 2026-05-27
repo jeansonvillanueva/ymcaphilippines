@@ -1,8 +1,17 @@
 <?php
 // PUT /admin/news/:id
 $data = getPostData();
-$id = intval($_GET['id'] ?? 0);
 
+error_log('[admin_news_update] $_GET[id]: ' . ($_GET['id'] ?? 'NOT SET'));
+error_log('[admin_news_update] $_POST[id]: ' . ($_POST['id'] ?? 'NOT SET'));
+error_log('[admin_news_update] $data[id]: ' . ($data['id'] ?? 'NOT SET'));
+
+$id = intval($_GET['id'] ?? $_POST['id'] ?? $data['id'] ?? 0);
+if ($id <= 0) {
+    $id = getNumericRouteId('news');
+}
+
+error_log('[admin_news_update] Final ID after intval: ' . $id);
 error_log('[admin_news_update] Received PUT data for ID ' . $id . ': ' . json_encode($data));
 error_log('[admin_news_update] Content-Type: ' . ($_SERVER['CONTENT_TYPE'] ?? 'not set'));
 error_log('[admin_news_update] REQUEST_METHOD: ' . ($_SERVER['REQUEST_METHOD'] ?? 'not set'));

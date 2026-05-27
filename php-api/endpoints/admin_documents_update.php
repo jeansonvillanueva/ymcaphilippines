@@ -1,7 +1,10 @@
 <?php
 // PUT /admin/documents/:id - Update document metadata
 $data = getPostData();
-$id = intval($_GET['id'] ?? 0);
+$id = intval($_GET['id'] ?? $_POST['id'] ?? $data['id'] ?? 0);
+if ($id <= 0) {
+    $id = getNumericRouteId('documents');
+}
 
 if ($id <= 0) {
     sendResponse(['error' => 'Invalid document ID'], 400);

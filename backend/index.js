@@ -441,6 +441,96 @@ app.delete("/admin/news/:id", (req, res) => {
   });
 });
 
+// NEWS IMAGES - Slideshow Management
+app.get("/admin/news/:newsId/images", (req, res) => {
+  db.query("SELECT id, news_id, image_url, image_order, created_at FROM news_images WHERE news_id = ? ORDER BY image_order ASC", 
+    [req.params.newsId], 
+    (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(result || []);
+    }
+  );
+});
+
+app.post("/admin/news/:newsId/upload", upload.single('image'), (req, res) => {
+  const newsId = req.params.newsId;
+  
+  if (!req.file) {
+    return res.status(400).json({ error: "No file uploaded" });
+  }
+
+  // Check if up to 20 images are already uploaded (supports multiple slideshow blocks)
+  db.query("SELECT COUNT(*) as count FROM news_images WHERE news_id = ?", [newsId], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    
+    if (result[0].count >= 20) {
+      return res.status(400).json({ error: "Maximum 20 images allowed per news article" });
+    }
+
+    // Get the next image order
+    db.query("SELECT MAX(image_order) as max_order FROM news_images WHERE news_id = ?", [newsId], (err, orderResult) => {
+      if (err) return res.status(500).json({ error: err.message });
+
+      const nextOrder = (orderResult[0].max_order !== null) ? orderResult[0].max_order + 1 : 0;
+      const imagePath = `/uploads/${req.file.filename}`;
+
+      db.query(
+        "INSERT INTO news_images (news_id, image_url, image_order) VALUES (?, ?, ?)",
+        [newsId, imagePath, nextOrder],
+        (err, insertResult) => {
+          if (err) return res.status(500).json({ error: err.message });
+          res.json({
+            message: "Image uploaded successfully",
+            id: insertResult.insertId,
+            image_url: imagePath,
+            image_order: nextOrder
+          });
+        }
+      );
+    });
+  });
+});
+
+// Delete all slideshow images for a news article (MUST be before the :imageId endpoint)
+app.delete("/admin/news/:newsId/images/all", (req, res) => {
+  const newsId = req.params.newsId;
+
+  db.query("DELETE FROM news_images WHERE news_id = ?", [newsId], (err) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ message: "All slideshow images deleted successfully" });
+  });
+});
+
+app.delete("/admin/news/:newsId/images/:imageId", (req, res) => {
+  const { newsId, imageId } = req.params;
+
+  // Check if image exists and belongs to this news article
+  db.query("SELECT image_url FROM news_images WHERE id = ? AND news_id = ?", [imageId, newsId], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    
+    if (!result || result.length === 0) {
+      return res.status(404).json({ error: "Image not found" });
+    }
+
+    // Delete the database record
+    db.query("DELETE FROM news_images WHERE id = ? AND news_id = ?", [imageId, newsId], (err) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: "Image deleted successfully" });
+    });
+  });
+});
+
+// NEWS IMAGES - Public endpoint (for fetching slideshow images)
+app.get("/news/:newsId/images", (req, res) => {
+  db.query("SELECT id, news_id, image_url, image_order, created_at FROM news_images WHERE news_id = ? ORDER BY image_order ASC", 
+    [req.params.newsId], 
+    (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(result || []);
+    }
+  );
+});
+
 // CALENDAR EVENTS - Public endpoint
 app.get("/api/calendar", (req, res) => {
   db.query("SELECT * FROM calendar_events ORDER BY start_date DESC, date DESC", (err, result) => {

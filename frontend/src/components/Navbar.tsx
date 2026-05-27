@@ -103,22 +103,14 @@ function Navbar() {
                   <Link to="/#vision_2030" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>Vision 2030</Link>
                 </li>
                 <li>
-<<<<<<< HEAD
                   <Link to="/#made-our-impact" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>Our Reach & Impact</Link>
-=======
-                  <Link to="/#made-our-impact" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>Made Our Impact</Link>
->>>>>>> 0ac1e4a8513bef680c8307afe418cb8b5a90d925
                 </li>
               </ul>
             </li>
 
             <li className="nav-dropdown">
               <NavLink
-<<<<<<< HEAD
                 to="/what-we-do"
-=======
-                to="/calendar"
->>>>>>> 0ac1e4a8513bef680c8307afe418cb8b5a90d925
                 onClick={() => {
                   setIsSearchOpen(false);
                   setIsMenuOpen(false);
@@ -130,21 +122,13 @@ function Navbar() {
 
               <ul className="nav-dropdown-menu" aria-label="What We Do submenu">
                 <li>
-<<<<<<< HEAD
                   <Link to="/what-we-do#latest-news" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
-=======
-                  <Link to="/calendar#latest-news" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
->>>>>>> 0ac1e4a8513bef680c8307afe418cb8b5a90d925
                     Latest News
                   </Link>
                 </li>
 
                 <li>
-<<<<<<< HEAD
                   <Link to="/what-we-do#calendar" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
-=======
-                  <Link to="/calendar#calendar" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
->>>>>>> 0ac1e4a8513bef680c8307afe418cb8b5a90d925
                     Calendar of Activities
                   </Link>
                 </li>
@@ -159,11 +143,7 @@ function Navbar() {
 
             <li className="nav-dropdown">
               <NavLink
-<<<<<<< HEAD
                 to="/where-we-are"
-=======
-                to="/find-ymca"
->>>>>>> 0ac1e4a8513bef680c8307afe418cb8b5a90d925
                 onClick={() => {
                   setIsSearchOpen(false);
                   setIsMenuOpen(false);
@@ -175,21 +155,13 @@ function Navbar() {
 
               <ul className="nav-dropdown-menu" aria-label="Where We Are submenu">
                 <li>
-<<<<<<< HEAD
                   <Link to="/where-we-are#find-your-ymca" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
-=======
-                  <Link to="/find-ymca#find-your-ymca" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
->>>>>>> 0ac1e4a8513bef680c8307afe418cb8b5a90d925
                     Find Your YMCA
                   </Link>
                 </li>
 
                 <li>
-<<<<<<< HEAD
                   <Link to="/where-we-are#contact-us" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
-=======
-                  <Link to="/find-ymca#contact-us" onClick={() => { setIsSearchOpen(false); setIsMenuOpen(false); }}>
->>>>>>> 0ac1e4a8513bef680c8307afe418cb8b5a90d925
                     Contact Us
                   </Link>
                 </li>
