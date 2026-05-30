@@ -15,6 +15,7 @@ import About_Us from './pages/About_Us';
 import Developer from './pages/developer';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminLogin from './pages/admin/AdminLogin';
+import AdminNewsPreview from './pages/admin/AdminNewsPreview';
 import ProtectedRoute from './components/ProtectedRoute';
 
 import Footer from './components/Footer';
@@ -83,6 +84,14 @@ function AppContent() {
           <Route path="/" element={<Home />} />
           <Route path="/secure-management/v3/k7n4m9p2q8c1x5j3/portal/login" element={<AdminLogin />} />
           <Route path="/secure-management/v3/k7n4m9p2q8c1x5j3/portal/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+          <Route
+            path="/secure-management/v3/k7n4m9p2q8c1x5j3/portal/news/preview"
+            element={
+              <ProtectedRoute>
+                <AdminNewsPreview />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/secure-management/v3/k7n4m9p2q8c1x5j3/*" element={<Navigate to="/secure-management/v3/k7n4m9p2q8c1x5j3/portal/login" replace />} />
           <Route path="/calendar" element={<Navigate to="/what-we-do" replace />} />
           <Route path="/find-ymca" element={<Navigate to="/where-we-are" replace />} />

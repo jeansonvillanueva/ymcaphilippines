@@ -3,10 +3,14 @@ import axios from 'axios';
 import { ADMIN_API_URL } from '../../hooks/useApi';
 import ContentBuilder from '../../components/ContentBuilder';
 import type { ContentBlock } from '../../components/ContentBuilder';
-import ContentRenderer from '../../components/ContentRenderer';
 import { LOCALS_BY_ID } from '../../data/locals';
 import { compareNewsDatesDesc } from '../../utils/newsDate';
-import { hasSlideshowBlocks, parseContentBlocks } from '../../utils/contentBlocks';
+import { parseContentBlocks } from '../../utils/contentBlocks';
+import {
+  ADMIN_NEWS_PREVIEW_PATH,
+  saveAdminNewsPreviewDraft,
+  type AdminNewsPreviewDraft,
+} from '../../utils/adminNewsPreview';
 
 interface News {
   id?: number;
@@ -141,6 +145,31 @@ export default function AdminNews() {
   const [showTopicSuggestions, setShowTopicSuggestions] = useState(false);
 
   const API_URL = `${ADMIN_API_URL}/news`;
+
+  const buildPreviewDraft = (): AdminNewsPreviewDraft => ({
+    title: form.title,
+    date: form.date,
+    subtitle: form.subtitle,
+    imageUrl: form.imageUrl,
+    category: form.category,
+    topic: form.topic,
+    localYMCA: form.localYMCA,
+    contentBlocks: Array.isArray(form.contentBlocks) ? form.contentBlocks : [],
+  });
+
+  const savePreviewDraft = () => {
+    saveAdminNewsPreviewDraft(buildPreviewDraft());
+  };
+
+  useEffect(() => {
+    const timer = window.setTimeout(savePreviewDraft, 400);
+    return () => window.clearTimeout(timer);
+  }, [form]);
+
+  const openPreviewPage = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    savePreviewDraft();
+    event.currentTarget.href = ADMIN_NEWS_PREVIEW_PATH;
+  };
 
   useEffect(() => {
     fetchNews();
@@ -587,36 +616,24 @@ export default function AdminNews() {
         </div>
 
         <div className="form-group wp-post-field" style={{ gridColumn: '1 / -1' }}>
-          <label htmlFor="news-content-editor">Content</label>
+          <div className="wp-post-field__toolbar">
+            <label htmlFor="news-content-editor">Content</label>
+            <a
+              href={ADMIN_NEWS_PREVIEW_PATH}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="admin-preview-btn"
+              onClick={openPreviewPage}
+            >
+              Preview article
+            </a>
+          </div>
           <div id="news-content-editor">
-          <ContentBuilder
-            blocks={Array.isArray(form.contentBlocks) ? form.contentBlocks : []}
-            onChange={(blocks) => setForm((prev) => ({ ...prev, contentBlocks: blocks }))}
-          />
+            <ContentBuilder
+              blocks={Array.isArray(form.contentBlocks) ? form.contentBlocks : []}
+              onChange={(blocks) => setForm((prev) => ({ ...prev, contentBlocks: blocks }))}
+            />
           </div>
-        </div>
-
-        <div className="admin-news-preview" style={{ gridColumn: '1 / -1' }}>
-          <div className="admin-news-preview__header">
-            <span>Preview</span>
-          </div>
-          <article className="admin-news-preview__article">
-            {form.imageUrl && !hasSlideshowBlocks(form.contentBlocks) && (
-              <img
-                src={form.imageUrl}
-                alt={form.title || 'News preview'}
-                className="admin-news-preview__image"
-              />
-            )}
-            <div className="admin-news-preview__meta">
-              {form.category && <span>{form.category}</span>}
-              {form.topic && <span>{form.topic}</span>}
-              {form.date && <span>{form.date}</span>}
-            </div>
-            <h2>{form.title || 'Untitled news article'}</h2>
-            {form.subtitle && <p className="admin-news-preview__subtitle">{form.subtitle}</p>}
-            <ContentRenderer contentBlocks={Array.isArray(form.contentBlocks) ? form.contentBlocks : []} />
-          </article>
         </div>
 
         <div className="form-group" style={{ gridColumn: '1 / -1' }}>
@@ -699,66 +716,38 @@ export default function AdminNews() {
       )}
 
       <style>{`
-        .admin-news-preview {
-          border: 1px solid #d9e2ec;
-          border-radius: 8px;
-          overflow: hidden;
-          background: #fff;
-          margin-top: 1rem;
-        }
-
-        .admin-news-preview__header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0.75rem 1rem;
-          background: #f5f7fa;
-          border-bottom: 1px solid #d9e2ec;
-          color: #243b53;
-          font-weight: 700;
-        }
-
-        .admin-news-preview__article {
-          max-width: 860px;
-          margin: 0 auto;
-          padding: 1.5rem;
-        }
-
-        .admin-news-preview__image {
-          width: 100%;
-          max-height: 360px;
-          object-fit: cover;
-          border-radius: 8px;
-          margin-bottom: 1rem;
-        }
-
-        .admin-news-preview__meta {
+        .wp-post-field__toolbar {
           display: flex;
           flex-wrap: wrap;
-          gap: 0.5rem;
-          color: #52606d;
-          font-size: 0.9rem;
-          margin-bottom: 0.75rem;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.5rem 1rem;
+          margin-bottom: 0.5rem;
         }
 
-        .admin-news-preview__meta span:not(:last-child)::after {
-          content: "•";
-          margin-left: 0.5rem;
-          color: #9fb3c8;
+        .wp-post-field__toolbar label {
+          margin-bottom: 0;
         }
 
-        .admin-news-preview__article h2 {
-          margin: 0 0 0.75rem;
-          color: #102a43;
-          font-size: 1.8rem;
-          line-height: 1.2;
+        .admin-preview-btn {
+          display: inline-flex;
+          align-items: center;
+          min-height: 32px;
+          padding: 0 14px;
+          border: 1px solid #2271b1;
+          border-radius: 6px;
+          background: #fff;
+          color: #2271b1;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background 0.15s ease, border-color 0.15s ease;
         }
 
-        .admin-news-preview__subtitle {
-          color: #334e68;
-          font-size: 1.05rem;
-          line-height: 1.6;
-          margin-bottom: 1.25rem;
+        .admin-preview-btn:hover {
+          background: #f0f6fc;
+          border-color: #135e96;
+          color: #135e96;
         }
       `}</style>
     </div>

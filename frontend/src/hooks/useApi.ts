@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-import { LATEST_NEWS, type NewsArticleMeta } from '../data/news';
+import type { NewsArticleMeta } from '../data/news';
 import { resolveApiIndexUrl } from '../config/api';
+import { normalizeNewsItem } from '../utils/newsPath';
 
 // Query-parameter routing works on cPanel without .htaccess rewrites
 const API_BASE = resolveApiIndexUrl();
@@ -50,18 +51,16 @@ export function useNews() {
     const fetchNews = async () => {
       try {
         const response = await axios.get(`${PUBLIC_API_URL}/news`);
-        // Only use API data if it has items; otherwise fallback to local data
-        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-          setNews(response.data);
+        if (response.data && Array.isArray(response.data)) {
+          setNews(response.data.map((item: NewsArticleMeta) => normalizeNewsItem(item)));
         } else {
-          setNews(LATEST_NEWS);
+          setNews([]);
         }
         setError(null);
       } catch (err) {
-        console.error('Error fetching news, using local data:', err);
-        // On error, fallback to local news data
-        setNews(LATEST_NEWS);
-        setError(null);
+        console.error('Error fetching news:', err);
+        setNews([]);
+        setError('Failed to load news');
       } finally {
         setLoading(false);
       }

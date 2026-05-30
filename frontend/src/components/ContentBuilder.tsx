@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import RichTextEditor from './RichTextEditor';
 import './ContentBuilder.css';
 
@@ -69,6 +69,94 @@ const compressImage = (
 };
 
 const createId = (prefix: string) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+
+type BlockInserterProps = {
+  insertIndex: number;
+  onAddParagraph: (index: number) => void;
+  onAddMedia: (index: number) => void;
+  onAddGallery: (index: number) => void;
+};
+
+const BlockInserter: React.FC<BlockInserterProps> = ({
+  insertIndex,
+  onAddParagraph,
+  onAddMedia,
+  onAddGallery,
+}) => {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handlePointerDown = (e: MouseEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [open]);
+
+  const choose = (action: () => void) => {
+    action();
+    setOpen(false);
+  };
+
+  return (
+    <div
+      ref={rootRef}
+      className={`wp-post-editor__inserter ${open ? 'is-open' : ''}`}
+    >
+      <button
+        type="button"
+        className="wp-post-editor__inserter-btn"
+        title="Add block"
+        aria-label="Add block"
+        aria-expanded={open}
+        aria-haspopup="menu"
+        onClick={() => setOpen((prev) => !prev)}
+      />
+      {open && (
+        <div className="wp-post-editor__inserter-menu" role="menu">
+          <button
+            type="button"
+            role="menuitem"
+            className="wp-post-editor__inserter-option"
+            onClick={() => choose(() => onAddParagraph(insertIndex))}
+          >
+            Paragraph
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            className="wp-post-editor__inserter-option"
+            onClick={() => choose(() => onAddMedia(insertIndex))}
+          >
+            Image
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            className="wp-post-editor__inserter-option"
+            onClick={() => choose(() => onAddGallery(insertIndex))}
+          >
+            Gallery
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const ContentBuilder: React.FC<ContentBuilderProps> = ({ blocks, onChange }) => {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -263,6 +351,10 @@ const ContentBuilder: React.FC<ContentBuilderProps> = ({ blocks, onChange }) => 
   };
 
   const addTextAt = (index: number) => {
+    if (blocks.length === 0) {
+      ensureInitialTextBlock();
+      return;
+    }
     insertBlock(index, {
       id: createId('text'),
       type: 'text',
@@ -270,34 +362,32 @@ const ContentBuilder: React.FC<ContentBuilderProps> = ({ blocks, onChange }) => 
     });
   };
 
+  const openAddMedia = (insertIndex: number) => {
+    if (blocks.length === 0) {
+      pendingInsertIndex.current = 0;
+      imageInputRef.current?.click();
+      return;
+    }
+    queueImageInsert(insertIndex);
+  };
+
+  const openAddGallery = (insertIndex: number) => {
+    if (blocks.length === 0) {
+      pendingInsertIndex.current = 0;
+      slideshowInputRef.current?.click();
+      return;
+    }
+    queueSlideshowInsert(insertIndex);
+  };
+
+  const inserterProps = {
+    onAddParagraph: addTextAt,
+    onAddMedia: openAddMedia,
+    onAddGallery: openAddGallery,
+  };
+
   return (
     <div className="wp-post-editor">
-      <div className="wp-post-editor__media-bar">
-        <button
-          type="button"
-          className="wp-post-editor__media-btn"
-          onClick={() => {
-            ensureInitialTextBlock();
-            queueImageInsert(blocks.length);
-          }}
-        >
-          Add Media
-        </button>
-        <button
-          type="button"
-          className="wp-post-editor__media-btn wp-post-editor__media-btn--secondary"
-          onClick={() => {
-            ensureInitialTextBlock();
-            queueSlideshowInsert(blocks.length);
-          }}
-        >
-          Gallery
-        </button>
-        <span className="wp-post-editor__media-hint">
-          Insert images or a gallery (select multiple images at once for galleries)
-        </span>
-      </div>
-
       <input
         ref={imageInputRef}
         type="file"
@@ -322,177 +412,166 @@ const ContentBuilder: React.FC<ContentBuilderProps> = ({ blocks, onChange }) => 
 
       <div className="wp-post-editor__canvas">
         {blocks.length === 0 ? (
-          <button
-            type="button"
-            className="wp-post-editor__empty"
-            onClick={ensureInitialTextBlock}
-          >
-            <span className="wp-post-editor__empty-title">Start writing</span>
-            <span className="wp-post-editor__empty-text">
-              Click here to type your article, or use Add Media / Gallery above (gallery supports multiple images at once).
-            </span>
-          </button>
+          <div className="wp-post-editor__empty">
+            <BlockInserter insertIndex={0} {...inserterProps} />
+            <p className="wp-post-editor__empty-text">
+              Click <strong>+</strong> to add a paragraph, image, or gallery.
+            </p>
+          </div>
         ) : (
-          blocks.map((block, index) => (
-            <div key={block.id} className="wp-post-editor__flow">
-              {index > 0 && (
-                <div className="wp-post-editor__inserter">
-                  <button
-                    type="button"
-                    className="wp-post-editor__inserter-btn"
-                    title="Add paragraph"
-                    aria-label="Add paragraph"
-                    onClick={() => addTextAt(index)}
-                  />
-                </div>
-              )}
-
-              <section
-                className={`wp-post-editor__section ${draggedIndex === index ? 'is-dragging' : ''}`}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  if (draggedIndex === null || draggedIndex === index) return;
-                  moveBlock(draggedIndex, index);
-                  setDraggedIndex(index);
-                }}
-              >
-                <div className="wp-post-editor__section-controls">
-                  <button
-                    type="button"
-                    className="wp-post-editor__drag-handle"
-                    draggable
-                    title="Drag to reorder"
-                    onDragStart={() => setDraggedIndex(index)}
-                    onDragEnd={() => setDraggedIndex(null)}
-                    aria-label="Drag to reorder"
-                  >
-                    ⋮⋮
-                  </button>
-                  <div className="wp-post-editor__section-actions">
+          <>
+            <BlockInserter insertIndex={0} {...inserterProps} />
+            {blocks.map((block, index) => (
+              <div key={block.id} className="wp-post-editor__flow">
+                <section
+                  className={`wp-post-editor__section ${draggedIndex === index ? 'is-dragging' : ''}`}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    if (draggedIndex === null || draggedIndex === index) return;
+                    moveBlock(draggedIndex, index);
+                    setDraggedIndex(index);
+                  }}
+                >
+                  <div className="wp-post-editor__section-controls">
                     <button
                       type="button"
-                      className="wp-post-editor__icon-btn"
-                      title="Move up"
-                      disabled={index === 0}
-                      onClick={() => moveBlock(index, index - 1)}
+                      className="wp-post-editor__drag-handle"
+                      draggable
+                      title="Drag to reorder"
+                      onDragStart={() => setDraggedIndex(index)}
+                      onDragEnd={() => setDraggedIndex(null)}
+                      aria-label="Drag to reorder"
                     >
-                      ↑
+                      ⋮⋮
                     </button>
-                    <button
-                      type="button"
-                      className="wp-post-editor__icon-btn"
-                      title="Move down"
-                      disabled={index === blocks.length - 1}
-                      onClick={() => moveBlock(index, index + 1)}
-                    >
-                      ↓
-                    </button>
-                    <button
-                      type="button"
-                      className="wp-post-editor__icon-btn wp-post-editor__icon-btn--danger"
-                      title="Remove"
-                      onClick={() => deleteBlock(index)}
-                    >
-                      Remove
-                    </button>
+                    <div className="wp-post-editor__section-actions">
+                      <button
+                        type="button"
+                        className="wp-post-editor__icon-btn"
+                        title="Move up"
+                        disabled={index === 0}
+                        onClick={() => moveBlock(index, index - 1)}
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        className="wp-post-editor__icon-btn"
+                        title="Move down"
+                        disabled={index === blocks.length - 1}
+                        onClick={() => moveBlock(index, index + 1)}
+                      >
+                        ↓
+                      </button>
+                      <button
+                        type="button"
+                        className="wp-post-editor__icon-btn wp-post-editor__icon-btn--danger"
+                        title="Remove"
+                        onClick={() => deleteBlock(index)}
+                      >
+                        Remove
+                      </button>
+                    </div>
                   </div>
-                </div>
 
-                {block.type === 'text' && (
-                  <RichTextEditor
-                    value={block.content}
-                    onChange={(html) => updateBlock(index, { content: html })}
-                    placeholder="Write your content…"
-                    embedded
-                    minHeight={index === 0 ? 280 : 160}
-                  />
-                )}
-
-                {block.type === 'image' && (
-                  <figure className="wp-post-editor__figure">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      id={`image-upload-${block.id}`}
-                      className="wp-post-editor__hidden-input"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) void handleImageUpload(index, file);
-                      }}
+                  {block.type === 'text' && (
+                    <RichTextEditor
+                      value={block.content}
+                      onChange={(html) => updateBlock(index, { content: html })}
+                      placeholder="Write your content…"
+                      embedded
+                      minHeight={index === 0 ? 280 : 160}
                     />
-                    {!block.content ? (
-                      <label htmlFor={`image-upload-${block.id}`} className="wp-post-editor__media-placeholder">
-                        <span>Click to upload an image</span>
-                        <small>Max 2 MB · auto-compressed</small>
-                      </label>
-                    ) : (
-                      <>
-                        <img src={block.content} alt={block.alt || ''} className="wp-post-editor__figure-image" />
-                        <label htmlFor={`image-upload-${block.id}`} className="wp-post-editor__replace-btn">
-                          Replace
-                        </label>
-                      </>
-                    )}
-                    <figcaption className="wp-post-editor__caption-field">
-                      <label htmlFor={`image-alt-${block.id}`}>Caption / alt text</label>
-                      <input
-                        id={`image-alt-${block.id}`}
-                        type="text"
-                        value={block.alt || ''}
-                        onChange={(e) => updateBlock(index, { alt: e.target.value })}
-                        placeholder="Describe this image for accessibility"
-                      />
-                    </figcaption>
-                  </figure>
-                )}
+                  )}
 
-                {block.type === 'slideshow' && (
-                  <div className="wp-post-editor__gallery">
-                    <div className="wp-post-editor__gallery-toolbar">
-                      <label htmlFor={`slideshow-upload-${block.id}`} className="wp-post-editor__gallery-add">
-                        Add to gallery
-                      </label>
+                  {block.type === 'image' && (
+                    <figure className="wp-post-editor__figure">
                       <input
                         type="file"
                         accept="image/*"
-                        multiple
-                        id={`slideshow-upload-${block.id}`}
+                        id={`image-upload-${block.id}`}
                         className="wp-post-editor__hidden-input"
                         onChange={(e) => {
-                          const files = Array.from(e.target.files ?? []);
-                          if (files.length > 0) void handleSlideshowImagesUpload(index, files);
-                          e.target.value = '';
+                          const file = e.target.files?.[0];
+                          if (file) void handleImageUpload(index, file);
                         }}
                       />
-                      <span className="wp-post-editor__gallery-count">
-                        {(block.slideshow_images?.length || 0)} image
-                        {(block.slideshow_images?.length || 0) === 1 ? '' : 's'}
-                      </span>
-                    </div>
+                      {!block.content ? (
+                        <label htmlFor={`image-upload-${block.id}`} className="wp-post-editor__media-placeholder">
+                          <span>Click to upload an image</span>
+                          <small>Max 2 MB · auto-compressed</small>
+                        </label>
+                      ) : (
+                        <>
+                          <img src={block.content} alt={block.alt || ''} className="wp-post-editor__figure-image" />
+                          <label htmlFor={`image-upload-${block.id}`} className="wp-post-editor__replace-btn">
+                            Replace
+                          </label>
+                        </>
+                      )}
+                      <figcaption className="wp-post-editor__caption-field">
+                        <label htmlFor={`image-alt-${block.id}`}>Caption / alt text</label>
+                        <input
+                          id={`image-alt-${block.id}`}
+                          type="text"
+                          value={block.alt || ''}
+                          onChange={(e) => updateBlock(index, { alt: e.target.value })}
+                          placeholder="Describe this image for accessibility"
+                        />
+                      </figcaption>
+                    </figure>
+                  )}
 
-                    {block.slideshow_images && block.slideshow_images.length > 0 && (
-                      <div className="wp-post-editor__gallery-grid">
-                        {block.slideshow_images.map((image) => (
-                          <div key={image.id} className="wp-post-editor__gallery-item">
-                            <img src={image.url} alt={`Gallery image ${image.order + 1}`} />
-                            <span className="wp-post-editor__gallery-order">{image.order + 1}</span>
-                            <button
-                              type="button"
-                              className="wp-post-editor__gallery-remove"
-                              onClick={() => handleDeleteSlideshowImage(index, image.id)}
-                              aria-label={`Remove image ${image.order + 1}`}
-                            >
-                              ×
-                            </button>
-                          </div>
-                        ))}
+                  {block.type === 'slideshow' && (
+                    <div className="wp-post-editor__gallery">
+                      <div className="wp-post-editor__gallery-toolbar">
+                        <label htmlFor={`slideshow-upload-${block.id}`} className="wp-post-editor__gallery-add">
+                          Add to gallery
+                        </label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          id={`slideshow-upload-${block.id}`}
+                          className="wp-post-editor__hidden-input"
+                          onChange={(e) => {
+                            const files = Array.from(e.target.files ?? []);
+                            if (files.length > 0) void handleSlideshowImagesUpload(index, files);
+                            e.target.value = '';
+                          }}
+                        />
+                        <span className="wp-post-editor__gallery-count">
+                          {(block.slideshow_images?.length || 0)} image
+                          {(block.slideshow_images?.length || 0) === 1 ? '' : 's'}
+                        </span>
                       </div>
-                    )}
-                  </div>
-                )}
-              </section>
-            </div>
-          ))
+
+                      {block.slideshow_images && block.slideshow_images.length > 0 && (
+                        <div className="wp-post-editor__gallery-grid">
+                          {block.slideshow_images.map((image) => (
+                            <div key={image.id} className="wp-post-editor__gallery-item">
+                              <img src={image.url} alt={`Gallery image ${image.order + 1}`} />
+                              <span className="wp-post-editor__gallery-order">{image.order + 1}</span>
+                              <button
+                                type="button"
+                                className="wp-post-editor__gallery-remove"
+                                onClick={() => handleDeleteSlideshowImage(index, image.id)}
+                                aria-label={`Remove image ${image.order + 1}`}
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </section>
+
+                <BlockInserter insertIndex={index + 1} {...inserterProps} />
+              </div>
+            ))}
+          </>
         )}
       </div>
     </div>

@@ -68,6 +68,7 @@ function Home() {
 
   const heroSlides = useMemo<HeroSlide[]>(() => {
     const latest = [...news]
+      .filter((item) => item.imageUrl && item.path)
       .sort((a, b) => compareNewsDatesDesc(a.date, b.date))
       .slice(0, 3);
 
@@ -78,6 +79,8 @@ function Home() {
       path: item.path,
     }));
   }, [news]);
+
+  const activeHeroSlide = heroSlides[activeSlide];
 
   const videoItems = useMemo<VideoItem[]>(() => {
     if (videos.length > 0) {
@@ -95,6 +98,12 @@ function Home() {
 
 
   useEffect(() => {
+    if (activeSlide >= heroSlides.length) {
+      setActiveSlide(0);
+    }
+  }, [activeSlide, heroSlides.length]);
+
+  useEffect(() => {
     if (heroSlides.length < 2) return;
     const interval = setInterval(() => {
       setActiveSlide((prev) => (prev + 1) % heroSlides.length);
@@ -107,10 +116,11 @@ function Home() {
     <div ref={sectionRef} className="who-is-y-page">
 
       {/* Hero slider */}
+      {heroSlides.length > 0 && (
       <section className="home-hero">
         {heroSlides.map((slide, index) => (
           <div
-            key={slide.heading}
+            key={slide.path}
             className={
               index === activeSlide
                 ? 'home-hero__slide home-hero__slide--active'
@@ -120,15 +130,20 @@ function Home() {
             aria-hidden={index !== activeSlide}
           >
             <div className="home-hero__overlay" />
-            <div className="home-hero__content">
-              <h1 className="home-hero__title">{slide.heading}</h1>
-              <p className="home-hero__subtitle">{slide.subheading}</p>
-              <div className="home-hero__cta-row">
-                <Link to={slide.path} className="home-hero__cta">Read more</Link>
-              </div>
-            </div>
           </div>
         ))}
+
+        {activeHeroSlide && (
+          <div className="home-hero__content">
+            <h1 className="home-hero__title">{activeHeroSlide.heading}</h1>
+            <p className="home-hero__subtitle">{activeHeroSlide.subheading}</p>
+            <div className="home-hero__cta-row">
+              <Link to={activeHeroSlide.path} className="home-hero__cta">
+                Read more
+              </Link>
+            </div>
+          </div>
+        )}
 
         <div className="home-hero__dots">
           {heroSlides.map((_, index) => (
@@ -145,6 +160,7 @@ function Home() {
           ))}
         </div>
       </section>
+      )}
 
       <VideoShowcase id="videosHome" heading="YMCA Videos" videos={videoItems} />
 

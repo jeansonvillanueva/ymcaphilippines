@@ -1097,14 +1097,17 @@
   background-position: center 35%;
   opacity: 0;
   transform: scale(1.03);
+  pointer-events: none;
+  z-index: 0;
   transition:
     opacity 0.9s ease,
     transform 4s linear;
 }
 
 .home-hero__content {
-  position: relative;
-  z-index: 1;
+  position: absolute;
+  z-index: 2;
+  inset: 0;
   height: 100%;
   max-width: 640px;
   padding: 0 5vw;
@@ -1112,11 +1115,13 @@
   flex-direction: column;
   justify-content: center;
   color: #ffffff;
+  pointer-events: none;
 }
 
 .home-hero__slide--active {
   opacity: 1;
   transform: scale(1.01);
+  z-index: 1;
 }
 
 /* Single overlay: navy with strong left contrast so white text is readable */
@@ -1154,6 +1159,7 @@
   display: flex;
   gap: 1rem;
   align-items: center;
+  pointer-events: auto;
 }
 
 .home-hero__cta {
