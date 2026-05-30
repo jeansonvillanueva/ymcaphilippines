@@ -328,7 +328,7 @@ function sendResponse($data, $statusCode = 200) {
     }
 
     http_response_code($statusCode);
-    echo json_encode($data);
+    echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit();
 }
 
@@ -341,21 +341,85 @@ function validateRequired($data, $requiredFields) {
     }
 }
 
+// Ensure news table/columns support 4-byte UTF-8 (emojis, etc.)
+function ensureNewsUtf8Mb4($conn) {
+    if (!$conn) {
+        return;
+    }
+
+    $result = $conn->query(
+        "SELECT TABLE_COLLATION FROM information_schema.TABLES
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'news'"
+    );
+
+    if (!$result || $result->num_rows === 0) {
+        return;
+    }
+
+    $collation = $result->fetch_assoc()['TABLE_COLLATION'] ?? '';
+    if (stripos($collation, 'utf8mb4') !== false) {
+        return;
+    }
+
+    error_log('[ensureNewsUtf8Mb4] Converting news table from ' . $collation . ' to utf8mb4');
+    $converted = $conn->query(
+        'ALTER TABLE news CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
+    );
+
+    if (!$converted) {
+        error_log('[ensureNewsUtf8Mb4] Conversion failed: ' . $conn->error);
+    }
+}
+
+function getMysqliError($conn, $stmt = null) {
+    if ($stmt instanceof mysqli_stmt && $stmt->error) {
+        return $stmt->error;
+    }
+    if ($conn && $conn->error) {
+        return $conn->error;
+    }
+    return 'Unknown database error';
+}
+
+function sanitizeNewsImageUrl($imageUrl) {
+    $imageUrl = trim((string)$imageUrl);
+    if ($imageUrl === '' || stripos($imageUrl, 'data:') === 0) {
+        return '';
+    }
+    if (strlen($imageUrl) > 500) {
+        error_log('[sanitizeNewsImageUrl] imageUrl exceeded 500 chars, clearing value');
+        return '';
+    }
+    return $imageUrl;
+}
+
 // Function to ensure database has required columns
 function ensureDatabaseSchema($conn) {
     if (!$conn) {
         return;
     }
-    
-    // Check if contentBlocks column exists in news table
-    $result = $conn->query("SHOW COLUMNS FROM news LIKE 'contentBlocks'");
-    if (!$result || $result->num_rows === 0) {
-        error_log('[ensureDatabaseSchema] Adding contentBlocks column to news table');
-        $alterResult = $conn->query("ALTER TABLE news ADD COLUMN contentBlocks LONGTEXT AFTER body");
+
+    ensureNewsUtf8Mb4($conn);
+
+    $newsColumns = [
+        'body' => 'TEXT',
+        'localYMCA' => 'VARCHAR(100)',
+        'contentBlocks' => 'LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci',
+    ];
+
+    foreach ($newsColumns as $column => $definition) {
+        $result = $conn->query("SHOW COLUMNS FROM news LIKE '$column'");
+        if ($result && $result->num_rows > 0) {
+            continue;
+        }
+
+        error_log("[ensureDatabaseSchema] Adding news.$column column");
+        $after = $column === 'contentBlocks' ? ' AFTER body' : '';
+        $alterResult = $conn->query("ALTER TABLE news ADD COLUMN $column $definition$after");
         if ($alterResult) {
-            error_log('[ensureDatabaseSchema] Successfully added contentBlocks column');
+            error_log("[ensureDatabaseSchema] Successfully added news.$column");
         } else {
-            error_log('[ensureDatabaseSchema] Failed to add contentBlocks column: ' . $conn->error);
+            error_log("[ensureDatabaseSchema] Failed to add news.$column: " . $conn->error);
         }
     }
 }

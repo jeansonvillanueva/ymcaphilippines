@@ -9,6 +9,7 @@ import { NEWS_FEATURED_IMAGE, type NewsCategory } from '../data/news';
 import '../styles/design-system.css';
 import './What_We_Do.css';
 import { Link } from 'react-router-dom';
+import { compareNewsDatesDesc } from '../utils/newsDate';
 
 const normalizeImageUrl = (url?: string | null) => {
   if (!url) return '';
@@ -24,16 +25,6 @@ function extractYear(date?: string) {
   if (!date) return null;
   const match = date.match(/\b(19|20)\d{2}\b/);
   return match?.[0] ?? null;
-}
-
-// Parse date string for chronological sorting (latest first)
-function parseNewsDate(date?: string) {
-  if (!date) return Number.MIN_SAFE_INTEGER;
-  const parsed = Date.parse(date);
-  if (!Number.isNaN(parsed)) return parsed;
-  const year = date.match(/\b(19|20)\d{2}\b/)?.[0];
-  if (year) return new Date(`${year}-01-01`).getTime();
-  return Number.MIN_SAFE_INTEGER;
 }
 
 function ymdToday() {
@@ -56,7 +47,7 @@ const WhatWeDo: React.FC = () => {
   
   // Sort news by date field chronologically (latest first), not by creation order
   const newsItems = useMemo(() => {
-    return [...news].sort((a, b) => parseNewsDate(b.date) - parseNewsDate(a.date));
+    return [...news].sort((a, b) => compareNewsDatesDesc(a.date, b.date));
   }, [news]);
 
   const initialEvent = useMemo(() => {

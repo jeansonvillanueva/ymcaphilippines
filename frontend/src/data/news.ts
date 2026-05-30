@@ -12,9 +12,14 @@ export type LocalYMCAMeta = {
 
 export type ContentBlock = {
   id: string;
-  type: 'text' | 'image';
+  type: 'text' | 'image' | 'slideshow';
   content: string;
   alt?: string;
+  slideshow_images?: Array<{
+    id: string;
+    url: string;
+    order: number;
+  }>;
 };
 
 export type NewsArticleMeta = {

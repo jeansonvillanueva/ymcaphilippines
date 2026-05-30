@@ -38,7 +38,10 @@ foreach ($columns as $col) {
 $message = '';
 if (!$contentBlocksExists) {
     error_log('[check_news_schema] Adding missing contentBlocks column');
-    $alterResult = $conn->query("ALTER TABLE news ADD COLUMN contentBlocks LONGTEXT AFTER body");
+    $alterResult = $conn->query(
+        "ALTER TABLE news ADD COLUMN contentBlocks LONGTEXT
+         CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci AFTER body"
+    );
     if ($alterResult) {
         $message = 'Added contentBlocks column successfully';
         $contentBlocksExists = true;

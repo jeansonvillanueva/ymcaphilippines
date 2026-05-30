@@ -16,12 +16,12 @@ if (!$newsResult || $newsResult->num_rows === 0) {
 }
 error_log('[admin_news_upload_images.php] News found, proceeding with image upload');
 
-// Check if up to 20 images are already uploaded (supports multiple slideshow blocks)
+// Check if up to 100 images are already uploaded (supports multiple slideshow blocks)
 $imageCountResult = $conn->query("SELECT COUNT(*) as count FROM news_images WHERE news_id = $newsId");
 if ($imageCountResult) {
     $row = $imageCountResult->fetch_assoc();
-    if ($row['count'] >= 20) {
-        sendResponse(['error' => 'Maximum 20 images allowed per news article'], 400);
+    if ($row['count'] >= 100) {
+        sendResponse(['error' => 'Maximum 100 images allowed per news article'], 400);
         exit;
     }
 }

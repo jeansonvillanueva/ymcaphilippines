@@ -96,6 +96,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  max-height: calc(100vh - 3rem);
 }
 
 .admin-main__header {
@@ -120,7 +121,11 @@
 }
 
 .admin-content {
+  flex: 1;
+  min-height: 0;
   padding: 2rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .admin-placeholder {
@@ -164,6 +169,13 @@
   display: flex;
   flex-direction: column;
   margin-bottom: 1rem;
+}
+
+.wp-post-field label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1d2327;
+  margin-bottom: 0.5rem;
 }
 
 .form-group label {
@@ -268,14 +280,21 @@
   background: #f8fbff;
 }
 
+.admin-facilities-message,
+.admin-status-banner,
 .success-message,
 .error-message {
-  padding: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 1rem 1.15rem;
   border-radius: 14px;
   margin-bottom: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.1);
 }
 
 .success-message {
@@ -290,14 +309,34 @@
   border: 1px solid #f7c6c1;
 }
 
+.admin-status-banner__text {
+  flex: 1;
+  line-height: 1.45;
+}
+
+.admin-status-banner__close,
 .success-message button,
 .error-message button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
   background: none;
   border: none;
-  font-size: 1.4rem;
+  border-radius: 50%;
+  font-size: 1.35rem;
+  line-height: 1;
   cursor: pointer;
   color: inherit;
   padding: 0;
+}
+
+.admin-status-banner__close:hover,
+.success-message button:hover,
+.error-message button:hover {
+  background: rgba(0, 0, 0, 0.06);
 }
 
 .loading {
@@ -348,9 +387,17 @@
     padding: 1.5rem;
   }
 
+  .admin-main {
+    max-height: none;
+  }
+
   .admin-main__header,
   .admin-content {
     padding: 1.25rem;
+  }
+
+  .admin-content {
+    overflow-y: visible;
   }
 
   .admin-form.expanded {

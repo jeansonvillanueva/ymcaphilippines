@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import RichTextEditor from './RichTextEditor';
 import './ContentBuilder.css';
 
 export interface SlideshowImage {
-  id: string; // Temporary ID during edit, server ID after save
+  id: string;
   url: string;
   order: number;
 }
@@ -11,9 +11,9 @@ export interface SlideshowImage {
 export interface ContentBlock {
   id: string;
   type: 'text' | 'image' | 'slideshow';
-  content: string; // HTML for text blocks, image URL for image blocks, empty for slideshow
-  alt?: string; // For images
-  slideshow_images?: SlideshowImage[]; // For slideshow blocks
+  content: string;
+  alt?: string;
+  slideshow_images?: SlideshowImage[];
 }
 
 interface ContentBuilderProps {
@@ -21,15 +21,18 @@ interface ContentBuilderProps {
   onChange: (blocks: ContentBlock[]) => void;
 }
 
-// Image compression utility
-const compressImage = (file: File, quality: number = 0.8, maxWidth: number = 1200, maxHeight: number = 1200): Promise<File> => {
+const compressImage = (
+  file: File,
+  quality: number = 0.8,
+  maxWidth: number = 1200,
+  maxHeight: number = 1200,
+): Promise<File> => {
   return new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     const img = new Image();
 
     img.onload = () => {
-      // Calculate new dimensions
       let { width, height } = img;
 
       if (width > height) {
@@ -37,25 +40,23 @@ const compressImage = (file: File, quality: number = 0.8, maxWidth: number = 120
           height = (height * maxWidth) / width;
           width = maxWidth;
         }
-      } else {
-        if (height > maxHeight) {
-          width = (width * maxHeight) / height;
-          height = maxHeight;
-        }
+      } else if (height > maxHeight) {
+        width = (width * maxHeight) / height;
+        height = maxHeight;
       }
 
       canvas.width = width;
       canvas.height = height;
-
       ctx?.drawImage(img, 0, 0, width, height);
 
       canvas.toBlob((blob) => {
         if (blob) {
-          const compressedFile = new File([blob], file.name, {
-            type: file.type,
-            lastModified: Date.now(),
-          });
-          resolve(compressedFile);
+          resolve(
+            new File([blob], file.name, {
+              type: file.type,
+              lastModified: Date.now(),
+            }),
+          );
         } else {
           reject(new Error('Compression failed'));
         }
@@ -67,140 +68,191 @@ const compressImage = (file: File, quality: number = 0.8, maxWidth: number = 120
   });
 };
 
+const createId = (prefix: string) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+
 const ContentBuilder: React.FC<ContentBuilderProps> = ({ blocks, onChange }) => {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const slideshowInputRef = useRef<HTMLInputElement>(null);
+  const pendingInsertIndex = useRef<number | null>(null);
 
-  const addTextBlock = () => {
-    const newBlock: ContentBlock = {
-      id: `text-${Date.now()}`,
-      type: 'text',
-      content: '<p>Enter your text here...</p>',
-    };
-    onChange([...blocks, newBlock]);
+  const ensureInitialTextBlock = () => {
+    if (blocks.length > 0) return;
+    onChange([
+      {
+        id: createId('text'),
+        type: 'text',
+        content: '<p></p>',
+      },
+    ]);
   };
 
-  const addImageBlock = () => {
-    const newBlock: ContentBlock = {
-      id: `image-${Date.now()}`,
-      type: 'image',
-      content: '',
-      alt: '',
-    };
-    onChange([...blocks, newBlock]);
-  };
-
-  const addSlideshowBlock = () => {
-    const newBlock: ContentBlock = {
-      id: `slideshow-${Date.now()}`,
-      type: 'slideshow',
-      content: '',
-      slideshow_images: [],
-    };
-    onChange([...blocks, newBlock]);
+  const insertBlock = (index: number, block: ContentBlock) => {
+    const next = [...blocks];
+    next.splice(index, 0, block);
+    onChange(next);
   };
 
   const updateBlock = (index: number, updates: Partial<ContentBlock>) => {
-    const newBlocks = [...blocks];
-    newBlocks[index] = { ...newBlocks[index], ...updates };
-    onChange(newBlocks);
+    const next = [...blocks];
+    next[index] = { ...next[index], ...updates };
+    onChange(next);
   };
 
   const deleteBlock = (index: number) => {
-    const newBlocks = blocks.filter((_, i) => i !== index);
-    onChange(newBlocks);
+    onChange(blocks.filter((_, i) => i !== index));
   };
 
   const moveBlock = (fromIndex: number, toIndex: number) => {
-    const newBlocks = [...blocks];
-    const [movedBlock] = newBlocks.splice(fromIndex, 1);
-    newBlocks.splice(toIndex, 0, movedBlock);
-    onChange(newBlocks);
+    if (toIndex < 0 || toIndex >= blocks.length) return;
+    const next = [...blocks];
+    const [moved] = next.splice(fromIndex, 1);
+    next.splice(toIndex, 0, moved);
+    onChange(next);
   };
 
-  const handleDragStart = (index: number) => {
-    setDraggedIndex(index);
-  };
+  const readImageFile = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const MAX_FILE_SIZE = 2 * 1024 * 1024;
+      if (file.size > MAX_FILE_SIZE) {
+        reject(new Error('Image must be 2 MB or smaller'));
+        return;
+      }
 
-  const handleDragOver = (e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    if (draggedIndex === null || draggedIndex === index) return;
-
-    moveBlock(draggedIndex, index);
-    setDraggedIndex(index);
-  };
-
-  const handleDragEnd = () => {
-    setDraggedIndex(null);
-  };
-
-  const handleImageUpload = (index: number, file: File) => {
-    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
-    if (file.size > MAX_FILE_SIZE) {
-      alert('Image must be 2 MB or smaller');
-      return;
-    }
-
-    // Compress image
-    compressImage(file, 0.8, 1200, 1200).then((compressedFile) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === 'string') {
-          updateBlock(index, { content: reader.result });
-        }
-      };
-      reader.readAsDataURL(compressedFile);
-    }).catch((error) => {
-      console.error('Image compression failed:', error);
-      // Fallback to original file
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === 'string') {
-          updateBlock(index, { content: reader.result });
-        }
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const handleSlideshowImageUpload = (index: number, file: File) => {
-    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
-    if (file.size > MAX_FILE_SIZE) {
-      alert('Image must be 2 MB or smaller');
-      return;
-    }
-
-    // Compress image
-    compressImage(file, 0.8, 1200, 1200).then((compressedFile) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === 'string') {
-          const newImage: SlideshowImage = {
-            id: `slideshow-img-${Date.now()}`,
-            url: reader.result as string,
-            order: blocks[index].slideshow_images?.length || 0,
+      compressImage(file)
+        .then((compressed) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            if (typeof reader.result === 'string') resolve(reader.result);
+            else reject(new Error('Could not read image'));
           };
-          const updatedImages = [...(blocks[index].slideshow_images || []), newImage];
-          updateBlock(index, { slideshow_images: updatedImages });
-        }
-      };
-      reader.readAsDataURL(compressedFile);
-    }).catch((error) => {
-      console.error('Image compression failed:', error);
-      // Fallback to original file
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === 'string') {
-          const newImage: SlideshowImage = {
-            id: `slideshow-img-${Date.now()}`,
-            url: reader.result as string,
-            order: blocks[index].slideshow_images?.length || 0,
+          reader.onerror = () => reject(new Error('Could not read image'));
+          reader.readAsDataURL(compressed);
+        })
+        .catch(() => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            if (typeof reader.result === 'string') resolve(reader.result);
+            else reject(new Error('Could not read image'));
           };
-          const updatedImages = [...(blocks[index].slideshow_images || []), newImage];
-          updateBlock(index, { slideshow_images: updatedImages });
-        }
-      };
-      reader.readAsDataURL(file);
+          reader.onerror = () => reject(new Error('Could not read image'));
+          reader.readAsDataURL(file);
+        });
     });
+
+  const queueImageInsert = (index: number) => {
+    pendingInsertIndex.current = index;
+    imageInputRef.current?.click();
+  };
+
+  const queueSlideshowInsert = (index: number) => {
+    pendingInsertIndex.current = index;
+    slideshowInputRef.current?.click();
+  };
+
+  const handleImageFile = async (file: File) => {
+    try {
+      const dataUrl = await readImageFile(file);
+      const block: ContentBlock = {
+        id: createId('image'),
+        type: 'image',
+        content: dataUrl,
+        alt: '',
+      };
+      const index = pendingInsertIndex.current ?? blocks.length;
+      if (blocks.length === 0) {
+        onChange([block]);
+      } else {
+        insertBlock(index, block);
+      }
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to upload image');
+    } finally {
+      pendingInsertIndex.current = null;
+      if (imageInputRef.current) imageInputRef.current.value = '';
+    }
+  };
+
+  const readImageFiles = async (files: File[]): Promise<string[]> => {
+    const results = await Promise.allSettled(files.map((file) => readImageFile(file)));
+    const dataUrls: string[] = [];
+    const errors: string[] = [];
+    for (const result of results) {
+      if (result.status === 'fulfilled') {
+        dataUrls.push(result.value);
+      } else {
+        errors.push(result.reason instanceof Error ? result.reason.message : 'Could not read image');
+      }
+    }
+    if (errors.length > 0) {
+      const summary =
+        errors.length === 1
+          ? errors[0]
+          : `${errors.length} image(s) could not be added:\n${errors.slice(0, 3).join('\n')}${errors.length > 3 ? '\n…' : ''}`;
+      alert(summary);
+    }
+    return dataUrls;
+  };
+
+  const buildSlideshowImages = (dataUrls: string[], startOrder: number): SlideshowImage[] =>
+    dataUrls.map((url, i) => ({
+      id: createId('slideshow-img'),
+      url,
+      order: startOrder + i,
+    }));
+
+  const handleSlideshowFiles = async (files: File[]) => {
+    if (files.length === 0) return;
+    try {
+      const dataUrls = await readImageFiles(files);
+      if (dataUrls.length === 0) return;
+
+      const insertIndex = pendingInsertIndex.current ?? blocks.length;
+      const existing = blocks[insertIndex];
+
+      if (existing?.type === 'slideshow') {
+        const current = existing.slideshow_images || [];
+        updateBlock(insertIndex, {
+          slideshow_images: [...current, ...buildSlideshowImages(dataUrls, current.length)],
+        });
+      } else {
+        insertBlock(insertIndex, {
+          id: createId('slideshow'),
+          type: 'slideshow',
+          content: '',
+          slideshow_images: buildSlideshowImages(dataUrls, 0),
+        });
+      }
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to upload images');
+    } finally {
+      pendingInsertIndex.current = null;
+      if (slideshowInputRef.current) slideshowInputRef.current.value = '';
+    }
+  };
+
+  const handleImageUpload = async (index: number, file: File) => {
+    try {
+      const dataUrl = await readImageFile(file);
+      updateBlock(index, { content: dataUrl });
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to upload image');
+    }
+  };
+
+  const handleSlideshowImagesUpload = async (index: number, files: File[]) => {
+    if (files.length === 0) return;
+    try {
+      const dataUrls = await readImageFiles(files);
+      if (dataUrls.length === 0) return;
+
+      const current = blocks[index].slideshow_images || [];
+      updateBlock(index, {
+        slideshow_images: [...current, ...buildSlideshowImages(dataUrls, current.length)],
+      });
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to upload images');
+    }
   };
 
   const handleDeleteSlideshowImage = (blockIndex: number, imageId: string) => {
@@ -210,182 +262,225 @@ const ContentBuilder: React.FC<ContentBuilderProps> = ({ blocks, onChange }) => 
     updateBlock(blockIndex, { slideshow_images: updatedImages });
   };
 
+  const addTextAt = (index: number) => {
+    insertBlock(index, {
+      id: createId('text'),
+      type: 'text',
+      content: '<p></p>',
+    });
+  };
+
   return (
-    <div className="content-builder">
-      <div className="content-builder__toolbar">
-        <button type="button" onClick={addTextBlock} className="btn btn-secondary">
-          + Add Text Block
+    <div className="wp-post-editor">
+      <div className="wp-post-editor__media-bar">
+        <button
+          type="button"
+          className="wp-post-editor__media-btn"
+          onClick={() => {
+            ensureInitialTextBlock();
+            queueImageInsert(blocks.length);
+          }}
+        >
+          Add Media
         </button>
-        <button type="button" onClick={addImageBlock} className="btn btn-secondary">
-          + Add Image Block
+        <button
+          type="button"
+          className="wp-post-editor__media-btn wp-post-editor__media-btn--secondary"
+          onClick={() => {
+            ensureInitialTextBlock();
+            queueSlideshowInsert(blocks.length);
+          }}
+        >
+          Gallery
         </button>
-        <button type="button" onClick={addSlideshowBlock} className="btn btn-secondary">
-          + Add Image Slide Show Block
-        </button>
+        <span className="wp-post-editor__media-hint">
+          Insert images or a gallery (select multiple images at once for galleries)
+        </span>
       </div>
 
-      <div className="content-builder__blocks">
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept="image/*"
+        className="wp-post-editor__hidden-input"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) void handleImageFile(file);
+        }}
+      />
+      <input
+        ref={slideshowInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        className="wp-post-editor__hidden-input"
+        onChange={(e) => {
+          const files = Array.from(e.target.files ?? []);
+          if (files.length > 0) void handleSlideshowFiles(files);
+        }}
+      />
+
+      <div className="wp-post-editor__canvas">
         {blocks.length === 0 ? (
-          <div className="content-builder__empty">
-            <p>No content blocks yet. Add text or image blocks above.</p>
-          </div>
+          <button
+            type="button"
+            className="wp-post-editor__empty"
+            onClick={ensureInitialTextBlock}
+          >
+            <span className="wp-post-editor__empty-title">Start writing</span>
+            <span className="wp-post-editor__empty-text">
+              Click here to type your article, or use Add Media / Gallery above (gallery supports multiple images at once).
+            </span>
+          </button>
         ) : (
           blocks.map((block, index) => (
-            <div
-              key={block.id}
-              className={`content-builder__block ${draggedIndex === index ? 'dragging' : ''}`}
-              draggable
-              onDragStart={() => handleDragStart(index)}
-              onDragOver={(e) => handleDragOver(e, index)}
-              onDragEnd={handleDragEnd}
-            >
-              <div className="content-builder__block-header">
-                <span className="content-builder__block-type">
-                  {block.type === 'text' ? '📝 Text' : block.type === 'image' ? '🖼️ Image' : '🎬 Slideshow'}
-                </span>
-                <div className="content-builder__block-actions">
+            <div key={block.id} className="wp-post-editor__flow">
+              {index > 0 && (
+                <div className="wp-post-editor__inserter">
                   <button
                     type="button"
-                    onClick={() => deleteBlock(index)}
-                    className="btn btn-danger btn-sm"
-                    title="Delete block"
-                  >
-                    ×
-                  </button>
+                    className="wp-post-editor__inserter-btn"
+                    title="Add paragraph"
+                    aria-label="Add paragraph"
+                    onClick={() => addTextAt(index)}
+                  />
                 </div>
-              </div>
+              )}
 
-              <div className="content-builder__block-content">
-                {block.type === 'text' ? (
+              <section
+                className={`wp-post-editor__section ${draggedIndex === index ? 'is-dragging' : ''}`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  if (draggedIndex === null || draggedIndex === index) return;
+                  moveBlock(draggedIndex, index);
+                  setDraggedIndex(index);
+                }}
+              >
+                <div className="wp-post-editor__section-controls">
+                  <button
+                    type="button"
+                    className="wp-post-editor__drag-handle"
+                    draggable
+                    title="Drag to reorder"
+                    onDragStart={() => setDraggedIndex(index)}
+                    onDragEnd={() => setDraggedIndex(null)}
+                    aria-label="Drag to reorder"
+                  >
+                    ⋮⋮
+                  </button>
+                  <div className="wp-post-editor__section-actions">
+                    <button
+                      type="button"
+                      className="wp-post-editor__icon-btn"
+                      title="Move up"
+                      disabled={index === 0}
+                      onClick={() => moveBlock(index, index - 1)}
+                    >
+                      ↑
+                    </button>
+                    <button
+                      type="button"
+                      className="wp-post-editor__icon-btn"
+                      title="Move down"
+                      disabled={index === blocks.length - 1}
+                      onClick={() => moveBlock(index, index + 1)}
+                    >
+                      ↓
+                    </button>
+                    <button
+                      type="button"
+                      className="wp-post-editor__icon-btn wp-post-editor__icon-btn--danger"
+                      title="Remove"
+                      onClick={() => deleteBlock(index)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+
+                {block.type === 'text' && (
                   <RichTextEditor
                     value={block.content}
                     onChange={(html) => updateBlock(index, { content: html })}
-                    placeholder="Enter text content..."
+                    placeholder="Write your content…"
+                    embedded
+                    minHeight={index === 0 ? 280 : 160}
                   />
-                ) : block.type === 'image' ? (
-                  <div className="image-block">
-                    <div className="image-upload">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) handleImageUpload(index, file);
-                        }}
-                        style={{ display: 'none' }}
-                        id={`image-upload-${block.id}`}
-                      />
-                      {!block.content ? (
-                        <label htmlFor={`image-upload-${block.id}`} className="image-upload__label">
-                          <div className="image-upload__placeholder">
-                            <span>Click to upload image</span>
-                            <small>Max 2MB (auto-compressed)</small>
-                          </div>
+                )}
+
+                {block.type === 'image' && (
+                  <figure className="wp-post-editor__figure">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id={`image-upload-${block.id}`}
+                      className="wp-post-editor__hidden-input"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) void handleImageUpload(index, file);
+                      }}
+                    />
+                    {!block.content ? (
+                      <label htmlFor={`image-upload-${block.id}`} className="wp-post-editor__media-placeholder">
+                        <span>Click to upload an image</span>
+                        <small>Max 2 MB · auto-compressed</small>
+                      </label>
+                    ) : (
+                      <>
+                        <img src={block.content} alt={block.alt || ''} className="wp-post-editor__figure-image" />
+                        <label htmlFor={`image-upload-${block.id}`} className="wp-post-editor__replace-btn">
+                          Replace
                         </label>
-                      ) : (
-                        <div className="image-preview">
-                          <img src={block.content} alt={block.alt || 'Content image'} />
-                          <label htmlFor={`image-upload-${block.id}`} className="image-replace-btn">
-                            Replace Image
-                          </label>
-                        </div>
-                      )}
-                    </div>
-                    <div className="image-alt-input">
-                      <label htmlFor={`image-alt-${block.id}`}>Alt text:</label>
+                      </>
+                    )}
+                    <figcaption className="wp-post-editor__caption-field">
+                      <label htmlFor={`image-alt-${block.id}`}>Caption / alt text</label>
                       <input
                         id={`image-alt-${block.id}`}
                         type="text"
                         value={block.alt || ''}
                         onChange={(e) => updateBlock(index, { alt: e.target.value })}
-                        placeholder="Describe the image for accessibility"
+                        placeholder="Describe this image for accessibility"
                       />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="slideshow-block">
-                    <div className="slideshow-upload">
-                      <label htmlFor={`slideshow-upload-${block.id}`} className="btn btn-secondary" style={{ cursor: 'pointer', marginBottom: '1rem' }}>
-                        + Add Image to Slideshow
+                    </figcaption>
+                  </figure>
+                )}
+
+                {block.type === 'slideshow' && (
+                  <div className="wp-post-editor__gallery">
+                    <div className="wp-post-editor__gallery-toolbar">
+                      <label htmlFor={`slideshow-upload-${block.id}`} className="wp-post-editor__gallery-add">
+                        Add to gallery
                       </label>
                       <input
                         type="file"
                         accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) handleSlideshowImageUpload(index, file);
-                        }}
-                        style={{ display: 'none' }}
+                        multiple
                         id={`slideshow-upload-${block.id}`}
+                        className="wp-post-editor__hidden-input"
+                        onChange={(e) => {
+                          const files = Array.from(e.target.files ?? []);
+                          if (files.length > 0) void handleSlideshowImagesUpload(index, files);
+                          e.target.value = '';
+                        }}
                       />
-                      <span style={{ color: '#666', fontSize: '0.95rem' }}>
-                        {block.slideshow_images?.length || 0}/5 slideshow images
+                      <span className="wp-post-editor__gallery-count">
+                        {(block.slideshow_images?.length || 0)} image
+                        {(block.slideshow_images?.length || 0) === 1 ? '' : 's'}
                       </span>
                     </div>
 
                     {block.slideshow_images && block.slideshow_images.length > 0 && (
-                      <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
-                        gap: '1rem',
-                        marginTop: '1rem'
-                      }}>
+                      <div className="wp-post-editor__gallery-grid">
                         {block.slideshow_images.map((image) => (
-                          <div
-                            key={image.id}
-                            style={{
-                              position: 'relative',
-                              borderRadius: '8px',
-                              overflow: 'hidden',
-                              aspectRatio: '1',
-                              background: '#f0f0f0',
-                              border: '1px solid #e0e0e0'
-                            }}
-                          >
-                            <img
-                              src={image.url}
-                              alt={`Slideshow image ${image.order + 1}`}
-                              style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover'
-                              }}
-                            />
-                            <div style={{
-                              position: 'absolute',
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              background: 'rgba(0, 0, 0, 0.7)',
-                              color: 'white',
-                              padding: '0.25rem',
-                              textAlign: 'center',
-                              fontSize: '0.75rem'
-                            }}>
-                              #{image.order + 1}
-                            </div>
+                          <div key={image.id} className="wp-post-editor__gallery-item">
+                            <img src={image.url} alt={`Gallery image ${image.order + 1}`} />
+                            <span className="wp-post-editor__gallery-order">{image.order + 1}</span>
                             <button
+                              type="button"
+                              className="wp-post-editor__gallery-remove"
                               onClick={() => handleDeleteSlideshowImage(index, image.id)}
-                              style={{
-                                position: 'absolute',
-                                top: '0.25rem',
-                                right: '0.25rem',
-                                background: 'rgba(220, 53, 69, 0.9)',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '50%',
-                                width: '24px',
-                                height: '24px',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: '1rem',
-                                transition: 'background 0.2s',
-                                padding: 0
-                              }}
-                              onMouseOver={(e) => e.currentTarget.style.background = 'rgba(220, 53, 69, 1)'}
-                              onMouseOut={(e) => e.currentTarget.style.background = 'rgba(220, 53, 69, 0.9)'}
+                              aria-label={`Remove image ${image.order + 1}`}
                             >
                               ×
                             </button>
@@ -395,17 +490,11 @@ const ContentBuilder: React.FC<ContentBuilderProps> = ({ blocks, onChange }) => 
                     )}
                   </div>
                 )}
-              </div>
+              </section>
             </div>
           ))
         )}
       </div>
-
-      {blocks.length > 0 && (
-        <div className="content-builder__help">
-          <small>💡 Drag blocks to reorder them. Add text, image, and slideshow blocks to create your article content. Max 5 images per slideshow.</small>
-        </div>
-      )}
     </div>
   );
 };

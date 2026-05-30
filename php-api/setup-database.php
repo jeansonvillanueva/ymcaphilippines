@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php';
+require_once 'utils.php';
 
 header('Content-Type: application/json');
 
@@ -41,8 +42,16 @@ function addColumnIfMissing($conn, $table, $column, $definition, &$results) {
     }
 }
 
+ensureNewsUtf8Mb4($conn);
+
 // Ensure contentBlocks column exists in news table
-addColumnIfMissing($conn, 'news', 'contentBlocks', 'LONGTEXT', $results);
+addColumnIfMissing(
+    $conn,
+    'news',
+    'contentBlocks',
+    'LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci',
+    $results
+);
 
 // Ensure body column exists in news table
 addColumnIfMissing($conn, 'news', 'body', 'TEXT', $results);

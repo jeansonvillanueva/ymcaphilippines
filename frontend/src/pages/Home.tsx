@@ -12,6 +12,7 @@ import EventVenueRental from '../components/EventVenueRental';
 import eventVenueImage1 from '../assets/images/rent/event1.png';
 import eventVenueImage2 from '../assets/images/rent/event2.png';
 import { useVideos, useNews } from '../hooks/useApi';
+import { compareNewsDatesDesc } from '../utils/newsDate';
 
 const normalizeImageUrl = (url?: string | null) => {
   if (!url) return '';
@@ -56,15 +57,6 @@ const FALLBACK_VIDEOS: VideoItem[] = [
   }
 ];
 
-function parseNewsDate(date?: string) {
-  if (!date) return Number.MIN_SAFE_INTEGER;
-  const parsed = Date.parse(date);
-  if (!Number.isNaN(parsed)) return parsed;
-  const year = date.match(/\b(19|20)\d{2}\b/)?.[0];
-  if (year) return new Date(`${year}-01-01`).getTime();
-  return Number.MIN_SAFE_INTEGER;
-}
-
 function Home() {
   const sectionRef = useScrollReveal<HTMLDivElement>();
   const [activeSlide, setActiveSlide] = useState(0);
@@ -76,7 +68,7 @@ function Home() {
 
   const heroSlides = useMemo<HeroSlide[]>(() => {
     const latest = [...news]
-      .sort((a, b) => parseNewsDate(b.date) - parseNewsDate(a.date))
+      .sort((a, b) => compareNewsDatesDesc(a.date, b.date))
       .slice(0, 3);
 
     return latest.map((item) => ({

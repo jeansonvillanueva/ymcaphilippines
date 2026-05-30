@@ -5,6 +5,9 @@ require_once 'auth.php';
 
 // Initialize database connection globally so all endpoints have access to $conn
 $conn = getDatabaseConnection();
+if ($conn) {
+    ensureDatabaseSchema($conn);
+}
 
 // Cache the php://input stream globally to avoid consuming it multiple times
 global $PHP_INPUT_BUFFER;

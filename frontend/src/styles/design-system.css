@@ -17,7 +17,8 @@
   --ymca-text-muted: #666666;
 
   /* Typography – readable base sizes and line heights */
-  --font-sans: 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif,
+    'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', emoji;
   --font-heading: var(--font-sans);
   --text-base: 1.0625rem; /* ~17px for comfortable reading */
   --text-lg: clamp(1.125rem, 1rem + 0.5vw, 1.25rem);

@@ -8,9 +8,18 @@ interface RichTextEditorProps {
   value: string;
   onChange: (content: string) => void;
   placeholder?: string;
+  /** Borderless style for use inside the post editor canvas */
+  embedded?: boolean;
+  minHeight?: number;
 }
 
-const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
+const RichTextEditor: React.FC<RichTextEditorProps> = ({
+  value,
+  onChange,
+  placeholder,
+  embedded = false,
+  minHeight = 200,
+}) => {
   const [isReady, setIsReady] = useState(false);
 
   const editor = useEditor({
@@ -27,7 +36,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
     },
     editorProps: {
       attributes: {
-        class: 'rich-editor-input',
+        class: embedded ? 'rich-editor-input rich-editor-input--embedded' : 'rich-editor-input',
+        ...(placeholder ? { 'data-placeholder': placeholder } : {}),
       },
     },
   });
@@ -68,8 +78,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
   }
 
   return (
-    <div className="rich-text-editor" style={{ border: '1px solid #ccc', borderRadius: '4px' }}>
-      <div className="editor-toolbar">
+    <div
+      className={embedded ? 'rich-text-editor rich-text-editor--embedded' : 'rich-text-editor'}
+      style={embedded ? { minHeight } : { border: '1px solid #ccc', borderRadius: '4px' }}
+    >
+      <div className={embedded ? 'editor-toolbar editor-toolbar--embedded' : 'editor-toolbar'}>
         <div className="toolbar-group">
           <button
             type="button"

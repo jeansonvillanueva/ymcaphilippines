@@ -5,6 +5,33 @@
   background: white;
 }
 
+.rich-text-editor--embedded {
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+  background: transparent;
+}
+
+.rich-text-editor--embedded .editor-toolbar--embedded {
+  background: transparent;
+  border-bottom: 1px solid #f0f0f1;
+  padding: 0.35rem 0;
+  gap: 4px;
+}
+
+.rich-text-editor--embedded .toolbar-btn {
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  font-size: 12px;
+  border-radius: 2px;
+}
+
+.rich-text-editor--embedded .ProseMirror {
+  min-height: 120px;
+  padding: 0.35rem 0;
+}
+
 .editor-toolbar {
   display: flex;
   flex-wrap: wrap;

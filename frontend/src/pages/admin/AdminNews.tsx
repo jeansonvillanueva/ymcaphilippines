@@ -5,6 +5,8 @@ import ContentBuilder from '../../components/ContentBuilder';
 import type { ContentBlock } from '../../components/ContentBuilder';
 import ContentRenderer from '../../components/ContentRenderer';
 import { LOCALS_BY_ID } from '../../data/locals';
+import { compareNewsDatesDesc } from '../../utils/newsDate';
+import { hasSlideshowBlocks, parseContentBlocks } from '../../utils/contentBlocks';
 
 interface News {
   id?: number;
@@ -71,16 +73,6 @@ const topics = [
   'Employment Opportunities',
   'Press Releases'
 ];
-// Parse date string for chronological sorting (latest first)
-const parseNewsDate = (date?: string) => {
-  if (!date) return Number.MIN_SAFE_INTEGER;
-  const parsed = Date.parse(date);
-  if (!Number.isNaN(parsed)) return parsed;
-  const year = date.match(/\b(19|20)\d{2}\b/)?.[0];
-  if (year) return new Date(`${year}-01-01`).getTime();
-  return Number.MIN_SAFE_INTEGER;
-};
-
 // Image compression utility
 const compressImage = (file: File, quality: number = 0.8, maxWidth: number = 1200, maxHeight: number = 1200): Promise<File> => {
   return new Promise((resolve, reject) => {
@@ -160,7 +152,7 @@ export default function AdminNews() {
       const response = await axios.get(`${API_URL}&t=${timestamp}`);
       if (Array.isArray(response.data)) {
         // Sort news by date field chronologically (latest first), not by created_at
-        const sortedNews = response.data.sort((a, b) => parseNewsDate(b.date) - parseNewsDate(a.date));
+        const sortedNews = response.data.sort((a, b) => compareNewsDatesDesc(a.date, b.date));
         setNewsList(sortedNews);
       } else {
         console.error('Unexpected API response format:', response.data);
@@ -198,40 +190,109 @@ export default function AdminNews() {
     ? topics 
     : topics.filter((topic) => topic.toLowerCase().includes(topicSearch.toLowerCase()));
 
-  const extractSlideshowImages = () => {
-    const images: Array<{ url: string; order: number }> = [];
-    (form.contentBlocks || []).forEach((block) => {
-      if (block.type === 'slideshow' && block.slideshow_images) {
-        block.slideshow_images.forEach((img) => {
-          images.push({
-            url: img.url,
-            order: images.length, // Global order across all slideshows
-          });
-        });
+  const cloneBlocksForSave = (blocks: ContentBlock[], stripPendingImages = false) => {
+    return blocks.map((block) => {
+      if (block.type === 'image') {
+        if (stripPendingImages && block.content.startsWith('data:')) {
+          return { ...block, content: '' };
+        }
+        return block;
       }
+
+      if (block.type !== 'slideshow') return block;
+
+      return {
+        ...block,
+        slideshow_images: (block.slideshow_images || [])
+          .filter((image) => !stripPendingImages || !image.url.startsWith('data:'))
+          .map((image, index) => ({ ...image, order: index })),
+      };
     });
-    return images;
   };
 
-  const uploadSlideshowImages = async (newsId: number) => {
-    const images = extractSlideshowImages();
-    if (images.length === 0) return;
+  const buildNewsFormData = (blocks: ContentBlock[], includeImage: boolean) => {
+    const formData = new FormData();
+    formData.append('title', form.title.trim());
+    formData.append('date', form.date || '');
+    formData.append('subtitle', form.subtitle || '');
+    formData.append('body', form.body || '');
+    formData.append('contentBlocks', JSON.stringify(blocks));
+    formData.append('localYMCA', form.localYMCA || '');
+    formData.append('category', form.category || 'News');
+    formData.append('topic', form.topic || '');
 
-    for (const image of images) {
-      try {
-        // Convert base64 to blob
-        const response = await fetch(image.url);
-        const blob = await response.blob();
-        
-        const formData = new FormData();
-        formData.append('image', blob, `slideshow-${image.order}.jpg`);
-
-        await axios.post(`${ADMIN_API_URL}/news/${newsId}/upload`, formData);
-      } catch (error) {
-        console.error(`Error uploading slideshow image ${image.order}:`, error);
-        throw new Error(`Failed to upload slideshow image ${image.order + 1}`);
+    if (includeImage) {
+      if (imageFile) {
+        formData.append('image', imageFile);
+      } else if (form.imageUrl !== undefined && !form.imageUrl.startsWith('data:')) {
+        formData.append('imageUrl', form.imageUrl || '');
       }
     }
+
+    return formData;
+  };
+
+  const uploadPendingBlockImages = async (newsId: number, blocks: ContentBlock[]) => {
+    let uploadOrder = 0;
+    const updatedBlocks: ContentBlock[] = [];
+
+    for (const block of blocks) {
+      if (block.type === 'image' && block.content.startsWith('data:')) {
+        try {
+          const response = await fetch(block.content);
+          const blob = await response.blob();
+          const formData = new FormData();
+          formData.append('image', blob, `content-image-${uploadOrder}.jpg`);
+
+          const uploadResponse = await axios.post(`${ADMIN_API_URL}/news/${newsId}/upload`, formData);
+          updatedBlocks.push({
+            ...block,
+            content: uploadResponse.data?.image_url || block.content,
+          });
+          uploadOrder += 1;
+        } catch (error) {
+          console.error(`Error uploading content image ${uploadOrder}:`, error);
+          throw new Error(`Failed to upload content image ${uploadOrder + 1}`);
+        }
+        continue;
+      }
+
+      if (block.type !== 'slideshow') {
+        updatedBlocks.push(block);
+        continue;
+      }
+
+      const updatedImages = [];
+      for (const image of block.slideshow_images || []) {
+        if (!image.url.startsWith('data:')) {
+          updatedImages.push({ ...image, order: updatedImages.length });
+          continue;
+        }
+
+        try {
+          const response = await fetch(image.url);
+          const blob = await response.blob();
+          const formData = new FormData();
+          formData.append('image', blob, `slideshow-${uploadOrder}.jpg`);
+
+          const uploadResponse = await axios.post(`${ADMIN_API_URL}/news/${newsId}/upload`, formData);
+          updatedImages.push({
+            ...image,
+            id: String(uploadResponse.data?.id ?? image.id),
+            url: uploadResponse.data?.image_url || image.url,
+            order: updatedImages.length,
+          });
+          uploadOrder += 1;
+        } catch (error) {
+          console.error(`Error uploading slideshow image ${uploadOrder}:`, error);
+          throw new Error(`Failed to upload slideshow image ${uploadOrder + 1}`);
+        }
+      }
+
+      updatedBlocks.push({ ...block, slideshow_images: updatedImages });
+    }
+
+    return updatedBlocks;
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -285,58 +346,51 @@ export default function AdminNews() {
       return;
     }
 
-    // Validate contentBlocks size - increased limit for rich content with multiple images
-    const contentBlocksJson = JSON.stringify(form.contentBlocks || []);
-    if (contentBlocksJson.length > 10000000) { // ~10MB limit (increased for 10+ images)
+    const rawBlocks = Array.isArray(form.contentBlocks) ? form.contentBlocks : [];
+    const initialBlocksForSave = cloneBlocksForSave(rawBlocks, true);
+    const contentBlocksJson = JSON.stringify(initialBlocksForSave);
+    if (contentBlocksJson.length > 1000000) {
       setMessage({ type: 'error', text: 'Content is too large. Please reduce the amount of content or use fewer images.' });
       return;
     }
 
     try {
-      const formData = new FormData();
-      formData.append('title', form.title.trim());
-      formData.append('date', form.date || '');
-      formData.append('subtitle', form.subtitle || '');
-      formData.append('body', form.body || ''); // Keep for backward compatibility
-      formData.append('contentBlocks', contentBlocksJson);
-      formData.append('localYMCA', form.localYMCA || '');
-      formData.append('category', form.category || 'News');
-      formData.append('topic', form.topic || '');
-      if (imageFile) {
-        formData.append('image', imageFile);
-      } else if (form.imageUrl) {
-        formData.append('imageUrl', form.imageUrl);
-      }
-
       if (editingId) {
-        formData.append('_method', 'PUT');
-        formData.append('id', editingId.toString());
-        await axios.post(`${API_URL}/${editingId}`, formData, {
-          timeout: 120000, // 2 minutes
-          maxContentLength: Infinity,
-          maxBodyLength: Infinity,
-        });
-        // Delete old slideshow images and upload new ones for editing
         try {
-          // First, delete all existing slideshow images for this news
           await axios.delete(`${ADMIN_API_URL}/news/${editingId}/images/all`);
         } catch (error) {
           console.log('Note: Could not delete existing slideshow images (may not exist)');
         }
-        // Upload new slideshow images
-        await uploadSlideshowImages(editingId);
+
+        const uploadedBlocks = await uploadPendingBlockImages(editingId, rawBlocks);
+        const formData = buildNewsFormData(uploadedBlocks, true);
+        formData.append('_method', 'PUT');
+        formData.append('id', editingId.toString());
+        await axios.post(`${API_URL}/${editingId}`, formData, {
+          timeout: 120000,
+          maxContentLength: Infinity,
+          maxBodyLength: Infinity,
+        });
         setMessage({ type: 'success', text: 'News updated successfully' });
       } else {
+        const formData = buildNewsFormData(initialBlocksForSave, true);
         const createResponse = await axios.post(API_URL, formData, {
-          timeout: 120000, // 2 minutes
+          timeout: 120000,
           maxContentLength: Infinity,
           maxBodyLength: Infinity,
         });
         console.log('[AdminNews] Create response:', createResponse.data);
         const newNewsId = createResponse.data.id;
-        // Upload slideshow images for new news
         if (newNewsId) {
-          await uploadSlideshowImages(newNewsId);
+          const uploadedBlocks = await uploadPendingBlockImages(newNewsId, rawBlocks);
+          const updateFormData = buildNewsFormData(uploadedBlocks, false);
+          updateFormData.append('_method', 'PUT');
+          updateFormData.append('id', newNewsId.toString());
+          await axios.post(`${API_URL}/${newNewsId}`, updateFormData, {
+            timeout: 120000,
+            maxContentLength: Infinity,
+            maxBodyLength: Infinity,
+          });
         }
         setMessage({ type: 'success', text: 'News added successfully' });
       }
@@ -371,9 +425,7 @@ export default function AdminNews() {
   };
 
   const handleEdit = (news: News) => {
-    const parsedContentBlocks: ContentBlock[] = news.contentBlocks
-      ? (Array.isArray(news.contentBlocks) ? news.contentBlocks : JSON.parse(news.contentBlocks))
-      : [];
+    const parsedContentBlocks = parseContentBlocks(news.contentBlocks);
     setForm({
       ...news,
       contentBlocks: parsedContentBlocks,
@@ -422,9 +474,11 @@ export default function AdminNews() {
       <h2>Manage Y Latest News</h2>
 
       {message && (
-        <div className={`${message.type}-message`}>
-          {message.text}
-          <button onClick={() => setMessage(null)}>×</button>
+        <div className={`admin-status-banner ${message.type}-message`} role="status" aria-live="polite">
+          <span className="admin-status-banner__text">{message.text}</span>
+          <button type="button" className="admin-status-banner__close" onClick={() => setMessage(null)} aria-label="Dismiss notification">
+            ×
+          </button>
         </div>
       )}
 
@@ -532,12 +586,14 @@ export default function AdminNews() {
           ) : null}
         </div>
 
-        <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-          <label>Article Content (Paragraphs & Images)</label>
+        <div className="form-group wp-post-field" style={{ gridColumn: '1 / -1' }}>
+          <label htmlFor="news-content-editor">Content</label>
+          <div id="news-content-editor">
           <ContentBuilder
             blocks={Array.isArray(form.contentBlocks) ? form.contentBlocks : []}
             onChange={(blocks) => setForm((prev) => ({ ...prev, contentBlocks: blocks }))}
           />
+          </div>
         </div>
 
         <div className="admin-news-preview" style={{ gridColumn: '1 / -1' }}>
@@ -545,7 +601,7 @@ export default function AdminNews() {
             <span>Preview</span>
           </div>
           <article className="admin-news-preview__article">
-            {form.imageUrl && (
+            {form.imageUrl && !hasSlideshowBlocks(form.contentBlocks) && (
               <img
                 src={form.imageUrl}
                 alt={form.title || 'News preview'}

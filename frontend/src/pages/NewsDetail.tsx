@@ -3,9 +3,9 @@ import { useParams } from 'react-router-dom';
 import { useLoadingScreen } from '../hooks/useLoadingScreen';
 import { useNews } from '../hooks/useApi';
 import NewsArticle, { type LocalYMCAConfig } from '../components/NewsArticle';
-import NewsSlideshow from '../components/NewsSlideshow';
 import ContentRenderer from '../components/ContentRenderer';
 import { LOCALS_BY_ID } from '../data/locals';
+import { hasContentBlocks, hasSlideshowBlocks, parseContentBlocks } from '../utils/contentBlocks';
 import '../styles/design-system.css';
 
 function resolveLocalYMCA(localYMCA?: string | LocalYMCAConfig | null): LocalYMCAConfig | undefined {
@@ -64,6 +64,9 @@ const NewsDetail: React.FC = () => {
   if (error) return <div className="latest-news-error">{error}</div>;
   if (!item) return <div className="latest-news-error">News article not found.</div>;
 
+  const contentBlocks = parseContentBlocks(item.contentBlocks);
+  const inlineSlideshow = hasSlideshowBlocks(contentBlocks);
+
   return (
     <NewsArticle
       title={item.title}
@@ -74,16 +77,10 @@ const NewsDetail: React.FC = () => {
       websiteUrl={item.websiteUrl}
       articlePath={currentPath || undefined}
       layoutVariant="article"
+      hideHeaderMedia={inlineSlideshow}
     >
-      {/* Display slideshow if article has images */}
-      {item.id && <NewsSlideshow newsId={item.id} />}
-      
-      {item.contentBlocks && item.contentBlocks.length > 0 ? (
-        <ContentRenderer contentBlocks={
-          typeof item.contentBlocks === 'string'
-            ? JSON.parse(item.contentBlocks)
-            : item.contentBlocks
-        } />
+      {hasContentBlocks(contentBlocks) ? (
+        <ContentRenderer contentBlocks={contentBlocks} />
       ) : item.body ? (
         <div dangerouslySetInnerHTML={{ __html: item.body }} />
       ) : (

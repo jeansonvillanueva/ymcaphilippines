@@ -40,6 +40,8 @@ export interface NewsArticleProps {
   /** Current route path for “More Like This” */
   articlePath?: string;
   layoutVariant?: 'news' | 'article';
+  /** Hide header hero/featured image when slideshow is placed in article body */
+  hideHeaderMedia?: boolean;
   children: ReactNode;
 }
 
@@ -55,17 +57,19 @@ export default function NewsArticle({
   websiteUrl,
   articlePath,
   layoutVariant = 'news',
+  hideHeaderMedia = false,
   children,
 }: NewsArticleProps) {
   const ref = useScrollReveal<HTMLDivElement>();
   const { news } = useNews();
   
   const slides = useMemo(() => {
+    if (hideHeaderMedia) return [];
     const fromProp = heroImageUrls?.filter(Boolean) as string[] | undefined;
     if (fromProp && fromProp.length) return fromProp;
     if (imageUrl) return [imageUrl];
     return [];
-  }, [heroImageUrls, imageUrl]);
+  }, [hideHeaderMedia, heroImageUrls, imageUrl]);
 
   const [heroIndex, setHeroIndex] = useState(0);
   const clampedHeroIndex = slides.length > 0 ? heroIndex % slides.length : 0;

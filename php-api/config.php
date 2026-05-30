@@ -1,5 +1,5 @@
 <?php
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 
 // CORS configuration with credentials support
 // When using withCredentials: true in frontend, we need to specify exact origin, not '*'
@@ -73,7 +73,8 @@ function getDatabaseConnection() {
             // Don't exit here - let individual endpoints handle it
             return null;
         }
-        $conn->set_charset('utf8');
+        $conn->set_charset('utf8mb4');
+        $conn->query("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
     }
     return $conn;
 }
