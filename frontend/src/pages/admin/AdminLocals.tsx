@@ -29,6 +29,7 @@ interface Local {
   twitterUrl?: string;
   heroImageUrl?: string;
   logoImageUrl?: string;
+  embeddedMapUrl?: string;
   corporate: number;
   nonCorporate: number;
   youth: number;
@@ -37,7 +38,7 @@ interface Local {
   pillars?: LocalPillar[];
 }
 
-type UploadField = 'heroImageUrl' | 'logoImageUrl';
+type UploadField = 'heroImageUrl';
 
 const normalizeImageUrl = (url?: string | null) => {
   if (!url) return '';
@@ -67,6 +68,7 @@ export default function AdminLocals() {
     twitterUrl: '',
     heroImageUrl: '',
     logoImageUrl: '',
+    embeddedMapUrl: '',
     corporate: 0,
     nonCorporate: 0,
     youth: 0,
@@ -191,14 +193,7 @@ export default function AdminLocals() {
     }
   };
 
-  const handleLogoImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      await uploadLocalImage(file, 'logoImageUrl');
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     setForm((prev) => ({
       ...prev,
@@ -331,19 +326,15 @@ export default function AdminLocals() {
           </div>
 
           <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-            <label>Logo Image Upload</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleLogoImageChange}
+            <label>Embedded Map Link</label>
+            <textarea
+              name="embeddedMapUrl"
+              placeholder="Paste Google Maps embed URL or full iframe embed code"
+              value={form.embeddedMapUrl || ''}
+              onChange={handleChange}
+              rows={4}
+              style={{ width: '100%', resize: 'vertical' }}
             />
-            {form.logoImageUrl && (
-              <img
-                src={normalizeImageUrl(form.logoImageUrl)}
-                alt="Current logo"
-                style={{ marginTop: '0.75rem', width: '120px', height: 'auto', objectFit: 'contain', borderRadius: '6px' }}
-              />
-            )}
           </div>
 
           <h4 style={{ gridColumn: '1 / -1', marginTop: '1.5rem', marginBottom: '1rem' }}>Member Statistics</h4>

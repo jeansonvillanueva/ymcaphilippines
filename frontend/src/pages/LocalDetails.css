@@ -97,6 +97,20 @@
   box-shadow: 0 2px 14px rgba(0, 0, 0, 0.08);
 }
 
+.local-details-map {
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid rgba(196, 30, 58, 0.2);
+}
+
+.local-details-map iframe {
+  display: block;
+  width: 100%;
+  min-height: 320px;
+}
+
 .local-details-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;

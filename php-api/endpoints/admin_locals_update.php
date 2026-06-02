@@ -49,6 +49,7 @@ $instagramUrl = isset($data['instagramUrl']) ? $conn->real_escape_string($data['
 $twitterUrl = isset($data['twitterUrl']) ? $conn->real_escape_string($data['twitterUrl']) : '';
 $heroImageUrl = isset($data['heroImageUrl']) ? $conn->real_escape_string($data['heroImageUrl']) : '';
 $logoImageUrl = isset($data['logoImageUrl']) ? $conn->real_escape_string($data['logoImageUrl']) : '';
+$embeddedMapUrl = isset($data['embeddedMapUrl']) ? $conn->real_escape_string($data['embeddedMapUrl']) : '';
 $corporate = isset($data['corporate']) ? intval($data['corporate']) : 0;
 $nonCorporate = isset($data['nonCorporate']) ? intval($data['nonCorporate']) : 0;
 $youth = isset($data['youth']) ? intval($data['youth']) : 0;
@@ -87,7 +88,7 @@ $existingRow = $existsResult->fetch_assoc();
 error_log("[ADMIN_LOCALS_UPDATE] Found existing local: " . json_encode($existingRow));
 
 // Build and execute update query
-$sql = "UPDATE `local` SET name='$name', established=$establishedClause, facebook_url='$facebookUrl', instagramUrl='$instagramUrl', twitterUrl='$twitterUrl', hero_image_url='$heroImageUrl', logo_image_url='$logoImageUrl', corporate=$corporate, non_corporate=$nonCorporate, youth=$youth, others=$others, total_members_as_of=$totalMembersAsOfClause WHERE local_id='$id'";
+$sql = "UPDATE `local` SET name='$name', established=$establishedClause, facebook_url='$facebookUrl', instagramUrl='$instagramUrl', twitterUrl='$twitterUrl', hero_image_url='$heroImageUrl', logo_image_url='$logoImageUrl', embedded_map_url='$embeddedMapUrl', corporate=$corporate, non_corporate=$nonCorporate, youth=$youth, others=$others, total_members_as_of=$totalMembersAsOfClause WHERE local_id='$id'";
 
 error_log("[ADMIN_LOCALS_UPDATE] Executing SQL: " . $sql);
 

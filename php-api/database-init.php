@@ -60,6 +60,7 @@ if ($action === 'create') {
           `facebook_url` varchar(255) DEFAULT NULL,
           `hero_image_url` varchar(255) DEFAULT NULL,
           `logo_image_url` varchar(255) DEFAULT NULL,
+          `embedded_map_url` varchar(1000) DEFAULT NULL,
           `corporate` int DEFAULT 0,
           `non_corporate` int DEFAULT 0,
           `youth` int DEFAULT 0,
@@ -69,6 +70,8 @@ if ($action === 'create') {
           `twitterUrl` varchar(500) DEFAULT NULL,
           INDEX idx_local_id (local_id)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+
+        "ALTER TABLE `local` ADD COLUMN IF NOT EXISTS `embedded_map_url` varchar(1000) DEFAULT NULL",
 
         "CREATE TABLE IF NOT EXISTS `local_pillars` (
           `pillars_id` int NOT NULL AUTO_INCREMENT PRIMARY KEY,

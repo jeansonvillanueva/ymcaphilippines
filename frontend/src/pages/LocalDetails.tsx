@@ -26,6 +26,16 @@ function formatNumber(n: number) {
   return new Intl.NumberFormat('en-PH').format(n);
 }
 
+function resolveEmbeddedMapSrc(value?: string | null): string {
+  if (!value) return '';
+  const trimmed = value.trim();
+  const iframeSrcMatch = trimmed.match(/src=["']([^"']+)["']/i);
+  if (iframeSrcMatch?.[1]) {
+    return iframeSrcMatch[1];
+  }
+  return trimmed;
+}
+
 const PILLAR_ICONS: Record<LocalPillarKey, string> = {
   community: pillarCommunityWellbeing,
   work: pillarMeaningWork,
@@ -53,6 +63,7 @@ export default function LocalDetails() {
         twitterUrl: apiLocal.twitterUrl,
         heroImageUrl: apiLocal.heroImageUrl,
         logoImageUrl: apiLocal.logoImageUrl,
+        embeddedMapUrl: apiLocal.embeddedMapUrl,
         stats: {
           corporate: Number(apiLocal.corporate) || 0,
           nonCorporate: Number(apiLocal.nonCorporate) || 0,
@@ -168,6 +179,18 @@ export default function LocalDetails() {
           <div className="local-details-card">
             {local.stats ? (
               <>
+                {resolveEmbeddedMapSrc(local.embeddedMapUrl) ? (
+                  <div className="local-details-map">
+                    <iframe
+                      src={resolveEmbeddedMapSrc(local.embeddedMapUrl)}
+                      title={`${local.name} map`}
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    />
+                  </div>
+                ) : null}
                 <div className="local-details-stats">
                   <div className="local-details-stats__row">
                     <div className="local-details-stats__label">Corporate</div>

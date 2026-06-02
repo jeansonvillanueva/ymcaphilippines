@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS `local` (
   `facebook_url` varchar(255) DEFAULT NULL,
   `hero_image_url` varchar(255) DEFAULT NULL,
   `logo_image_url` varchar(255) DEFAULT NULL,
+  `embedded_map_url` varchar(1000) DEFAULT NULL,
   `corporate` int DEFAULT 0,
   `non_corporate` int DEFAULT 0,
   `youth` int DEFAULT 0,

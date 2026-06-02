@@ -78,6 +78,7 @@ export function initializeTables() {
       twitterUrl VARCHAR(500) DEFAULT NULL,
       hero_image_url VARCHAR(255) DEFAULT NULL,
       logo_image_url VARCHAR(255) DEFAULT NULL,
+      embedded_map_url VARCHAR(1000) DEFAULT NULL,
       corporate INT DEFAULT 0,
       non_corporate INT DEFAULT 0,
       youth INT DEFAULT 0,
@@ -293,6 +294,7 @@ export function initializeTables() {
   // Ensure locals table has social media columns
   ensureLocalsColumn('instagramUrl', 'VARCHAR(500)');
   ensureLocalsColumn('twitterUrl', 'VARCHAR(500)');
+  ensureLocalsColumn('embedded_map_url', 'VARCHAR(1000)');
 
   // Execute creation for remaining tables in correct dependency order
   const tables = [

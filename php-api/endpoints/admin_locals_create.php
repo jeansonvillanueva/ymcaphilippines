@@ -12,6 +12,7 @@ $instagramUrl = isset($data['instagramUrl']) ? $conn->real_escape_string($data['
 $twitterUrl = isset($data['twitterUrl']) ? $conn->real_escape_string($data['twitterUrl']) : '';
 $heroImageUrl = isset($data['heroImageUrl']) ? $conn->real_escape_string($data['heroImageUrl']) : '';
 $logoImageUrl = isset($data['logoImageUrl']) ? $conn->real_escape_string($data['logoImageUrl']) : '';
+$embeddedMapUrl = isset($data['embeddedMapUrl']) ? $conn->real_escape_string($data['embeddedMapUrl']) : '';
 $corporate = isset($data['corporate']) ? intval($data['corporate']) : 0;
 $nonCorporate = isset($data['nonCorporate']) ? intval($data['nonCorporate']) : 0;
 $youth = isset($data['youth']) ? intval($data['youth']) : 0;
@@ -22,8 +23,8 @@ $totalMembersAsOf = isset($data['totalMembersAsOf']) ? $conn->real_escape_string
 $establishedClause = $established === '' ? 'NULL' : "'$established'";
 $totalMembersAsOfClause = $totalMembersAsOf === '' ? 'NULL' : "'$totalMembersAsOf'";
 
-$sql = "INSERT INTO `local` (local_id, name, established, facebook_url, instagramUrl, twitterUrl, hero_image_url, logo_image_url, corporate, non_corporate, youth, others, total_members_as_of)
-        VALUES ('$id', '$name', $establishedClause, '$facebookUrl', '$instagramUrl', '$twitterUrl', '$heroImageUrl', '$logoImageUrl', $corporate, $nonCorporate, $youth, $others, $totalMembersAsOfClause)";
+$sql = "INSERT INTO `local` (local_id, name, established, facebook_url, instagramUrl, twitterUrl, hero_image_url, logo_image_url, embedded_map_url, corporate, non_corporate, youth, others, total_members_as_of)
+        VALUES ('$id', '$name', $establishedClause, '$facebookUrl', '$instagramUrl', '$twitterUrl', '$heroImageUrl', '$logoImageUrl', '$embeddedMapUrl', $corporate, $nonCorporate, $youth, $others, $totalMembersAsOfClause)";
 
 if ($conn->query($sql) === TRUE) {
     sendResponse(['id' => $id, 'message' => 'Local added successfully']);

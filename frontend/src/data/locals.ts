@@ -29,6 +29,7 @@ export type LocalConfig = {
   twitterUrl?: string;
   heroImageUrl?: string; // background image for the top area
   logoImageUrl?: string; // local logo image (clickable to facebook)
+  embeddedMapUrl?: string;
   stats?: LocalStats;
   pillars: LocalPillar[];
 };
@@ -43,6 +44,7 @@ export interface Local {
   twitterUrl?: string;
   heroImageUrl?: string;
   logoImageUrl?: string;
+  embeddedMapUrl?: string;
   corporate: number;
   nonCorporate: number;
   youth: number;
@@ -1552,6 +1554,7 @@ export function mergeLocalRecords(staticLocal: LocalConfig, backendLocal?: Local
       twitterUrl: staticLocal.twitterUrl || '',
       heroImageUrl: staticLocal.heroImageUrl || '',
       logoImageUrl: staticLocal.logoImageUrl || '',
+      embeddedMapUrl: staticLocal.embeddedMapUrl || '',
       corporate: staticLocal.stats?.corporate || 0,
       nonCorporate: staticLocal.stats?.nonCorporate || 0,
       youth: staticLocal.stats?.youth || 0,
@@ -1583,6 +1586,7 @@ export function mergeLocalRecords(staticLocal: LocalConfig, backendLocal?: Local
     twitterUrl: backendLocal.twitterUrl || staticLocal.twitterUrl || '',
     heroImageUrl: backendLocal.heroImageUrl || staticLocal.heroImageUrl || '',
     logoImageUrl: backendLocal.logoImageUrl || staticLocal.logoImageUrl || '',
+    embeddedMapUrl: backendLocal.embeddedMapUrl || staticLocal.embeddedMapUrl || '',
     corporate: backendLocal.corporate !== undefined ? backendLocal.corporate : (staticLocal.stats?.corporate || 0),
     nonCorporate: backendLocal.nonCorporate !== undefined ? backendLocal.nonCorporate : (staticLocal.stats?.nonCorporate || 0),
     youth: backendLocal.youth !== undefined ? backendLocal.youth : (staticLocal.stats?.youth || 0),
