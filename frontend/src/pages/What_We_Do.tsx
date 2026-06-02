@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useLoadingScreen } from '../hooks/useLoadingScreen';
 import { useNews, useCalendarEvents } from '../hooks/useApi';
@@ -75,6 +75,10 @@ const WhatWeDo: React.FC = () => {
   const [selected, setSelected] = useState<CalendarEvent | null>(initialEvent);
   const [currentPage, setCurrentPage] = useState(0);
 
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [news]);
+
   type CategoryFilter = 'All' | NewsCategory;
   const [category, setCategory] = useState<CategoryFilter>('All');
   const [topic, setTopic] = useState<string>('All');
@@ -115,7 +119,7 @@ const WhatWeDo: React.FC = () => {
   const start = safeCurrentPage * CARDS_PER_PAGE;
   const visibleItems = filteredItems.slice(start, start + CARDS_PER_PAGE);
 
-  const featuredItem = newsItems[0] ?? null;
+  const featuredItem = !loading ? (newsItems[0] ?? null) : null;
 
   const selectedDate = selected?.date ?? null;
   const formattedDate = useMemo(() => {
@@ -252,7 +256,13 @@ const WhatWeDo: React.FC = () => {
             {/* RIGHT: results */}
             <div className="latest-news-results">
               <div className="latest-news-grid reveal reveal-delay-1">
-                {visibleItems.map((item) => (
+                {loading ? (
+                  <p className="latest-news-loading" aria-live="polite">
+                    Loading latest news…
+                  </p>
+                ) : null}
+                {!loading &&
+                  visibleItems.map((item) => (
                   <Link
                     key={item.path}
                     to={item.path}
@@ -270,7 +280,7 @@ const WhatWeDo: React.FC = () => {
                       <span className="latest-news-card-cta">Read More</span>
                     </Card>
                   </Link>
-                ))}
+                  ))}
               </div>
 
               <div className="latest-news-nav-controls reveal reveal-delay-2">

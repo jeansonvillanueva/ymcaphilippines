@@ -2,8 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import type { NewsArticleMeta } from '../data/news';
 import { resolveApiIndexUrl } from '../config/api';
-import { normalizeNewsItem } from '../utils/newsPath';
-import { sortNewsByDateDesc } from '../utils/newsDate';
+import { useNewsContext } from '../context/NewsContext';
 
 // Query-parameter routing works on cPanel without .htaccess rewrites
 const API_BASE = resolveApiIndexUrl();
@@ -42,39 +41,9 @@ export function useVideos() {
   return { videos, loading, error };
 }
 
-// Hook for fetching news
+// Shared news list (single fetch for the whole app — avoids duplicate requests / race conditions)
 export function useNews() {
-  const [news, setNews] = useState<NewsArticleMeta[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchNews = async () => {
-      try {
-        const response = await axios.get(`${PUBLIC_API_URL}/news`, {
-          params: { t: Date.now() },
-          headers: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' },
-        });
-        if (response.data && Array.isArray(response.data)) {
-          const normalized = response.data.map((item: NewsArticleMeta) => normalizeNewsItem(item));
-          setNews(sortNewsByDateDesc(normalized));
-        } else {
-          setNews([]);
-        }
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching news:', err);
-        setNews([]);
-        setError('Failed to load news');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchNews();
-  }, []);
-
-  return { news, loading, error };
+  return useNewsContext();
 }
 
 export function useNewsItem(path: NewsArticleMeta['path']) {

@@ -2,7 +2,8 @@ import Navbar from './components/Navbar';
 import './App.css';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate, useParams } from 'react-router-dom';
 import { useEffect } from 'react';
-import { LoadingProvider, useLoading } from './context/LoadingContext';
+import { LoadingProvider } from './context/LoadingContext';
+import { NewsProvider } from './context/NewsContext';
 import { LoadingScreen } from './components/LoadingScreen';
 
 import Home from './pages/Home';
@@ -51,28 +52,19 @@ function ScrollToHash() {
 function App() {
   return (
     <LoadingProvider>
-      <LoadingScreen />
-      <Router basename="/">
-        <AppContent />
-      </Router>
+      <NewsProvider>
+        <LoadingScreen />
+        <Router basename="/">
+          <AppContent />
+        </Router>
+      </NewsProvider>
     </LoadingProvider>
   );
 }
 
 function AppContent() {
   const location = useLocation();
-  const { setIsLoading } = useLoading();
   const isAdminRoute = location.pathname.startsWith('/secure-management/v3/k7n4m9p2q8c1x5j3');
-
-  // Hide loading screen when content is mounted
-  useEffect(() => {
-    // Use a small delay to ensure render has completed
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [setIsLoading]);
 
   return (
     <>

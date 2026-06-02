@@ -13,6 +13,7 @@ import eventVenueImage1 from '../assets/images/rent/event1.png';
 import eventVenueImage2 from '../assets/images/rent/event2.png';
 import { useVideos, useNews } from '../hooks/useApi';
 import { compareNewsDatesDesc } from '../utils/newsDate';
+import { NEWS_FEATURED_IMAGE } from '../data/news';
 
 const normalizeImageUrl = (url?: string | null) => {
   if (!url) return '';
@@ -68,12 +69,14 @@ function Home() {
 
   const heroSlides = useMemo<HeroSlide[]>(() => {
     const latest = [...news]
-      .filter((item) => item.imageUrl && item.path)
+      // Don't exclude the newest item just because it has no image yet.
+      // We fall back to the featured placeholder image below.
+      .filter((item) => item.path)
       .sort((a, b) => compareNewsDatesDesc(a.date, b.date))
       .slice(0, 3);
 
     return latest.map((item) => ({
-      image: normalizeImageUrl(item.imageUrl),
+      image: normalizeImageUrl(item.imageUrl) || NEWS_FEATURED_IMAGE,
       heading: item.title,
       subheading: item.subtitle ?? item.date ?? 'Latest YMCA update',
       path: item.path,
