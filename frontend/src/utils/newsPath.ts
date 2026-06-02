@@ -9,9 +9,25 @@ export function normalizeNewsPath(path: string): NewsArticleMeta['path'] {
   return `/news/${slug}` as NewsArticleMeta['path'];
 }
 
-export function normalizeNewsItem<T extends { path?: string | null }>(item: T): T & { path: NewsArticleMeta['path'] } {
+function resolveNewsDisplayDate(item: Record<string, unknown>): string | undefined {
+  for (const key of ['date', 'Date', 'event_date', 'eventDate']) {
+    const value = item[key];
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+  }
+  return undefined;
+}
+
+export function normalizeNewsItem<T extends { path?: string | null; date?: string }>(
+  item: T,
+): T & { path: NewsArticleMeta['path']; date?: string } {
+  const record = item as Record<string, unknown>;
+  const displayDate = resolveNewsDisplayDate(record);
+
   return {
     ...item,
     path: normalizeNewsPath(item.path ?? ''),
+    ...(displayDate ? { date: displayDate } : {}),
   };
 }

@@ -1,9 +1,11 @@
 <?php
 // GET /admin/news
+require_once __DIR__ . '/../utils/news_date.php';
+
 $conn = getDatabaseConnection();
 error_log('[admin_news] Fetching news from database');
 error_log('[admin_news] Request time: ' . date('Y-m-d H:i:s'));
-$result = $conn->query("SELECT * FROM news ORDER BY created_at DESC");
+$result = $conn->query('SELECT * FROM news');
 
 if ($result) {
     $news = [];
@@ -12,8 +14,13 @@ if ($result) {
         if (!isset($row['contentBlocks']) || $row['contentBlocks'] === null || $row['contentBlocks'] === '') {
             $row['contentBlocks'] = '[]';
         }
+        $displayDate = getNewsRowDate($row);
+        if ($displayDate !== null) {
+            $row['date'] = $displayDate;
+        }
         $news[] = $row;
     }
+    $news = sortNewsRowsByDateDesc($news);
     error_log('[admin_news] Found ' . count($news) . ' news items');
     if (count($news) > 0) {
         error_log('[admin_news] First news item: ' . json_encode(array_slice($news[0], 0, 3)));

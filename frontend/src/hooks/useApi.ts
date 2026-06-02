@@ -51,14 +51,12 @@ export function useNews() {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const response = await axios.get(`${PUBLIC_API_URL}/news`);
+        const response = await axios.get(`${PUBLIC_API_URL}/news`, {
+          params: { t: Date.now() },
+          headers: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' },
+        });
         if (response.data && Array.isArray(response.data)) {
-          const normalized = response.data.map((item: NewsArticleMeta) =>
-            normalizeNewsItem({
-              ...item,
-              date: item.date ?? (item as { Date?: string }).Date,
-            }),
-          );
+          const normalized = response.data.map((item: NewsArticleMeta) => normalizeNewsItem(item));
           setNews(sortNewsByDateDesc(normalized));
         } else {
           setNews([]);
