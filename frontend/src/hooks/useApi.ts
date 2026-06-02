@@ -3,6 +3,7 @@ import axios from 'axios';
 import type { NewsArticleMeta } from '../data/news';
 import { resolveApiIndexUrl } from '../config/api';
 import { normalizeNewsItem } from '../utils/newsPath';
+import { sortNewsByDateDesc } from '../utils/newsDate';
 
 // Query-parameter routing works on cPanel without .htaccess rewrites
 const API_BASE = resolveApiIndexUrl();
@@ -52,7 +53,13 @@ export function useNews() {
       try {
         const response = await axios.get(`${PUBLIC_API_URL}/news`);
         if (response.data && Array.isArray(response.data)) {
-          setNews(response.data.map((item: NewsArticleMeta) => normalizeNewsItem(item)));
+          const normalized = response.data.map((item: NewsArticleMeta) =>
+            normalizeNewsItem({
+              ...item,
+              date: item.date ?? (item as { Date?: string }).Date,
+            }),
+          );
+          setNews(sortNewsByDateDesc(normalized));
         } else {
           setNews([]);
         }

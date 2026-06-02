@@ -602,7 +602,7 @@ export default function AdminNews() {
           <input id="news-image" type="file" accept="image/*" onChange={handleFileChange} />
           {form.imageUrl ? (
             <div className="image-preview">
-              <img src={form.imageUrl} alt="News preview" style={{ maxWidth: '100%', marginTop: '0.75rem' }} />
+              <img src={form.imageUrl} alt="News preview" />
               <button
                 type="button"
                 onClick={handleRemoveImage}

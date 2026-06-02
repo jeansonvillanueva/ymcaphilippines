@@ -209,6 +209,28 @@
   min-height: 100px;
 }
 
+/* Admin upload preview — show full image without cropping (user cards still use cover) */
+.image-preview {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.image-preview img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: min(420px, 55vh);
+  margin: 0 auto;
+  object-fit: contain;
+  object-position: center;
+}
+
 .form-actions {
   display: flex;
   gap: 1rem;

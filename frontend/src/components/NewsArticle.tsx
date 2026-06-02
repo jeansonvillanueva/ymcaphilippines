@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { FaFacebookF, FaInstagram, FaTwitter } from 'react-icons/fa';
 import { useNews } from '../hooks/useApi';
+import { sortNewsByDateDesc } from '../utils/newsDate';
 import '../styles/design-system.css';
 import './NewsArticle.css';
 
@@ -84,8 +85,7 @@ export default function NewsArticle({
 
   const related = useMemo(() => {
     if (!articlePath || !news || news.length === 0) return [];
-    // Filter out current article and return first 3 items
-    return news.filter((n) => n.path !== articlePath).slice(0, 3);
+    return sortNewsByDateDesc(news.filter((n) => n.path !== articlePath)).slice(0, 3);
   }, [articlePath, news]);
 
   const rootClass =

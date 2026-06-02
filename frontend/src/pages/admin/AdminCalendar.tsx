@@ -292,7 +292,7 @@ export default function AdminCalendar() {
           <input type="file" accept="image/*" onChange={handleFileChange} />
           {form.imageUrl ? (
             <div className="image-preview">
-              <img src={form.imageUrl} alt="Event preview" style={{ maxWidth: '100%', marginTop: '0.75rem' }} />
+              <img src={form.imageUrl} alt="Event preview" />
             </div>
           ) : null}
         </div>

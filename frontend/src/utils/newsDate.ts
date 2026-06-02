@@ -23,13 +23,61 @@ const MONTH_RANGE_PATTERN = new RegExp(
   'i',
 );
 
+/** Catches day ranges Date.parse mishandles (e.g. "May 22-24, 2026" → May 2024). */
+const AMBIGUOUS_DAY_RANGE_PATTERN = new RegExp(
+  `\\b(${MONTH_NAME_PATTERN})\\s+(\\d{1,2})\\s*[-–—]\\s*(?:((${MONTH_NAME_PATTERN})\\s+)?(\\d{1,2}))?,?\\s*((?:19|20)\\d{2})\\b`,
+  'i',
+);
+
 export type NewsDateParts = {
   start: number;
   end: number;
 };
 
 function normalizeNewsDateInput(date: string) {
-  return date.replace(/[\u2013\u2014]/g, '-').replace(/\s+/g, ' ').trim();
+  return date
+    .replace(/[\u2013\u2014]/g, '-')
+    .replace(/\u00a0/g, ' ')
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function partsFromMonthRangeMatch(match: RegExpMatchArray): NewsDateParts | null {
+  const startMonthName = match[1].toLowerCase();
+  const startDay = Number(match[2]);
+  const endMonthName = (match[3] || match[1]).toLowerCase();
+  const endDay = Number(match[4] || match[2]);
+  const year = Number(match[5]);
+  const startMonthIndex = MONTHS[startMonthName];
+  const endMonthIndex = MONTHS[endMonthName];
+
+  if (startMonthIndex === undefined || endMonthIndex === undefined) {
+    return null;
+  }
+
+  return {
+    start: new Date(year, startMonthIndex, startDay).getTime(),
+    end: new Date(year, endMonthIndex, endDay).getTime(),
+  };
+}
+
+function parseMonthRange(normalized: string): NewsDateParts | null {
+  const monthRange = normalized.match(MONTH_RANGE_PATTERN);
+  if (monthRange) {
+    return partsFromMonthRangeMatch(monthRange);
+  }
+
+  const relaxed = normalized.match(AMBIGUOUS_DAY_RANGE_PATTERN);
+  if (relaxed) {
+    return partsFromMonthRangeMatch(relaxed);
+  }
+
+  return null;
+}
+
+function hasAmbiguousDayRange(normalized: string) {
+  return AMBIGUOUS_DAY_RANGE_PATTERN.test(normalized);
 }
 
 /** Parse start/end timestamps for sorting and display logic. */
@@ -39,30 +87,17 @@ export function parseNewsDateParts(date?: string): NewsDateParts {
   }
 
   const normalized = normalizeNewsDateInput(date);
-  const monthRange = normalized.match(MONTH_RANGE_PATTERN);
-
-  if (monthRange) {
-    const startMonthName = monthRange[1].toLowerCase();
-    const startDay = Number(monthRange[2]);
-    const endMonthName = (monthRange[3] || monthRange[1]).toLowerCase();
-    const endDay = Number(monthRange[4] || monthRange[2]);
-    const year = Number(monthRange[5]);
-    const startMonthIndex = MONTHS[startMonthName];
-    const endMonthIndex = MONTHS[endMonthName];
-
-    if (startMonthIndex === undefined || endMonthIndex === undefined) {
-      return { start: INVALID_TIMESTAMP, end: INVALID_TIMESTAMP };
-    }
-
-    return {
-      start: new Date(year, startMonthIndex, startDay).getTime(),
-      end: new Date(year, endMonthIndex, endDay).getTime(),
-    };
+  const fromRange = parseMonthRange(normalized);
+  if (fromRange) {
+    return fromRange;
   }
 
-  const parsed = Date.parse(normalized);
-  if (!Number.isNaN(parsed)) {
-    return { start: parsed, end: parsed };
+  // Date.parse turns "May 22-24, 2026" into May 22, 2024 — never use it for day ranges.
+  if (!hasAmbiguousDayRange(normalized)) {
+    const parsed = Date.parse(normalized);
+    if (!Number.isNaN(parsed)) {
+      return { start: parsed, end: parsed };
+    }
   }
 
   const year = normalized.match(/\b(19|20)\d{2}\b/)?.[0];
@@ -92,4 +127,9 @@ export function compareNewsDatesDesc(dateA?: string, dateB?: string) {
   }
 
   return a.end - b.end;
+}
+
+/** Sort news-like items by display date, newest first. */
+export function sortNewsByDateDesc<T extends { date?: string }>(items: T[]): T[] {
+  return [...items].sort((a, b) => compareNewsDatesDesc(a.date, b.date));
 }
