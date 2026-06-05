@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { ADMIN_API_URL } from '../../hooks/useApi';
+import { useAdminEditingLabel, type AdminEditingItemChange } from './useAdminEditingLabel';
 
 interface CalendarEvent {
   id?: number;
@@ -12,7 +13,11 @@ interface CalendarEvent {
   imageUrl?: string;
 }
 
-export default function AdminCalendar() {
+type Props = {
+  onEditingItemChange?: AdminEditingItemChange;
+};
+
+export default function AdminCalendar({ onEditingItemChange }: Props) {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [form, setForm] = useState<CalendarEvent>({
     title: '',
@@ -27,6 +32,8 @@ export default function AdminCalendar() {
   const [loading, setLoading] = useState(true);
 
   const API_URL = `${ADMIN_API_URL}/calendar`;
+
+  useAdminEditingLabel(onEditingItemChange, editingId !== null, form.title);
 
   const fetchEvents = useCallback(async () => {
     try {

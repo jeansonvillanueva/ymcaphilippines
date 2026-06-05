@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ADMIN_API_URL } from '../../hooks/useApi';
+import { useAdminEditingLabel, type AdminEditingItemChange } from './useAdminEditingLabel';
 
 interface Document {
   id?: number;
@@ -14,7 +15,11 @@ interface Document {
   created_at?: string;
 }
 
-export default function AdminDocuments() {
+type Props = {
+  onEditingItemChange?: AdminEditingItemChange;
+};
+
+export default function AdminDocuments({ onEditingItemChange }: Props) {
   const [documentsList, setDocumentsList] = useState<Document[]>([]);
   const [form, setForm] = useState<Document>({
     title: '',
@@ -27,6 +32,8 @@ export default function AdminDocuments() {
   const [loading, setLoading] = useState(true);
 
   const API_URL = `${ADMIN_API_URL}/documents`;
+
+  useAdminEditingLabel(onEditingItemChange, editingId !== null, form.title);
 
   useEffect(() => {
     fetchDocuments();

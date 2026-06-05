@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { ADMIN_API_URL } from '../../hooks/useApi';
+import { useAdminEditingLabel, type AdminEditingItemChange } from './useAdminEditingLabel';
 
 interface Staff {
   id?: number;
@@ -12,7 +13,11 @@ interface Staff {
   sequenceOrder?: number;
 }
 
-export default function AdminStaff() {
+type Props = {
+  onEditingItemChange?: AdminEditingItemChange;
+};
+
+export default function AdminStaff({ onEditingItemChange }: Props) {
   const [staffList, setStaffList] = useState<Staff[]>([]);
   const [form, setForm] = useState<Staff>({
     name: '',
@@ -30,6 +35,8 @@ export default function AdminStaff() {
   const [loading, setLoading] = useState(true);
 
   const API_URL = `${ADMIN_API_URL}/staff`;
+
+  useAdminEditingLabel(onEditingItemChange, editingId !== null, form.name);
 
   useEffect(() => {
     fetchStaff();

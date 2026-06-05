@@ -399,6 +399,36 @@ function ensureDatabaseSchema($conn) {
         return;
     }
 
+    require_once __DIR__ . '/pillars_helper.php';
+
+    try {
+        ensureLocalPillarTables($conn);
+        if (function_exists('ensureLocalProgramsColumns')) {
+            ensureLocalProgramsColumns($conn);
+        }
+        migrateLegacyBulletsToCanonical($conn);
+    } catch (Throwable $e) {
+        error_log('[ensureDatabaseSchema] Pillars migration skipped: ' . $e->getMessage());
+    }
+
+    $localColumns = [
+        'embedded_map_url' => 'varchar(1000) DEFAULT NULL',
+    ];
+    foreach ($localColumns as $column => $definition) {
+        $localTableCheck = $conn->query("SHOW TABLES LIKE 'local'");
+        if (!$localTableCheck || $localTableCheck->num_rows === 0) {
+            break;
+        }
+        $columnCheck = $conn->query("SHOW COLUMNS FROM `local` LIKE '$column'");
+        if ($columnCheck && $columnCheck->num_rows > 0) {
+            continue;
+        }
+        $alterResult = $conn->query("ALTER TABLE `local` ADD COLUMN `$column` $definition");
+        if (!$alterResult) {
+            error_log("[ensureDatabaseSchema] Failed to add local.$column: " . $conn->error);
+        }
+    }
+
     ensureNewsUtf8Mb4($conn);
 
     $newsColumns = [

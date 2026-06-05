@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { LOCALS_BY_ID, getLocalsAggregateStats } from '../data/locals';
+import { LOCALS_BY_ID, countAllProgramBullets, getLocalsAggregateStats } from '../data/locals';
+import { useCommunityProgramsCount } from '../hooks/useApi';
 
 type ImpactStat = {
   key: string;
@@ -15,17 +16,20 @@ function formatValue(n: number) {
 function ImpactStats() {
   const aggregate = useMemo(() => getLocalsAggregateStats(), []);
   const ymcaCount = useMemo(() => Object.keys(LOCALS_BY_ID).length, []);
+  const { count: apiProgramCount } = useCommunityProgramsCount();
+  const fallbackProgramCount = useMemo(() => countAllProgramBullets(), []);
+  const communityProgramsCount = apiProgramCount !== null ? apiProgramCount : fallbackProgramCount;
 
   const stats: ImpactStat[] = useMemo(
     () => [
       { key: 'ymcas', label: 'YMCAs Across the Philippines', value: ymcaCount },
       { key: 'members', label: 'Total Members', value: aggregate.total },
-      { key: 'programs', label: 'Community Programs', value: 50 },
+      { key: 'programs', label: 'Community Programs', value: communityProgramsCount },
       { key: 'partners', label: 'Partners & Donors', value: 250 },
       { key: 'volunteers', label: 'Volunteers', value: 2000, suffix: '+' },
       { key: 'employees', label: 'Employees', value: 150, suffix: '+' },
     ],
-    [ymcaCount, aggregate.total],
+    [ymcaCount, aggregate.total, communityProgramsCount],
   );
 
   const [animated, setAnimated] = useState<number[]>(() => stats.map(() => 0));

@@ -10,6 +10,10 @@ main {
   padding-top: var(--navbar-height, 96px);
 }
 
+main.main--admin {
+  padding-top: 0;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;

@@ -9,6 +9,23 @@ const API_BASE = resolveApiIndexUrl();
 export const ADMIN_API_URL = `${API_BASE}?path=/admin`;
 export const PUBLIC_API_URL = `${API_BASE}?path=/api`;
 
+/** Build admin API URL with encoded path (reliable on all hosts). */
+export function buildAdminUrl(routeSuffix: string): string {
+  const suffix = routeSuffix.startsWith('/') ? routeSuffix : `/${routeSuffix}`;
+  const fullPath = `/admin${suffix}`;
+  return `${API_BASE}?path=${encodeURIComponent(fullPath)}`;
+}
+
+/** Build public API URL with encoded path. */
+export function buildPublicUrl(routeSuffix: string): string {
+  const suffix = routeSuffix.startsWith('/') ? routeSuffix : `/${routeSuffix}`;
+  const fullPath = `/api${suffix}`;
+  return `${API_BASE}?path=${encodeURIComponent(fullPath)}`;
+}
+
+/** Required for authenticated admin API routes (session cookie). */
+export const adminRequestConfig = { withCredentials: true as const };
+
 // Hook for fetching videos
 export function useVideos() {
   const [videos, setVideos] = useState<any[]>([]);
@@ -49,7 +66,10 @@ export function useNews() {
 export function useNewsItem(path: NewsArticleMeta['path']) {
   const { news, loading, error } = useNews();
   const item = useMemo(
-    () => news.find((newsItem) => newsItem.path === path) ?? null,
+    () =>
+      Array.isArray(news)
+        ? (news.find((newsItem) => newsItem.path === path) ?? null)
+        : null,
     [news, path]
   );
 
@@ -67,7 +87,8 @@ export function useCalendarEvents() {
       try {
         // Use PUBLIC_API_URL to allow users to see calendar without admin login
         const response = await axios.get(`${PUBLIC_API_URL}/calendar`);
-        setEvents(response.data || []);
+        const payload = response.data;
+        setEvents(Array.isArray(payload) ? payload : []);
         setError(null);
       } catch (err) {
         console.error('Error fetching calendar events:', err);
@@ -151,11 +172,28 @@ export function useLocalById(id: string) {
 
     const fetchLocal = async () => {
       try {
-        const response = await axios.get(`${PUBLIC_API_URL}/locals/${id}`);
-        setLocal(response.data);
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching local:', err);
+        const response = await axios.get(buildPublicUrl(`/locals/${id}`));
+        const data = response.data;
+        if (data && typeof data === 'object' && !Array.isArray(data)) {
+          setLocal(data);
+          setError(null);
+          return;
+        }
+        throw new Error('Invalid local detail response');
+      } catch (detailErr) {
+        console.error('Error fetching local detail:', detailErr);
+        try {
+          const listResponse = await axios.get(`${PUBLIC_API_URL}/locals`);
+          const list = Array.isArray(listResponse.data) ? listResponse.data : [];
+          const match = list.find((item: { id?: string }) => item?.id === id);
+          if (match) {
+            setLocal({ ...match, pillars: [] });
+            setError(null);
+            return;
+          }
+        } catch (listErr) {
+          console.error('Error fetching local from list fallback:', listErr);
+        }
         setError('Failed to load local');
       } finally {
         setLoading(false);
@@ -166,4 +204,29 @@ export function useLocalById(id: string) {
   }, [id]);
 
   return { local, loading, error };
+}
+
+// Hook for total community program bullets (Our Reach & Impact)
+export function useCommunityProgramsCount() {
+  const [count, setCount] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCount = async () => {
+      try {
+        const response = await axios.get(buildPublicUrl('/stats/community-programs'));
+        const value = Number(response.data?.count);
+        setCount(Number.isFinite(value) ? value : 0);
+      } catch (err) {
+        console.error('Error fetching community programs count:', err);
+        setCount(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCount();
+  }, []);
+
+  return { count, loading };
 }

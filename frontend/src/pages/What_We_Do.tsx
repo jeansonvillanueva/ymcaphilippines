@@ -51,6 +51,7 @@ const WhatWeDo: React.FC = () => {
   }, [news]);
 
   const initialEvent = useMemo(() => {
+    if (!Array.isArray(calendarEvents)) return null;
     // Find event for today - either single date or within date range
     const todayEvent = calendarEvents.find((e) => {
       if (e.date === today) return true; // Old format: exact date match

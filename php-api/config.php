@@ -3,7 +3,14 @@ header('Content-Type: application/json; charset=utf-8');
 
 // CORS configuration with credentials support
 // When using withCredentials: true in frontend, we need to specify exact origin, not '*'
-$allowed_origins = ['https://ymca.ph', 'https://www.ymca.ph', 'http://localhost:5173', 'http://localhost:3000'];
+$allowed_origins = [
+    'https://ymca.ph',
+    'https://www.ymca.ph',
+    'http://ymca.ph',
+    'http://www.ymca.ph',
+    'http://localhost:5173',
+    'http://localhost:3000',
+];
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
 if (in_array($origin, $allowed_origins)) {

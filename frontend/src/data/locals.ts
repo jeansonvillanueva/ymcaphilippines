@@ -1542,6 +1542,106 @@ export function getDefaultPillars(): LocalPillar[] {
   return DEFAULT_PILLARS.map((p) => ({ ...p, programs: [...p.programs] }));
 }
 
+function isDatabasePillar(pillar: { id?: unknown }): boolean {
+  if (typeof pillar.id === 'number' && Number.isFinite(pillar.id)) return true;
+  if (typeof pillar.id === 'string' && /^\d+$/.test(pillar.id)) return true;
+  return false;
+}
+
+function normalizeBackendPrograms(programs: LocalProgram[] | undefined): LocalProgram[] {
+  return (programs ?? []).map((prog) => ({
+    title: prog.title || undefined,
+    bullets: [...(prog.bullets ?? [])],
+  }));
+}
+
+/** Merge static pillar programs with API data; saved database pillars always win. */
+export function mergePillarPrograms(
+  staticPillars: LocalPillar[] | undefined,
+  backendPillars?: Array<{
+    id?: number | string;
+    key: LocalPillarKey | string;
+    label?: string;
+    color?: string;
+    programs?: LocalProgram[];
+  }> | null,
+): LocalPillar[] {
+  const staticByKey = new Map((staticPillars ?? []).map((p) => [p.key, p]));
+  const base = getDefaultPillars().map((defaultPillar) => {
+    const staticPillar = staticByKey.get(defaultPillar.key);
+    if (!staticPillar) return { ...defaultPillar };
+    return {
+      ...defaultPillar,
+      label: staticPillar.label || defaultPillar.label,
+      color: staticPillar.color || defaultPillar.color,
+      programs: (staticPillar.programs ?? []).map((prog) => ({
+        title: prog.title,
+        bullets: [...(prog.bullets ?? [])],
+      })),
+    };
+  });
+
+  if (!backendPillars?.length) return base;
+
+  const backendByKey = new Map(backendPillars.map((p) => [p.key as LocalPillarKey, p]));
+  return base.map((pillar) => {
+    const backend = backendByKey.get(pillar.key);
+    if (!backend) return pillar;
+
+    // Pillar row exists in DB — use saved programs (even if empty), not static defaults.
+    if (isDatabasePillar(backend)) {
+      return {
+        ...pillar,
+        label: backend.label || pillar.label,
+        color: backend.color || pillar.color,
+        programs: normalizeBackendPrograms(backend.programs),
+      };
+    }
+
+    const backendPrograms = (backend.programs ?? []).filter(
+      (prog) => (prog.bullets?.length ?? 0) > 0 || Boolean(prog.title?.trim()),
+    );
+
+    if (!backendPrograms.length) return pillar;
+
+    return {
+      ...pillar,
+      label: backend.label || pillar.label,
+      color: backend.color || pillar.color,
+      programs: normalizeBackendPrograms(backendPrograms),
+    };
+  });
+}
+
+/** Shape expected by PUT /admin/locals/:id/pillar-programs */
+export function pillarsToApiPayload(pillars: LocalPillar[]) {
+  return pillars.map((pillar) => ({
+    key: pillar.key,
+    label: pillar.label,
+    color: pillar.color,
+    programs: (pillar.programs ?? [])
+      .map((program) => ({
+        title: program.title ?? '',
+        bullets: (program.bullets ?? []).map((b) => b.trim()).filter(Boolean),
+      }))
+      .filter((program) => program.bullets.length > 0),
+  }));
+}
+
+/** Total program bullets across all static local YMCA definitions (fallback when API unavailable). */
+export function countAllProgramBullets(): number {
+  let total = 0;
+  for (const local of Object.values(LOCALS_BY_ID)) {
+    const pillars = local.pillars?.length ? local.pillars : getDefaultPillars();
+    for (const pillar of pillars) {
+      for (const program of pillar.programs ?? []) {
+        total += program.bullets?.length ?? 0;
+      }
+    }
+  }
+  return total;
+}
+
 export function mergeLocalRecords(staticLocal: LocalConfig, backendLocal?: Local | null): Local {
   if (!backendLocal) {
     // Return static data as Local format
@@ -1560,7 +1660,7 @@ export function mergeLocalRecords(staticLocal: LocalConfig, backendLocal?: Local
       youth: staticLocal.stats?.youth || 0,
       others: staticLocal.stats?.others || 0,
       totalMembersAsOf: staticLocal.stats?.totalMembersAsOf || '',
-      pillars: staticLocal.pillars.map((pillar) => ({
+      pillars: mergePillarPrograms(staticLocal.pillars).map((pillar) => ({
         id: `${staticLocal.id}-${pillar.key}`,
         localId: staticLocal.id,
         key: pillar.key,
@@ -1577,6 +1677,7 @@ export function mergeLocalRecords(staticLocal: LocalConfig, backendLocal?: Local
   }
 
   // Merge backend data with static data, preferring backend values
+  const mergedPillars = mergePillarPrograms(staticLocal.pillars, backendLocal.pillars);
   return {
     id: backendLocal.id,
     name: backendLocal.name || staticLocal.name,
@@ -1587,12 +1688,12 @@ export function mergeLocalRecords(staticLocal: LocalConfig, backendLocal?: Local
     heroImageUrl: backendLocal.heroImageUrl || staticLocal.heroImageUrl || '',
     logoImageUrl: backendLocal.logoImageUrl || staticLocal.logoImageUrl || '',
     embeddedMapUrl: backendLocal.embeddedMapUrl || staticLocal.embeddedMapUrl || '',
-    corporate: backendLocal.corporate !== undefined ? backendLocal.corporate : (staticLocal.stats?.corporate || 0),
-    nonCorporate: backendLocal.nonCorporate !== undefined ? backendLocal.nonCorporate : (staticLocal.stats?.nonCorporate || 0),
-    youth: backendLocal.youth !== undefined ? backendLocal.youth : (staticLocal.stats?.youth || 0),
-    others: backendLocal.others !== undefined ? backendLocal.others : (staticLocal.stats?.others || 0),
+    corporate: Number(backendLocal.corporate ?? staticLocal.stats?.corporate ?? 0) || 0,
+    nonCorporate: Number(backendLocal.nonCorporate ?? staticLocal.stats?.nonCorporate ?? 0) || 0,
+    youth: Number(backendLocal.youth ?? staticLocal.stats?.youth ?? 0) || 0,
+    others: Number(backendLocal.others ?? staticLocal.stats?.others ?? 0) || 0,
     totalMembersAsOf: backendLocal.totalMembersAsOf || staticLocal.stats?.totalMembersAsOf || '',
-    pillars: backendLocal.pillars || staticLocal.pillars.map((pillar) => ({
+    pillars: mergedPillars.map((pillar) => ({
       id: `${staticLocal.id}-${pillar.key}`,
       localId: staticLocal.id,
       key: pillar.key,

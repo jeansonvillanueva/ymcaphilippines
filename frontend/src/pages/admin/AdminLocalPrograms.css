@@ -1,0 +1,101 @@
+.admin-local-programs {
+  margin: 0 0 2rem;
+  padding: 1.75rem;
+  background: #fff;
+  border-radius: 20px;
+  border: 2px solid #3b5bf2;
+  box-shadow: 0 8px 24px rgba(59, 91, 242, 0.12);
+}
+
+.admin-local-programs__header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.admin-local-programs__header h3 {
+  margin: 0 0 0.35rem;
+  color: #1f2937;
+  font-size: 1.25rem;
+}
+
+.admin-local-programs__hint {
+  margin: 0;
+  color: #4b5563;
+  font-size: 0.95rem;
+  max-width: 46rem;
+  line-height: 1.5;
+}
+
+.admin-local-programs__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.admin-local-programs__message {
+  margin-bottom: 1rem;
+}
+
+.admin-local-programs__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.admin-local-programs__pillar {
+  background: #f9fafb;
+  border: 1px solid #e6ebfb;
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.admin-local-programs__pillar label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #1f2937;
+  font-size: 0.95rem;
+}
+
+.admin-local-programs__pillar textarea {
+  width: 100%;
+  min-height: 180px;
+  padding: 0.85rem;
+  border: 1px solid #d9e0ee;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 0.96rem;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.admin-local-programs__pillar textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.12);
+}
+
+.admin-local-programs__count {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.admin-local-programs__loading {
+  margin: 1rem 0;
+  color: #666;
+  font-size: 1rem;
+}
+
+@media (max-width: 900px) {
+  .admin-local-programs__grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -52,6 +52,24 @@ interface StaffData {
   sequenceOrder?: number;
 }
 
+const VMV_STATEMENT_ROWS = [
+  {
+    id: 'vision',
+    label: 'Vision',
+    caption: 'What is our Vision for the world?',
+    text: 'Our vision is a world where every person lives in harmony with self, with society and with creation.',
+    barClass: 'ymca-vmv-row__bar--vision',
+  },
+  {
+    id: 'mission',
+    label: 'Mission',
+    caption: 'How will we get to our destination?',
+    text:
+      'The YMCA’s mission is to empower young people and communities worldwide to build a just, sustainable, equitable and inclusive world, where every person can thrive in body, mind and spirit.',
+    barClass: 'ymca-vmv-row__bar--mission',
+  },
+] as const;
+
 function AboutUs() {
   const sectionRef = useScrollReveal<HTMLDivElement>();
   const [selectedPillarKey, setSelectedPillarKey] = useState('');
@@ -69,7 +87,14 @@ function AboutUs() {
     const fetchStaff = async () => {
       try {
         const response = await axios.get(`${PUBLIC_API_URL}/staff`);
-        const staffList: StaffData[] = response.data;
+        const rawStaff = response.data;
+        const staffList: StaffData[] = Array.isArray(rawStaff)
+          ? rawStaff
+          : Array.isArray(rawStaff?.staff)
+            ? rawStaff.staff
+            : Array.isArray(rawStaff?.data)
+              ? rawStaff.data
+              : [];
 
         if (!staffList || staffList.length === 0) {
           setStaffError('No staff data available');
@@ -394,25 +419,18 @@ function AboutUs() {
       <section id="vision-mission-pillars" className="page-section page-section--white">
         <div className="page-section__inner">
           <div className="ymca-vmv">
-            <div className="ymca-vmv__block">
-              <h2 className="ymca-vmv__title">VISION</h2>
-              <div className="ymca-vmv__bar">
-                <p className="ymca-vmv__kicker">What is our Vision for the world?</p>
-                <p className="ymca-vmv__text">
-                  Our vision is a world where every person lives in harmony with self, with society and with creation.
-                </p>
-              </div>
-            </div>
-
-            <div className="ymca-vmv__block">
-              <h2 className="ymca-vmv__title">MISSION</h2>
-              <div className="ymca-vmv__bar">
-                <p className="ymca-vmv__kicker">How will we get to our destination?</p>
-                <p className="ymca-vmv__text">
-                  The YMCA’s mission is to empower young people and communities worldwide to build a just,
-                  sustainable, equitable and inclusive world, where every person can thrive in body, mind and spirit.
-                </p>
-              </div>
+            <div className="ymca-vmv__statements">
+              {VMV_STATEMENT_ROWS.map((row) => (
+                <article key={row.id} className="ymca-vmv-row">
+                  <div className="ymca-vmv-row__labels">
+                    <h3 className="ymca-vmv-row__label">{row.label}</h3>
+                    <p className="ymca-vmv-row__caption">{row.caption}</p>
+                  </div>
+                  <div className={`ymca-vmv-row__bar ${row.barClass}`}>
+                    <p className="ymca-vmv-row__text">{row.text}</p>
+                  </div>
+                </article>
+              ))}
             </div>
 
             <div className="ymca-vmv__block">

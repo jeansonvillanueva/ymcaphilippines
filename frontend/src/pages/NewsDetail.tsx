@@ -56,7 +56,7 @@ const NewsDetail: React.FC = () => {
   }, [slug]);
 
   const item = useMemo(() => {
-    if (!currentPath) return null;
+    if (!currentPath || !Array.isArray(news)) return null;
     return (news.find((n) => n.path === currentPath) ?? null) as NewsWithContentBlocks | null;
   }, [currentPath, news]);
 

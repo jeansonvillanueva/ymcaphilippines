@@ -73,6 +73,10 @@ if ($action === 'create') {
 
         "ALTER TABLE `local` ADD COLUMN IF NOT EXISTS `embedded_map_url` varchar(1000) DEFAULT NULL",
 
+        "ALTER TABLE `local_programs` ADD COLUMN IF NOT EXISTS `sequence_order` int DEFAULT 0",
+        "ALTER TABLE `local_programs` ADD COLUMN IF NOT EXISTS `title` varchar(200) NOT NULL DEFAULT ''",
+        "ALTER TABLE `local_programs_bullets` ADD COLUMN IF NOT EXISTS `sequence_order` int DEFAULT 0",
+
         "CREATE TABLE IF NOT EXISTS `local_pillars` (
           `pillars_id` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
           `local_id` varchar(50) NOT NULL,

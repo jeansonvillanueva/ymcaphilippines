@@ -11,6 +11,7 @@ import {
   saveAdminNewsPreviewDraft,
   type AdminNewsPreviewDraft,
 } from '../../utils/adminNewsPreview';
+import { useAdminEditingLabel, type AdminEditingItemChange } from './useAdminEditingLabel';
 
 interface News {
   id?: number;
@@ -123,7 +124,11 @@ const compressImage = (file: File, quality: number = 0.8, maxWidth: number = 120
   });
 };
 
-export default function AdminNews() {
+type Props = {
+  onEditingItemChange?: AdminEditingItemChange;
+};
+
+export default function AdminNews({ onEditingItemChange }: Props) {
   const [newsList, setNewsList] = useState<News[]>([]);
   const [form, setForm] = useState<NewsForm>({
     path: '',
@@ -145,6 +150,8 @@ export default function AdminNews() {
   const [showTopicSuggestions, setShowTopicSuggestions] = useState(false);
 
   const API_URL = `${ADMIN_API_URL}/news`;
+
+  useAdminEditingLabel(onEditingItemChange, editingId !== null, form.title);
 
   const buildPreviewDraft = (): AdminNewsPreviewDraft => ({
     title: form.title,

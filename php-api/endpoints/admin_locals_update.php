@@ -1,6 +1,6 @@
 <?php
 // PUT /admin/locals/:id
-$conn = getDatabaseConnection();
+global $conn;
 if (!$conn) {
     sendResponse(['error' => 'Database connection failed'], 500);
 }
@@ -41,6 +41,10 @@ if ($conn->connect_error) {
 }
 error_log("[ADMIN_LOCALS_UPDATE] Database connection: OK");
 error_log("[ADMIN_LOCALS_UPDATE] Selected DB: " . $conn->get_charset()->charset);
+
+if (!isset($data['name']) || trim((string)$data['name']) === '') {
+    sendResponse(['error' => 'Local name is required'], 400);
+}
 
 $name = $conn->real_escape_string($data['name']);
 $established = isset($data['established']) ? $conn->real_escape_string($data['established']) : '';
@@ -103,14 +107,55 @@ if ($conn->query($sql) === TRUE) {
         error_log("[ADMIN_LOCALS_UPDATE] Verification - New name in DB: " . $verifyRow['name']);
     }
     
+    $verifyStats = $conn->query(
+        "SELECT corporate, non_corporate AS nonCorporate, youth, others, total_members_as_of AS totalMembersAsOf FROM `local` WHERE local_id='$id' LIMIT 1"
+    );
+    $savedStats = ($verifyStats && $verifyStats->num_rows > 0) ? $verifyStats->fetch_assoc() : null;
+
+    $requestedStats = [
+        'corporate' => $corporate,
+        'nonCorporate' => $nonCorporate,
+        'youth' => $youth,
+        'others' => $others,
+        'totalMembersAsOf' => $totalMembersAsOf,
+    ];
+
+    $statsMatchRequest = $savedStats
+        && (int)($savedStats['corporate'] ?? -1) === $corporate
+        && (int)($savedStats['nonCorporate'] ?? -1) === $nonCorporate
+        && (int)($savedStats['youth'] ?? -1) === $youth
+        && (int)($savedStats['others'] ?? -1) === $others;
+
+    $detailResult = $conn->query(
+        "SELECT local_id AS id, name, established, facebook_url AS facebookUrl, instagramUrl, twitterUrl,
+                hero_image_url AS heroImageUrl, logo_image_url AS logoImageUrl, embedded_map_url AS embeddedMapUrl,
+                corporate, non_corporate AS nonCorporate, youth, others, total_members_as_of AS totalMembersAsOf
+         FROM `local` WHERE local_id='$id' LIMIT 1"
+    );
+    $savedLocal = ($detailResult && $detailResult->num_rows > 0) ? $detailResult->fetch_assoc() : null;
+
     if ($affectedRows === 0) {
         error_log("[ADMIN_LOCALS_UPDATE] **WARNING**: Update query succeeded but no rows were changed");
-        error_log("[ADMIN_LOCALS_UPDATE] This means either:");
-        error_log("  1. Data values haven't changed (update values same as existing)");
-        error_log("  2. Local ID exists but WHERE clause didn't match");
-        sendResponse(['message' => 'Local updated successfully', 'warning' => 'No rows were changed (data may be identical to existing)'], 200);
+        $warning = $statsMatchRequest
+            ? 'No rows were changed — member statistics already match what you entered.'
+            : 'No rows were changed — the database still has different member statistics than you submitted. Re-save after uploading the latest php-api.';
+        sendResponse([
+            'message' => 'Local updated successfully',
+            'warning' => $warning,
+            'stats' => $savedStats,
+            'requestedStats' => $requestedStats,
+            'statsMatchRequest' => $statsMatchRequest,
+            'local' => $savedLocal,
+        ], 200);
     } else {
-        sendResponse(['message' => 'Local updated successfully', 'affectedRows' => $affectedRows]);
+        sendResponse([
+            'message' => 'Local updated successfully',
+            'affectedRows' => $affectedRows,
+            'stats' => $savedStats,
+            'requestedStats' => $requestedStats,
+            'statsMatchRequest' => $statsMatchRequest,
+            'local' => $savedLocal,
+        ]);
     }
 } else {
     error_log("[ADMIN_LOCALS_UPDATE] **UPDATE FAILED**: " . $conn->error);

@@ -71,7 +71,7 @@ function AppContent() {
       {!isAdminRoute && <Navbar />}
       <ScrollToHash />
 
-      <main style={{ paddingTop: isAdminRoute ? 0 : undefined }}>
+      <main className={isAdminRoute ? 'main--admin' : undefined}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/secure-management/v3/k7n4m9p2q8c1x5j3/portal/login" element={<AdminLogin />} />

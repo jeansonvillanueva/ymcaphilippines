@@ -66,7 +66,7 @@ export default function AdminLogin() {
         setPassword('');
       }
     } catch (err) {
-      const axiosError = err as any;
+      const axiosError = err as { response?: { data?: { error?: string }; status?: number }; message?: string };
       const serverError = axiosError?.response?.data?.error;
       const status = axiosError?.response?.status;
 
@@ -74,12 +74,18 @@ export default function AdminLogin() {
         setError(serverError);
       } else if (status === 503) {
         setError('Server unavailable. Please try again later.');
+      } else if (!axiosError?.response) {
+        setError(
+          'Cannot reach the login API. Confirm php-api is uploaded and the site uses the correct API URL (check Network tab for the login request).',
+        );
+      } else if (status === 404) {
+        setError('Login API not found (404). Re-upload php-api and verify index.php routing.');
       } else {
         setError('Invalid username or password');
       }
 
       setPassword('');
-      console.error('Login error:', err);
+      console.error('Login failed:', { status, url: LOGIN_URL, err });
     } finally {
       setIsLoading(false);
     }

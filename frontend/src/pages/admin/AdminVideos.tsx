@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ADMIN_API_URL } from '../../hooks/useApi';
+import { useAdminEditingLabel, type AdminEditingItemChange } from './useAdminEditingLabel';
 
 interface Video {
   id?: number;
@@ -10,7 +11,11 @@ interface Video {
   videoUrl?: string;
 }
 
-export default function AdminVideos() {
+type Props = {
+  onEditingItemChange?: AdminEditingItemChange;
+};
+
+export default function AdminVideos({ onEditingItemChange }: Props) {
   const [videos, setVideos] = useState<Video[]>([]);
   const [form, setForm] = useState<Video>({
     title: '',
@@ -23,6 +28,8 @@ export default function AdminVideos() {
   const [loading, setLoading] = useState(true);
 
   const API_URL = `${ADMIN_API_URL}/videos`;
+
+  useAdminEditingLabel(onEditingItemChange, editingId !== null, form.title);
 
   useEffect(() => {
     fetchVideos();

@@ -68,6 +68,7 @@ function Home() {
   useLoadingScreen(videosLoading || newsLoading);
 
   const heroSlides = useMemo<HeroSlide[]>(() => {
+    if (!Array.isArray(news)) return [];
     const latest = [...news]
       // Don't exclude the newest item just because it has no image yet.
       // We fall back to the featured placeholder image below.

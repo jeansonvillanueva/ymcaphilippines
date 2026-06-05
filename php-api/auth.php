@@ -19,10 +19,14 @@ if (session_status() === PHP_SESSION_NONE) {
         }
     }
     
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443);
+
     if (!session_start([
         'cookie_httponly' => true,
-        // Removed cookie_samesite for local development compatibility
-        'cookie_secure' => false,
+        'cookie_secure' => $isHttps,
+        'cookie_samesite' => 'Lax',
+        'cookie_path' => '/',
     ])) {
         error_log('Failed to start session');
         // Continue without session - admin features will not work

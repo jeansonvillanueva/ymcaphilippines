@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ADMIN_API_URL } from '../../hooks/useApi';
@@ -27,7 +27,12 @@ const tabs: { id: AdminTab; label: string; icon: string }[] = [
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
+  const [editingItemName, setEditingItemName] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setEditingItemName(null);
+  }, [activeTab]);
 
   const handleLogout = async () => {
     try {
@@ -72,13 +77,19 @@ export default function AdminDashboard() {
             </button>
           </header>
 
+          {editingItemName && (
+            <div className="admin-main__editing-banner" aria-label="Currently editing">
+              <p className="admin-main__editing-label">{editingItemName}</p>
+            </div>
+          )}
+
           <section className="admin-content">
-            {activeTab === 'videos' && <AdminVideos />}
-            {activeTab === 'news' && <AdminNews />}
-            {activeTab === 'calendar' && <AdminCalendar />}
-            {activeTab === 'locals' && <AdminLocals />}
-            {activeTab === 'staff' && <AdminStaff />}
-            {activeTab === 'documents' && <AdminDocuments />}
+            {activeTab === 'videos' && <AdminVideos onEditingItemChange={setEditingItemName} />}
+            {activeTab === 'news' && <AdminNews onEditingItemChange={setEditingItemName} />}
+            {activeTab === 'calendar' && <AdminCalendar onEditingItemChange={setEditingItemName} />}
+            {activeTab === 'locals' && <AdminLocals onEditingItemChange={setEditingItemName} />}
+            {activeTab === 'staff' && <AdminStaff onEditingItemChange={setEditingItemName} />}
+            {activeTab === 'documents' && <AdminDocuments onEditingItemChange={setEditingItemName} />}
             {activeTab === 'dashboard' && <AdminSubmissions />}
           </section>
         </main>

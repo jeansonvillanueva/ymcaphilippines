@@ -281,6 +281,20 @@ if (isset($_GET['id']) && preg_match($newsPattern, $path)) {
     error_log('[INDEX.PHP] ! Pre-switch handler NOT triggered');
 }
 
+// Pillar programs must route before generic /locals/:id (some hosts mis-order switch cases).
+$localPillarProgramsPattern = '/^(\/n2r8k5j9m1\/locals\/([^\/]+)\/pillar-programs|\/admin\/locals\/([^\/]+)\/pillar-programs|\/secure-management\/v3\/k7n4m9p2q8c1x5j3\/portal\/locals\/([^\/]+)\/pillar-programs)$/';
+if (preg_match($localPillarProgramsPattern, $path, $pillarRouteMatches)) {
+    $_GET['id'] = firstNonEmptyMatch($pillarRouteMatches, [2, 3, 4]);
+    if ($requestMethod === 'GET') {
+        require_once 'endpoints/admin_locals_pillar_programs_get.php';
+        exit;
+    }
+    if ($requestMethod === 'PUT' || $requestMethod === 'POST') {
+        require_once 'endpoints/admin_locals_pillar_programs_save.php';
+        exit;
+    }
+}
+
 // Route the request
 switch ($path) {
     // Test route
@@ -329,6 +343,12 @@ switch ($path) {
     case '/api/locals':
         if ($requestMethod === 'GET') {
             require_once 'endpoints/locals.php';
+        }
+        break;
+
+    case '/api/stats/community-programs':
+        if ($requestMethod === 'GET') {
+            require_once 'endpoints/stats_community_programs.php';
         }
         break;
 
@@ -557,11 +577,20 @@ switch ($path) {
         }
         break;
 
+    case (preg_match('/^(\/n2r8k5j9m1\/locals\/([^\/]+)\/pillar-programs|\/admin\/locals\/([^\/]+)\/pillar-programs|\/secure-management\/v3\/k7n4m9p2q8c1x5j3\/portal\/locals\/([^\/]+)\/pillar-programs)$/', $path, $matches) ? true : false):
+        $_GET['id'] = firstNonEmptyMatch($matches, [2, 3, 4]);
+        if ($requestMethod === 'GET') {
+            require_once 'endpoints/admin_locals_pillar_programs_get.php';
+        } elseif ($requestMethod === 'PUT' || $requestMethod === 'POST') {
+            require_once 'endpoints/admin_locals_pillar_programs_save.php';
+        }
+        break;
+
     case (preg_match('/^(\/n2r8k5j9m1\/locals\/([^\/]+)|\/admin\/locals\/([^\/]+)|\/secure-management\/v3\/k7n4m9p2q8c1x5j3\/portal\/locals\/([^\/]+))$/', $path, $matches) ? true : false):
         $_GET['id'] = firstNonEmptyMatch($matches, [2, 3, 4]);
         if ($requestMethod === 'GET') {
             require_once 'endpoints/admin_locals_detail.php';
-        } elseif ($requestMethod === 'PUT') {
+        } elseif ($requestMethod === 'PUT' || $requestMethod === 'POST') {
             require_once 'endpoints/admin_locals_update.php';
         }
         break;
@@ -700,6 +729,7 @@ switch ($path) {
         break;
 
     case '/database-init':
+    case '/php-api/database-init':
         if ($requestMethod === 'GET' || $requestMethod === 'POST') {
             require_once 'database-init.php';
         }
@@ -724,5 +754,7 @@ switch ($path) {
 }
 
 // Close database connection
-$conn->close();
+if ($conn instanceof mysqli) {
+    $conn->close();
+}
 ?>

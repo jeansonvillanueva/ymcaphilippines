@@ -1,5 +1,9 @@
 <?php
 // GET /api/calendar - Public calendar endpoint (no auth required)
+if (!$conn) {
+    sendResponse([]);
+}
+
 $result = $conn->query("SELECT * FROM calendar_events ORDER BY start_date DESC, date DESC");
 if ($result) {
     $events = [];
