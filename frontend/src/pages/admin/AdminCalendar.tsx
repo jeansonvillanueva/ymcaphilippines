@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { ADMIN_API_URL } from '../../hooks/useApi';
+import { ADMIN_API_URL, adminRequestConfig } from '../../hooks/useApi';
 import { useAdminEditingLabel, type AdminEditingItemChange } from './useAdminEditingLabel';
 
 interface CalendarEvent {
@@ -11,6 +11,11 @@ interface CalendarEvent {
   endDate?: string;
   description?: string;
   imageUrl?: string;
+  documentTitle?: string;
+  documentUrl?: string;
+  documentFileName?: string;
+  documentFileType?: string;
+  documentFileSize?: number;
 }
 
 type Props = {
@@ -25,8 +30,12 @@ export default function AdminCalendar({ onEditingItemChange }: Props) {
     endDate: '',
     description: '',
     imageUrl: '',
+    documentTitle: '',
+    documentUrl: '',
+    documentFileName: '',
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [documentFile, setDocumentFile] = useState<File | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -37,7 +46,7 @@ export default function AdminCalendar({ onEditingItemChange }: Props) {
 
   const fetchEvents = useCallback(async () => {
     try {
-      const response = await axios.get(API_URL);
+      const response = await axios.get(API_URL, adminRequestConfig);
       setEvents(response.data);
       setLoading(false);
     } catch (error) {
@@ -76,6 +85,65 @@ export default function AdminCalendar({ onEditingItemChange }: Props) {
     reader.readAsDataURL(file);
   };
 
+  const handleDocumentFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'text/plain',
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      setMessage({ type: 'error', text: 'Only PDF, DOC, DOCX, XLS, XLSX, and TXT files are allowed' });
+      return;
+    }
+
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      setMessage({ type: 'error', text: 'Document must be 10 MB or smaller' });
+      return;
+    }
+
+    setDocumentFile(file);
+    setMessage(null);
+  };
+
+  const formatFileSize = (bytes?: number) => {
+    if (!bytes) return 'N/A';
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  };
+
+  const resetForm = () => {
+    setForm({
+      title: '',
+      startDate: '',
+      endDate: '',
+      description: '',
+      imageUrl: '',
+      documentTitle: '',
+      documentUrl: '',
+      documentFileName: '',
+    });
+    setImageFile(null);
+    setDocumentFile(null);
+    const documentInput = document.getElementById('calendar-document-input') as HTMLInputElement;
+    if (documentInput) documentInput.value = '';
+  };
+
+  const uploadRequestConfig = {
+    ...adminRequestConfig,
+    timeout: 120000,
+    maxContentLength: Infinity,
+    maxBodyLength: Infinity,
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title.trim()) {
@@ -94,6 +162,16 @@ export default function AdminCalendar({ onEditingItemChange }: Props) {
 
     if (startDate > endDate) {
       setMessage({ type: 'error', text: 'Start date cannot be after end date' });
+      return;
+    }
+
+    const documentTitle = (form.documentTitle || '').trim();
+    if (documentFile && !documentTitle) {
+      setMessage({ type: 'error', text: 'Document title is required when uploading a document' });
+      return;
+    }
+    if (!editingId && documentTitle && !documentFile) {
+      setMessage({ type: 'error', text: 'Document file is required when a document title is provided' });
       return;
     }
 
@@ -132,6 +210,17 @@ export default function AdminCalendar({ onEditingItemChange }: Props) {
       } else if (form.imageUrl && !form.imageUrl.startsWith('data:')) {
         formData.append('imageUrl', form.imageUrl);
       }
+      if (documentTitle) {
+        formData.append('documentTitle', documentTitle);
+      }
+      if (documentFile) {
+        formData.append('document', documentFile);
+      } else if (form.documentUrl) {
+        formData.append('documentUrl', form.documentUrl);
+        if (form.documentFileName) formData.append('documentFileName', form.documentFileName);
+        if (form.documentFileType) formData.append('documentFileType', form.documentFileType);
+        if (form.documentFileSize) formData.append('documentFileSize', String(form.documentFileSize));
+      }
 
       // Extensive logging for debugging
       console.log('=== CALENDAR EVENT SUBMISSION ===');
@@ -154,9 +243,11 @@ export default function AdminCalendar({ onEditingItemChange }: Props) {
       });
 
       if (editingId) {
-        console.log(`[UPDATE] Sending PUT request to: ${API_URL}/${editingId}`);
+        formData.append('_method', 'PUT');
+        formData.append('id', String(editingId));
+        console.log(`[UPDATE] Sending POST request to: ${API_URL}/${editingId}`);
         console.log('[UPDATE] Waiting for response...');
-        const response = await axios.put(`${API_URL}/${editingId}`, formData);
+        const response = await axios.post(`${API_URL}/${editingId}`, formData, uploadRequestConfig);
         console.log('[UPDATE] Response received:', {
           status: response.status,
           data: response.data,
@@ -171,7 +262,7 @@ export default function AdminCalendar({ onEditingItemChange }: Props) {
       } else {
         console.log(`[CREATE] Sending POST request to: ${API_URL}`);
         console.log('[CREATE] Waiting for response...');
-        const response = await axios.post(API_URL, formData);
+        const response = await axios.post(API_URL, formData, uploadRequestConfig);
         console.log('[CREATE] Response received:', {
           status: response.status,
           statusText: response.statusText,
@@ -189,8 +280,7 @@ export default function AdminCalendar({ onEditingItemChange }: Props) {
           setMessage({ type: 'success', text: 'Event added successfully' });
         }
       }
-      setForm({ title: '', startDate: '', endDate: '', description: '', imageUrl: '' });
-      setImageFile(null);
+      resetForm();
       setEditingId(null);
       
       // Refetch events with a small delay to ensure database write completes
@@ -208,18 +298,19 @@ export default function AdminCalendar({ onEditingItemChange }: Props) {
   const handleEdit = (event: CalendarEvent) => {
     setForm(event);
     setEditingId(event.id || null);
+    setImageFile(null);
+    setDocumentFile(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id: number) => {
     if (confirm('Are you sure you want to delete this event?')) {
       try {
-        await axios.delete(`${API_URL}/${id}`);
+        await axios.delete(`${API_URL}/${id}`, adminRequestConfig);
         setMessage({ type: 'success', text: 'Event deleted successfully' });
         fetchEvents();
         if (editingId === id) {
-          setForm({ title: '', startDate: '', endDate: '', description: '', imageUrl: '' });
-          setImageFile(null);
+          resetForm();
           setEditingId(null);
         }
       } catch (error) {
@@ -304,6 +395,46 @@ export default function AdminCalendar({ onEditingItemChange }: Props) {
           ) : null}
         </div>
 
+        <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+          <label htmlFor="document-title">Document Title (optional)</label>
+          <input
+            id="document-title"
+            type="text"
+            name="documentTitle"
+            placeholder="e.g., Event Program Schedule"
+            value={form.documentTitle || ''}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+          <label htmlFor="calendar-document-input">
+            Upload Document (optional) (PDF, DOC, DOCX, XLS, XLSX, TXT)
+          </label>
+          <input
+            id="calendar-document-input"
+            type="file"
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.txt"
+            onChange={handleDocumentFileChange}
+          />
+          {documentFile && (
+            <p style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: '#666' }}>
+              Selected: {documentFile.name} ({formatFileSize(documentFile.size)})
+            </p>
+          )}
+          {!documentFile && form.documentFileName && (
+            <p style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: '#666' }}>
+              Current file: {form.documentFileName}
+              {form.documentUrl ? (
+                <>
+                  {' '}
+                  (<a href={form.documentUrl} target="_blank" rel="noopener noreferrer">View</a>)
+                </>
+              ) : null}
+            </p>
+          )}
+        </div>
+
         <div className="form-actions" style={{ gridColumn: '1 / -1' }}>
           <button type="submit" className="btn btn-primary">
             {editingId ? 'Update Event' : 'Add Event'}
@@ -312,8 +443,7 @@ export default function AdminCalendar({ onEditingItemChange }: Props) {
             <button
               type="button"
               onClick={() => {
-                setForm({ title: '', startDate: '', endDate: '', description: '', imageUrl: '' });
-                setImageFile(null);
+                resetForm();
                 setEditingId(null);
               }}
               className="btn btn-secondary"
@@ -358,6 +488,19 @@ export default function AdminCalendar({ onEditingItemChange }: Props) {
                 {event.description && <p className="admin-item-subtitle">{event.description}</p>}
                 {event.imageUrl && (
                   <p className="admin-item-content"><strong>Image:</strong> {event.imageUrl.substring(0, 50)}...</p>
+                )}
+                {event.documentTitle && (
+                  <p className="admin-item-content">
+                    <strong>Document:</strong>{' '}
+                    {event.documentUrl ? (
+                      <a href={event.documentUrl} target="_blank" rel="noopener noreferrer">
+                        {event.documentTitle}
+                      </a>
+                    ) : (
+                      event.documentTitle
+                    )}
+                    {event.documentFileName ? ` (${event.documentFileName})` : ''}
+                  </p>
                 )}
                 <div className="admin-item-actions">
                   <button onClick={() => handleEdit(event)} className="btn btn-secondary btn-small">

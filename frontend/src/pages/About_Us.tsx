@@ -397,7 +397,7 @@ function AboutUs() {
         <div className="page-section__inner">
           <SubjectHeader text="About Us" className="reveal" />
           <p className="about-us__subtitle reveal">
-            The YMCA is a nonprofit organization that has been helping Filipino youth improve their lives since 1911.
+          The YMCA of the Philippines is a nonprofit, volunteer-driven organization dedicated to empowering young people and strengthening communities through programs that nurture leadership, character, and holistic development. Guided by the YMCA’s vision of a world where every person lives in harmony with self, society, and creation, the YMCA of the Philippines inspires individuals to become responsible citizens and servant leaders who contribute to building a just, sustainable, equitable, and inclusive society.
           </p>
 
           <div className="about-us-top reveal reveal-delay-1">
@@ -559,7 +559,7 @@ function AboutUs() {
           <div className="org-chart-card__name" style={{ textAlign: 'center', marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
             <div>NATIONAL BOARD OF TRUSTEES</div>
             <div style={{ fontSize: '4rem', lineHeight: '1' }}>↓</div>
-            <div>FEDERATIONAL OFFICE</div>
+            <div>FEDERATION OFFICE</div>
           </div>
           {loadingStaff ? (
             <div className="loading">Loading staff members...</div>

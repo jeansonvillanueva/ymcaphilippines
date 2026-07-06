@@ -68,6 +68,30 @@
   color: var(--ymca-text);
 }
 
+.calendar-details__document {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  font-size: 0.95rem;
+  color: var(--ymca-text);
+}
+
+.calendar-details__document-label {
+  font-weight: 600;
+  color: var(--ymca-navy);
+}
+
+.calendar-details__document-link {
+  color: var(--ymca-red, #c41e3a);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.calendar-details__document-link:hover {
+  color: var(--ymca-navy);
+}
+
 .calendar-details__image-wrap {
   width: 100%;
   margin-bottom: 1rem;

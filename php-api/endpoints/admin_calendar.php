@@ -13,6 +13,11 @@ if ($result) {
             'endDate' => $row['end_date'],      // snake_case -> camelCase
             'description' => $row['description'],
             'imageUrl' => $row['imageUrl'],
+            'documentTitle' => $row['documentTitle'] ?? null,
+            'documentUrl' => $row['documentUrl'] ?? null,
+            'documentFileName' => $row['documentFileName'] ?? null,
+            'documentFileType' => $row['documentFileType'] ?? null,
+            'documentFileSize' => isset($row['documentFileSize']) ? (int)$row['documentFileSize'] : null,
             'created_at' => $row['created_at'],
             'updated_at' => $row['updated_at'],
         ];

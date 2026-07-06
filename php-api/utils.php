@@ -8,6 +8,58 @@ if (!is_dir($uploadDir)) {
 }
 
 // Function to handle file uploads
+function handleDocumentUpload($fieldName = 'document') {
+    if (!isset($_FILES[$fieldName])) {
+        error_log('[handleDocumentUpload] No file uploaded for field: ' . $fieldName);
+        return null;
+    }
+
+    $file = $_FILES[$fieldName];
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        error_log('[handleDocumentUpload] Upload error for ' . $fieldName . ': ' . $file['error']);
+        return null;
+    }
+
+    $allowedTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'text/plain',
+    ];
+
+    if (!in_array($file['type'], $allowedTypes)) {
+        sendResponse(['error' => 'Only PDF, DOC, DOCX, XLS, XLSX, and TXT files are allowed'], 400);
+    }
+
+    if ($file['size'] > 10 * 1024 * 1024) {
+        sendResponse(['error' => 'Document file size must be less than 10MB'], 400);
+    }
+
+    $uploadDir = __DIR__ . '/uploads/documents/';
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0755, true);
+    }
+
+    $uniqueFilename = time() . '_' . basename($file['name']);
+    $filePath = $uploadDir . $uniqueFilename;
+
+    if (!move_uploaded_file($file['tmp_name'], $filePath)) {
+        sendResponse(['error' => 'Failed to save document file'], 500);
+    }
+
+    $basePath = getUploadBasePath();
+    $urlPrefix = $basePath !== '' ? $basePath . '/php-api/uploads/documents/' : '/php-api/uploads/documents/';
+
+    return [
+        'url' => $urlPrefix . $uniqueFilename,
+        'name' => $file['name'],
+        'type' => $file['type'],
+        'size' => (int)$file['size'],
+    ];
+}
+
 function handleFileUpload($fieldName = 'image') {
     global $uploadDir;
 
@@ -137,7 +189,8 @@ function getNumericRouteId($segment) {
 // Function to get POST data - handles both JSON and FormData
 function getPostData() {
     $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
-    $requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+    $actualMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+    $requestMethod = $actualMethod;
 
     // Check for method override
     $methodOverride = $_POST['_method'] ?? $_GET['_method'] ?? null;
@@ -147,6 +200,12 @@ function getPostData() {
 
     error_log('[getPostData] Method: ' . $requestMethod . ', Content-Type: ' . $contentType);
     error_log('[getPostData] _POST count: ' . count($_POST) . ', _FILES count: ' . count($_FILES));
+
+    // POST multipart (including _method=PUT overrides): PHP already parsed fields/files.
+    if ($actualMethod === 'POST' && !empty($_POST)) {
+        error_log('[getPostData] Using _POST from actual POST request');
+        return $_POST;
+    }
 
     // For PUT/DELETE requests, prioritize JSON parsing
     if (in_array($requestMethod, ['PUT', 'DELETE', 'PATCH'])) {
@@ -430,6 +489,28 @@ function ensureDatabaseSchema($conn) {
     }
 
     ensureNewsUtf8Mb4($conn);
+
+    $calendarColumns = [
+        'documentTitle' => 'VARCHAR(255) DEFAULT NULL',
+        'documentUrl' => 'VARCHAR(500) DEFAULT NULL',
+        'documentFileName' => 'VARCHAR(255) DEFAULT NULL',
+        'documentFileType' => 'VARCHAR(100) DEFAULT NULL',
+        'documentFileSize' => 'INT DEFAULT NULL',
+    ];
+
+    $calendarTableCheck = $conn->query("SHOW TABLES LIKE 'calendar_events'");
+    if ($calendarTableCheck && $calendarTableCheck->num_rows > 0) {
+        foreach ($calendarColumns as $column => $definition) {
+            $columnCheck = $conn->query("SHOW COLUMNS FROM calendar_events LIKE '$column'");
+            if ($columnCheck && $columnCheck->num_rows > 0) {
+                continue;
+            }
+            $alterResult = $conn->query("ALTER TABLE calendar_events ADD COLUMN `$column` $definition");
+            if (!$alterResult) {
+                error_log("[ensureDatabaseSchema] Failed to add calendar_events.$column: " . $conn->error);
+            }
+        }
+    }
 
     $newsColumns = [
         'body' => 'TEXT',

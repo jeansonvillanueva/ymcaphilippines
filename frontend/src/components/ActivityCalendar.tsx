@@ -5,6 +5,7 @@ import type { EventClickArg } from '@fullcalendar/core';
 import type { EventInput } from '@fullcalendar/core';
 
 export type CalendarEvent = {
+  id?: number;
   title: string;
   date?: string;
   startDate?: string;
@@ -14,11 +15,14 @@ export type CalendarEvent = {
   description?: string;
   image?: string;
   imageUrl?: string;
+  documentTitle?: string;
+  documentUrl?: string;
+  documentFileName?: string;
 };
 
 type Props = {
   onEventClick?: (event: CalendarEvent) => void;
-  events?: Array<CalendarEvent | { title: string; date?: string; startDate?: string; endDate?: string; start?: string; end?: string; description?: string; imageUrl?: string; image?: string }>;
+  events?: Array<CalendarEvent | { id?: number; title: string; date?: string; startDate?: string; endDate?: string; start?: string; end?: string; description?: string; imageUrl?: string; image?: string; documentTitle?: string; documentUrl?: string; documentFileName?: string }>;
 };
 
 function ymdToday() {
@@ -47,6 +51,13 @@ function ActivityCalendar({ onEventClick, events }: Props) {
   // Convert API events to FullCalendar format
   // Supports both old single-date format and new date-range format
   const calendarEvents: EventInput[] = (events || []).map((e) => {
+    const documentProps = {
+      id: e.id,
+      documentTitle: e.documentTitle,
+      documentUrl: e.documentUrl,
+      documentFileName: e.documentFileName,
+    };
+
     // For date range events (new format)
     if (e.startDate && e.endDate) {
       return {
@@ -58,7 +69,8 @@ function ActivityCalendar({ onEventClick, events }: Props) {
           image: e.imageUrl || e.image,
           startDate: e.startDate,
           endDate: e.endDate,
-          originalDate: e.startDate
+          originalDate: e.startDate,
+          ...documentProps,
         },
       };
     }
@@ -70,7 +82,8 @@ function ActivityCalendar({ onEventClick, events }: Props) {
         extendedProps: { 
           description: e.description, 
           image: e.imageUrl || e.image,
-          originalDate: e.date
+          originalDate: e.date,
+          ...documentProps,
         },
       };
     }
@@ -81,6 +94,7 @@ function ActivityCalendar({ onEventClick, events }: Props) {
       extendedProps: {
         description: e.description,
         image: e.imageUrl || e.image,
+        ...documentProps,
       },
     };
   });
@@ -91,12 +105,16 @@ function ActivityCalendar({ onEventClick, events }: Props) {
     const originalDate = arg.event.extendedProps.originalDate || (arg.event.startStr || '').slice(0, 10);
     
     onEventClick?.({
+      id: arg.event.extendedProps.id,
       title: arg.event.title,
       date: originalDate,
       startDate: startDate,
       endDate: endDate,
       description: arg.event.extendedProps.description,
       image: arg.event.extendedProps.image,
+      documentTitle: arg.event.extendedProps.documentTitle,
+      documentUrl: arg.event.extendedProps.documentUrl,
+      documentFileName: arg.event.extendedProps.documentFileName,
     });
   };
 

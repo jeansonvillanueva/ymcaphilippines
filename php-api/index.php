@@ -281,6 +281,28 @@ if (isset($_GET['id']) && preg_match($newsPattern, $path)) {
     error_log('[INDEX.PHP] ! Pre-switch handler NOT triggered');
 }
 
+$calendarUpdatePattern = '/^(\/n2r8k5j9m1\/calendar\/(\d+)|\/secure-management\/v3\/k7n4m9p2q8c1x5j3\/portal\/calendar\/(\d+)|\/admin\/calendar\/(\d+))$/';
+if (preg_match($calendarUpdatePattern, $path, $calendarRouteMatches)) {
+    $_GET['id'] = firstNonEmptyMatch($calendarRouteMatches, [2, 3, 4]);
+    if ($requestMethod === 'PUT') {
+        require_once 'endpoints/admin_calendar_update.php';
+        exit;
+    }
+    if ($requestMethod === 'DELETE') {
+        require_once 'endpoints/admin_calendar_delete.php';
+        exit;
+    }
+    if ($requestMethod === 'POST') {
+        $calendarPostData = !empty($_POST) ? $_POST : getPostData();
+        if (!empty($calendarPostData['title'])) {
+            error_log('[INDEX.PHP] Calendar POST update routed to admin_calendar_update.php for ID ' . $_GET['id']);
+            $_SERVER['REQUEST_METHOD'] = 'PUT';
+            require_once 'endpoints/admin_calendar_update.php';
+            exit;
+        }
+    }
+}
+
 // Pillar programs must route before generic /locals/:id (some hosts mis-order switch cases).
 $localPillarProgramsPattern = '/^(\/n2r8k5j9m1\/locals\/([^\/]+)\/pillar-programs|\/admin\/locals\/([^\/]+)\/pillar-programs|\/secure-management\/v3\/k7n4m9p2q8c1x5j3\/portal\/locals\/([^\/]+)\/pillar-programs)$/';
 if (preg_match($localPillarProgramsPattern, $path, $pillarRouteMatches)) {

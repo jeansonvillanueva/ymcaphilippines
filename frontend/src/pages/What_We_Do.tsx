@@ -19,6 +19,58 @@ const normalizeImageUrl = (url?: string | null) => {
   if (url.startsWith('/php-api/uploads/')) return `/backend/${url.substring('/php-api/uploads/'.length)}`;
   return url;
 };
+
+const normalizeDocumentUrl = (url?: string | null) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (typeof window === 'undefined') return url;
+
+  const { origin, pathname } = window.location;
+  const sitePrefix = pathname === '/testsite' || pathname.startsWith('/testsite/') ? '/testsite' : '';
+
+  if (url.startsWith('/')) {
+    if (sitePrefix && !url.startsWith(sitePrefix) && url.startsWith('/php-api/')) {
+      return `${origin}${sitePrefix}${url}`;
+    }
+    return `${origin}${url}`;
+  }
+
+  return url;
+};
+
+type ApiCalendarEvent = CalendarEvent & {
+  id?: number;
+  imageUrl?: string;
+};
+
+function toCalendarDetailsEvent(event: ApiCalendarEvent): CalendarEvent {
+  return {
+    title: event.title || '',
+    date: event.date || event.startDate,
+    startDate: event.startDate,
+    endDate: event.endDate,
+    description: event.description,
+    image: normalizeImageUrl(event.imageUrl || event.image),
+    documentTitle: event.documentTitle,
+    documentUrl: event.documentUrl,
+    documentFileName: event.documentFileName,
+  };
+}
+
+function findCalendarEvent(events: ApiCalendarEvent[], hint: CalendarEvent & { id?: number }) {
+  if (hint.id != null) {
+    const byId = events.find((event) => event.id === hint.id);
+    if (byId) return byId;
+  }
+
+  return events.find((event) => {
+    if (event.title !== hint.title) return false;
+    if (hint.startDate && hint.endDate) {
+      return event.startDate === hint.startDate && event.endDate === hint.endDate;
+    }
+    return event.date === hint.date || event.startDate === hint.date;
+  });
+}
 const CARDS_PER_PAGE = 3;
 
 function extractYear(date?: string) {
@@ -62,19 +114,24 @@ const WhatWeDo: React.FC = () => {
     });
     
     if (!todayEvent) return null;
-    
-    return {
-      title: todayEvent.title || '',
-      date: todayEvent.date || todayEvent.startDate || today,
-      startDate: todayEvent.startDate,
-      endDate: todayEvent.endDate,
-      description: todayEvent.description,
-      image: todayEvent.imageUrl || todayEvent.image,
-    };
-  }, [calendarEvents]);
 
-  const [selected, setSelected] = useState<CalendarEvent | null>(initialEvent);
+    return toCalendarDetailsEvent(todayEvent);
+  }, [calendarEvents, today]);
+
+  const [selected, setSelected] = useState<CalendarEvent | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
+
+  useEffect(() => {
+    if (!Array.isArray(calendarEvents) || calendarEvents.length === 0) return;
+
+    setSelected((current) => {
+      if (current) {
+        const match = findCalendarEvent(calendarEvents, current);
+        return match ? toCalendarDetailsEvent(match) : current;
+      }
+      return initialEvent;
+    });
+  }, [calendarEvents, initialEvent]);
 
   useEffect(() => {
     setCurrentPage(0);
@@ -359,13 +416,27 @@ const WhatWeDo: React.FC = () => {
                     {/* Image above description */}
                     {selected.image && (
                       <div className="calendar-details__image-wrap">
-                        <img src={selected.image} alt={selected.title} className="calendar-details__image" />
+                        <img src={normalizeImageUrl(selected.image)} alt={selected.title} className="calendar-details__image" />
                       </div>
                     )}
 
                     <p className="calendar-details__text">
                       {selected.description ?? 'No description available for this event.'}
                     </p>
+
+                    {selected.documentUrl && (
+                      <div className="calendar-details__document">
+                        <span className="calendar-details__document-label">Document:</span>{' '}
+                        <a
+                          href={normalizeDocumentUrl(selected.documentUrl)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="calendar-details__document-link"
+                        >
+                          {selected.documentTitle || selected.documentFileName || 'View document'}
+                        </a>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
@@ -373,7 +444,13 @@ const WhatWeDo: React.FC = () => {
 
             {/* RIGHT: calendar */}
             <div className="calendar-board" aria-label="Calendar">
-              <ActivityCalendar onEventClick={(e) => setSelected(e)} events={calendarEvents} />
+              <ActivityCalendar
+                onEventClick={(clicked) => {
+                  const match = findCalendarEvent(calendarEvents, clicked);
+                  setSelected(toCalendarDetailsEvent(match ?? clicked));
+                }}
+                events={calendarEvents}
+              />
             </div>
           </div>
         </div>

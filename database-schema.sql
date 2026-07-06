@@ -141,3 +141,22 @@ CREATE TABLE IF NOT EXISTS `news_images` (
   INDEX idx_news_id (news_id),
   CONSTRAINT fk_news_images_news FOREIGN KEY (news_id) REFERENCES `news`(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Create calendar_events table (Calendar of Activities)
+CREATE TABLE IF NOT EXISTS `calendar_events` (
+  `id` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `title` varchar(255) NOT NULL,
+  `date` date NOT NULL,
+  `start_date` date DEFAULT NULL,
+  `end_date` date DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `imageUrl` varchar(500) DEFAULT NULL,
+  `documentTitle` varchar(255) DEFAULT NULL,
+  `documentUrl` varchar(500) DEFAULT NULL,
+  `documentFileName` varchar(255) DEFAULT NULL,
+  `documentFileType` varchar(100) DEFAULT NULL,
+  `documentFileSize` int DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_start_date (`start_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

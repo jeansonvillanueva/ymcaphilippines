@@ -62,6 +62,11 @@ export function initializeTables() {
       end_date DATE NOT NULL,
       description TEXT,
       imageUrl VARCHAR(500),
+      documentTitle VARCHAR(255),
+      documentUrl VARCHAR(500),
+      documentFileName VARCHAR(255),
+      documentFileType VARCHAR(100),
+      documentFileSize INT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )

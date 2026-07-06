@@ -45,22 +45,65 @@ $description = isset($data['description']) ? $conn->real_escape_string($data['de
 error_log('[CALENDAR_CREATE] Validated fields: title=' . $title . ', startDate=' . $startDate . ', endDate=' . $endDate);
 
 // Handle file upload
-$imageUrl = isset($data['imageUrl']) ? $conn->real_escape_string($data['imageUrl']) : '';
+$imageUrl = isset($data['imageUrl']) ? trim($data['imageUrl']) : '';
+if ($imageUrl !== '' && stripos($imageUrl, 'data:') === 0) {
+    $imageUrl = '';
+}
 $uploadedImagePath = handleFileUpload('image');
 if ($uploadedImagePath) {
     $imageUrl = $uploadedImagePath;
     error_log('[CALENDAR_CREATE] File uploaded: ' . $imageUrl);
 }
+$imageUrl = $conn->real_escape_string($imageUrl);
 
-// Check if created_at column exists for the insert statement
+$documentTitle = isset($data['documentTitle']) ? $conn->real_escape_string(trim($data['documentTitle'])) : '';
+$documentUrl = isset($data['documentUrl']) ? $conn->real_escape_string($data['documentUrl']) : '';
+$documentFileName = isset($data['documentFileName']) ? $conn->real_escape_string($data['documentFileName']) : '';
+$documentFileType = isset($data['documentFileType']) ? $conn->real_escape_string($data['documentFileType']) : '';
+$documentFileSize = isset($data['documentFileSize']) ? (int)$data['documentFileSize'] : 'NULL';
+
+$uploadedDocument = handleDocumentUpload('document');
+if ($uploadedDocument) {
+    if ($documentTitle === '') {
+        sendResponse(['error' => 'Document title is required when uploading a document'], 400);
+    }
+    $documentUrl = $conn->real_escape_string($uploadedDocument['url']);
+    $documentFileName = $conn->real_escape_string($uploadedDocument['name']);
+    $documentFileType = $conn->real_escape_string($uploadedDocument['type']);
+    $documentFileSize = (int)$uploadedDocument['size'];
+    error_log('[CALENDAR_CREATE] Document uploaded: ' . $documentUrl);
+} elseif ($documentTitle !== '' && $documentUrl === '') {
+    sendResponse(['error' => 'Document file is required when a document title is provided'], 400);
+} else {
+    $documentFileSize = null;
+}
+
+$insertColumns = ['title', 'date', 'start_date', 'end_date', 'description', 'imageUrl'];
+$insertValues = ["'$title'", "'$startDate'", "'$startDate'", "'$endDate'", "'$description'", "'$imageUrl'"];
+
+$documentFields = [
+    'documentTitle' => $documentTitle !== '' ? "'$documentTitle'" : 'NULL',
+    'documentUrl' => $documentUrl !== '' ? "'$documentUrl'" : 'NULL',
+    'documentFileName' => $documentFileName !== '' ? "'$documentFileName'" : 'NULL',
+    'documentFileType' => $documentFileType !== '' ? "'$documentFileType'" : 'NULL',
+    'documentFileSize' => $documentFileSize !== null ? $documentFileSize : 'NULL',
+];
+
+foreach ($documentFields as $column => $value) {
+    $columnCheck = $conn->query("SHOW COLUMNS FROM calendar_events LIKE '$column'");
+    if ($columnCheck && $columnCheck->num_rows > 0) {
+        $insertColumns[] = $column;
+        $insertValues[] = $value;
+    }
+}
+
 $createdAtExists = $conn->query("SHOW COLUMNS FROM calendar_events LIKE 'created_at'");
 if ($createdAtExists && $createdAtExists->num_rows > 0) {
-    $sql = "INSERT INTO calendar_events (title, date, start_date, end_date, description, imageUrl, created_at)
-            VALUES ('$title', '$startDate', '$startDate', '$endDate', '$description', '$imageUrl', NOW())";
-} else {
-    $sql = "INSERT INTO calendar_events (title, date, start_date, end_date, description, imageUrl)
-            VALUES ('$title', '$startDate', '$startDate', '$endDate', '$description', '$imageUrl')";
+    $insertColumns[] = 'created_at';
+    $insertValues[] = 'NOW()';
 }
+
+$sql = 'INSERT INTO calendar_events (' . implode(', ', $insertColumns) . ') VALUES (' . implode(', ', $insertValues) . ')';
 
 error_log('[CALENDAR_CREATE] Executing SQL: ' . $sql);
 

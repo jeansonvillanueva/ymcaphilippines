@@ -2,9 +2,10 @@
 // PUT /admin/calendar/:id
 error_log('[CALENDAR_UPDATE] Request received for ID: ' . ($_GET['id'] ?? 'MISSING'));
 error_log('[CALENDAR_UPDATE] Content-Type: ' . ($_SERVER['CONTENT_TYPE'] ?? 'NOT SET'));
+error_log('[CALENDAR_UPDATE] _FILES keys: ' . json_encode(array_keys($_FILES)));
 
 $data = getPostData();
-error_log('[CALENDAR_UPDATE] Parsed data: ' . json_encode($data));
+error_log('[CALENDAR_UPDATE] Parsed data keys: ' . implode(', ', array_keys($data)));
 
 $id = intval($_GET['id'] ?? $_POST['id'] ?? $data['id'] ?? 0);
 if ($id <= 0) {
@@ -29,7 +30,6 @@ if (!isset($data['endDate']) || empty($data['endDate'])) {
     sendResponse(['error' => "Field 'endDate' is required"], 400);
 }
 
-// Validate date range
 $startDate = $data['startDate'];
 $endDate = $data['endDate'];
 if ($startDate > $endDate) {
@@ -37,12 +37,17 @@ if ($startDate > $endDate) {
     sendResponse(['error' => "Start date cannot be after end date"], 400);
 }
 
-// Check if start_date and end_date columns exist
 $columnsCheck = $conn->query("SHOW COLUMNS FROM calendar_events LIKE 'start_date'");
 if (!$columnsCheck || $columnsCheck->num_rows === 0) {
     error_log('[CALENDAR_UPDATE] CRITICAL: start_date column missing! Migration not applied.');
     sendResponse(['error' => 'Database schema error: start_date column missing. Please run the database migration.'], 500);
 }
+
+$existingResult = $conn->query("SELECT * FROM calendar_events WHERE id=$id LIMIT 1");
+if (!$existingResult || $existingResult->num_rows === 0) {
+    sendResponse(['error' => 'Event not found'], 404);
+}
+$existing = $existingResult->fetch_assoc();
 
 $title = $conn->real_escape_string($data['title']);
 $startDate = $conn->real_escape_string($data['startDate']);
@@ -51,12 +56,52 @@ $description = isset($data['description']) ? $conn->real_escape_string($data['de
 
 error_log('[CALENDAR_UPDATE] Validated fields for ID ' . $id . ': title=' . $title . ', startDate=' . $startDate . ', endDate=' . $endDate);
 
-// Handle file upload
-$imageUrl = isset($data['imageUrl']) ? $conn->real_escape_string($data['imageUrl']) : '';
+$imageUrl = isset($data['imageUrl']) ? trim($data['imageUrl']) : '';
+if ($imageUrl !== '' && stripos($imageUrl, 'data:') === 0) {
+    $imageUrl = '';
+}
+$imageUrl = $conn->real_escape_string($imageUrl);
+
 $uploadedImagePath = handleFileUpload('image');
 if ($uploadedImagePath) {
-    $imageUrl = $uploadedImagePath;
-    error_log('[CALENDAR_UPDATE] File uploaded: ' . $imageUrl);
+    $imageUrl = $conn->real_escape_string($uploadedImagePath);
+    error_log('[CALENDAR_UPDATE] Image uploaded: ' . $uploadedImagePath);
+} elseif ($imageUrl === '') {
+    $imageUrl = $conn->real_escape_string($existing['imageUrl'] ?? '');
+}
+
+$documentTitle = isset($data['documentTitle']) ? $conn->real_escape_string(trim($data['documentTitle'])) : '';
+$documentUrl = isset($data['documentUrl']) ? $conn->real_escape_string($data['documentUrl']) : '';
+$documentFileName = isset($data['documentFileName']) ? $conn->real_escape_string($data['documentFileName']) : '';
+$documentFileType = isset($data['documentFileType']) ? $conn->real_escape_string($data['documentFileType']) : '';
+$documentFileSize = isset($data['documentFileSize']) ? (int)$data['documentFileSize'] : null;
+
+$uploadedDocument = handleDocumentUpload('document');
+if ($uploadedDocument) {
+    if ($documentTitle === '') {
+        sendResponse(['error' => 'Document title is required when uploading a document'], 400);
+    }
+    $documentUrl = $conn->real_escape_string($uploadedDocument['url']);
+    $documentFileName = $conn->real_escape_string($uploadedDocument['name']);
+    $documentFileType = $conn->real_escape_string($uploadedDocument['type']);
+    $documentFileSize = (int)$uploadedDocument['size'];
+    error_log('[CALENDAR_UPDATE] Document uploaded: ' . $uploadedDocument['url']);
+} else {
+    if ($documentTitle === '') {
+        $documentTitle = $conn->real_escape_string($existing['documentTitle'] ?? '');
+    }
+    if ($documentUrl === '') {
+        $documentUrl = $conn->real_escape_string($existing['documentUrl'] ?? '');
+    }
+    if ($documentFileName === '') {
+        $documentFileName = $conn->real_escape_string($existing['documentFileName'] ?? '');
+    }
+    if ($documentFileType === '') {
+        $documentFileType = $conn->real_escape_string($existing['documentFileType'] ?? '');
+    }
+    if ($documentFileSize === null && isset($existing['documentFileSize'])) {
+        $documentFileSize = (int)$existing['documentFileSize'];
+    }
 }
 
 $updateParts = [
@@ -67,6 +112,21 @@ $updateParts = [
     "description='$description'",
     "imageUrl='$imageUrl'",
 ];
+
+$documentColumns = [
+    'documentTitle' => $documentTitle !== '' ? "'$documentTitle'" : 'NULL',
+    'documentUrl' => $documentUrl !== '' ? "'$documentUrl'" : 'NULL',
+    'documentFileName' => $documentFileName !== '' ? "'$documentFileName'" : 'NULL',
+    'documentFileType' => $documentFileType !== '' ? "'$documentFileType'" : 'NULL',
+    'documentFileSize' => $documentFileSize !== null ? $documentFileSize : 'NULL',
+];
+
+foreach ($documentColumns as $column => $value) {
+    $columnCheck = $conn->query("SHOW COLUMNS FROM calendar_events LIKE '$column'");
+    if ($columnCheck && $columnCheck->num_rows > 0) {
+        $updateParts[] = "$column=$value";
+    }
+}
 
 $updatedAtExists = $conn->query("SHOW COLUMNS FROM calendar_events LIKE 'updated_at'");
 if ($updatedAtExists && $updatedAtExists->num_rows > 0) {
@@ -79,9 +139,9 @@ error_log('[CALENDAR_UPDATE] Executing SQL: ' . $sql);
 
 if ($conn->query($sql) === TRUE) {
     error_log('[CALENDAR_UPDATE] SUCCESS: Event ID ' . $id . ' updated');
-
-    sendResponse(['message' => 'Event updated successfully']);
-} else {
-    sendResponse(['error' => 'Database error: ' . $conn->error], 500);
+    sendResponse(['message' => 'Event updated successfully', 'id' => $id]);
 }
+
+error_log('[CALENDAR_UPDATE] Database error: ' . $conn->error);
+sendResponse(['error' => 'Database error: ' . $conn->error], 500);
 ?>
